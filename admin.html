@@ -1,0 +1,2281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Panel del propietario | Hotel Cabaleón</title>
+    <meta name="theme-color" content="#0A212E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <script src="tailwindcss.js"></script>
+    <script src="lucide.min.js"></script><!-- Íconos Lucide 1.47.0 -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#0A212E',
+                        'ink-soft': '#16323F',
+                        brass: '#C9A063',
+                        'brass-deep': '#A8834A',
+                        bone: '#F7F5F0',
+                        sand: '#EDE7DD',
+                        moss: '#4E6B4F',
+                        graphite: '#20292E',
+                        line: 'rgba(10, 33, 46, 0.13)',
+                        'line-light': 'rgba(255, 255, 255, 0.16)'
+                    },
+                    fontFamily: {
+                        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --ink: #0A212E;
+            --brass: #C9A063;
+            --bone: #F7F5F0;
+            --line: rgba(10, 33, 46, 0.13);
+        }
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { background: var(--bone); color: #20292E; font-family: Inter, system-ui, sans-serif; font-weight: 300; }
+        h1, h2, h3, .font-display { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; }
+        ::selection { background: var(--brass); color: #fff; }
+
+        .micro {
+            font-size: 0.6rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: 0.8rem;
+            font-size: 0.58rem; font-weight: 600; letter-spacing: 0.3em;
+            text-transform: uppercase; color: var(--brass);
+        }
+        .eyebrow::before { content: ""; width: 28px; height: 1px; background: currentColor; opacity: .65; }
+
+        .field-input {
+            width: 100%;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            padding: 0.85rem 1rem;
+            font-size: 0.9rem;
+            color: var(--ink);
+            transition: border-color .3s;
+        }
+        .field-input:focus { outline: none; border-color: var(--brass); }
+        .field-input[readonly] { background: var(--bone); color: rgba(10,33,46,.7); }
+        .field-label {
+            display: block;
+            font-size: 0.55rem;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: rgba(10,33,46,.5);
+            margin-bottom: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem;
+            padding: 0.9rem 1.7rem;
+            font-size: 0.64rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+            border: 1px solid transparent; border-radius: 2px; cursor: pointer;
+            transition: background-color .35s, color .35s, border-color .35s;
+        }
+        .btn:disabled { opacity: .6; cursor: wait; }
+        .btn-ink { background: var(--ink); color: #fff; }
+        .btn-ink:hover { background: var(--brass); color: var(--ink); }
+        .btn-outline { border-color: var(--line); color: var(--ink); background: transparent; }
+        .btn-outline:hover { border-color: var(--ink); }
+        .btn-sm { padding: 0.6rem 1.1rem; font-size: 0.58rem; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 0.85rem;
+            padding: 0.7rem 1rem;
+            font-size: 0.78rem; font-weight: 400;
+            color: rgba(255,255,255,.55);
+            border-left: 2px solid transparent;
+            cursor: pointer;
+            transition: color .3s, background-color .3s, border-color .3s;
+        }
+        .nav-item:hover { color: #fff; background: rgba(255,255,255,.04); }
+        .nav-item.is-active { color: #fff; background: rgba(255,255,255,.06); border-left-color: var(--brass); }
+
+        .view { display: none; }
+        .view.is-active { display: block; animation: fade .4s ease both; }
+        @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        .card { background: #fff; border: 1px solid var(--line); border-radius: 3px; }
+
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td {
+            text-align: left; padding: 0.9rem 1rem; font-size: 0.82rem;
+            border-bottom: 1px solid var(--line); white-space: nowrap;
+        }
+        .data-table th {
+            font-size: 0.54rem; letter-spacing: 0.2em; text-transform: uppercase;
+            font-weight: 600; color: rgba(10,33,46,.42);
+        }
+        .data-table tbody tr:hover { background: var(--bone); }
+        .data-table tbody tr.fila { cursor: pointer; }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+
+        .pill {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.2rem 0.6rem; border-radius: 999px;
+            font-size: 0.58rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+        }
+        .pill-green { background: rgba(78,107,79,.12); color: #3d5a3e; }
+        .pill-amber { background: rgba(201,160,99,.16); color: #8a6a34; }
+        .pill-red { background: rgba(160,60,60,.12); color: #8a3d3d; }
+        .pill-gray { background: rgba(10,33,46,.08); color: rgba(10,33,46,.6); }
+
+        .chip {
+            padding: 0.4rem 0.85rem; border: 1px solid var(--line);
+            font-size: 0.62rem; font-weight: 600; letter-spacing: 0.08em;
+            color: rgba(10,33,46,.55); background: transparent; cursor: pointer;
+            transition: background-color .3s, color .3s, border-color .3s;
+        }
+        .chip:hover { border-color: var(--ink); color: var(--ink); }
+        .chip.is-active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+        .cal-day {
+            aspect-ratio: 1; display: flex; flex-direction: column; gap: 2px;
+            align-items: center; justify-content: center;
+            border: 1px solid var(--line); font-size: 0.75rem;
+            background: #fff; color: inherit; font-family: inherit;
+            transition: border-color .3s, box-shadow .3s;
+        }
+        button.cal-day { cursor: pointer; }
+        button.cal-day:hover { border-color: var(--ink); }
+        .cal-day.is-muted { color: rgba(10,33,46,.25); background: var(--bone); }
+        .cal-day.is-full { background: rgba(160,60,60,.1); color: #8a3d3d; font-weight: 600; }
+        .cal-day.is-partial { background: rgba(201,160,99,.14); color: #8a6a34; font-weight: 600; }
+        .cal-day.is-past { opacity: .45; }
+        .cal-day.is-elegido { box-shadow: inset 0 0 0 2px var(--brass); }
+
+        #app { display: none; }
+        #app.is-shown { display: block; }
+        @media (min-width: 1024px) {
+            #app.is-shown { display: grid; grid-template-columns: 260px 1fr; }
+        }
+
+        #sidebar { transition: transform .4s cubic-bezier(.16,1,.3,1); }
+        @media (min-width: 1024px) {
+            #sidebar { position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        }
+        @media (max-width: 1023px) {
+            #sidebar { position: fixed; inset: 0 auto 0 0; z-index: 60; transform: translateX(-100%); }
+            #sidebar.is-open { transform: none; }
+        }
+
+        /* ---------- Estadísticas ----------
+           Marcas finas en azul noche (#1C4A62, 9.5:1 sobre blanco), dorado oscuro (#A8834A, 3.5:1)
+           solo para destacar, cuadrícula de línea fina. El embudo usa una rampa de un solo tono
+           (validada: monótona, pasos visibles, el paso claro a 2.1:1 sobre blanco). */
+        /* Cada fila: etiqueta y valor arriba, la barra debajo a todo lo ancho y una nota opcional */
+        .est-fila { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 0.75rem; row-gap: 0.35rem; align-items: baseline; padding: 0.5rem 0.35rem; border-radius: 2px; outline: none; }
+        .est-fila > .est-pista { grid-column: 1 / -1; display: block; }
+        .est-fila:hover, .est-fila:focus-visible { background: var(--bone); }
+        .est-barra { display: block; height: 8px; background: #1C4A62; border-radius: 0 4px 4px 0; transition: width .7s cubic-bezier(.16,1,.3,1), filter .2s; }
+        .est-fila:hover .est-barra, .est-fila:focus-visible .est-barra { filter: brightness(1.2); }
+        .est-nota { grid-column: 1 / -1; margin-top: -0.1rem; font-size: 0.68rem; color: rgba(32,41,46,.5); }
+        .est-col { flex: 1 1 0; min-width: 0; background: #1C4A62; border-radius: 4px 4px 0 0; outline: none; transition: filter .2s; }
+        .est-col.is-pico { background: #A8834A; }
+        .est-col:hover, .est-col:focus-visible { filter: brightness(1.25); }
+        .est-kpi-valor { font-family: "Cormorant Garamond", Georgia, serif; font-size: 2.35rem; line-height: 1; color: var(--ink); }
+        #est-contenido.is-cargando { opacity: .45; }
+        #est-tip {
+            position: fixed; z-index: 95; pointer-events: none; max-width: 15rem;
+            background: var(--ink); color: rgba(255,255,255,.75); padding: 0.6rem 0.8rem; font-size: 0.72rem; line-height: 1.5;
+            box-shadow: inset 0 0 0 1px rgba(201,160,99,.5), 0 16px 34px -14px rgba(10,33,46,.6);
+            opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s;
+        }
+        #est-tip.is-visible { opacity: 1; transform: none; }
+        #est-tip strong { color: #fff; font-weight: 600; font-size: 0.82rem; }
+        #est-dias text { font-family: Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+        #est-dias:focus-visible { outline: 1px solid var(--brass); outline-offset: 4px; }
+        .est-tabla { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+        .est-tabla th { text-align: left; font-size: 0.54rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: rgba(10,33,46,.45); padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--line); }
+        .est-tabla td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+
+        #toast {
+            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(6rem);
+            background: var(--ink); color: #fff; padding: 0.9rem 1.4rem;
+            font-size: 0.8rem; border: 1px solid rgba(255,255,255,.15);
+            opacity: 0; transition: all .4s cubic-bezier(.16,1,.3,1); z-index: 90;
+            display: flex; align-items: center; gap: 0.6rem; max-width: calc(100vw - 2rem);
+        }
+        #toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- ================= AVISO DE CONSTRUCCIÓN (solo sin conexión) ================= -->
+    <div data-modo="ejemplo" class="bg-brass/20 border-b border-brass/40 text-ink text-center py-2 px-4 text-[0.68rem] tracking-wide flex items-center justify-center gap-2">
+        <i data-lucide="hard-hat" class="w-3.5 h-3.5"></i>
+        Entorno de construcción · datos de ejemplo. El panel aún no está conectado a la base de reservas.
+    </div>
+
+    <!-- ================= LOGIN ================= -->
+    <div id="login" class="min-h-[calc(100vh-33px)] grid lg:grid-cols-2">
+
+        <!-- Columna visual -->
+        <div class="hidden lg:flex flex-col justify-between bg-ink text-white p-14 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-25" style="background-image:url('foto-complejo-montanas.jpg'); background-size:cover; background-position:center;"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30"></div>
+            <div class="relative flex items-center gap-3">
+                <img src="logo-blanco.png" alt="Hotel Cabaleón" class="h-16 w-auto object-contain">
+                <span class="flex flex-col leading-none">
+                    <span class="font-display text-2xl tracking-[0.2em] uppercase">Cabaleón</span>
+                    <span class="text-[0.5rem] tracking-[0.4em] uppercase mt-1.5 text-white/50">Hotel · Tena</span>
+                </span>
+            </div>
+            <div class="relative">
+                <span class="eyebrow mb-6">Panel del propietario</span>
+                <h1 class="font-display text-4xl xl:text-5xl leading-tight mb-5">
+                    La operación del hotel,<br><em class="italic text-white/80">en un solo lugar</em>
+                </h1>
+                <p class="text-white/60 text-sm max-w-md leading-relaxed">
+                    Reservas de la página, pagos con Bold y disponibilidad de cada habitación.
+                    Un espacio privado para administrar Hotel Cabaleón día a día.
+                </p>
+            </div>
+            <p class="relative text-[0.68rem] text-white/35 tracking-wide">&copy; 2026 Hotel Cabaleón · Tena, Cundinamarca</p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="flex items-center justify-center p-6 sm:p-12">
+            <div class="w-full max-w-sm">
+                <div class="lg:hidden flex items-center gap-3 mb-10">
+                    <img src="logo-azul.png" alt="Hotel Cabaleón" class="h-14 w-auto object-contain">
+                    <span class="font-display text-xl tracking-[0.2em] uppercase text-ink">Cabaleón</span>
+                </div>
+
+                <span class="eyebrow mb-5">Acceso privado</span>
+                <h2 id="login-titulo" class="font-display text-3xl text-ink mb-2">Ingresa a tu panel</h2>
+                <p id="login-subtitulo" class="text-sm text-graphite/60 mb-9">Usa el correo del propietario del hotel.</p>
+
+                <form id="login-form" class="space-y-5" novalidate>
+                    <div>
+                        <label class="field-label" for="email">Correo</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="w-4 h-4 text-graphite/35 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input id="email" type="email" autocomplete="email" required
+                                   class="field-input pl-10" placeholder="propietario@hotelcabaleon.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="field-label" for="password">Contraseña</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="w-4 h-4 text-graphite/35 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                            <input id="password" type="password" autocomplete="current-password"
+                                   class="field-input pl-10 pr-10" placeholder="••••••••">
+                            <button type="button" id="toggle-pw" aria-label="Mostrar contraseña"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-graphite/35 hover:text-ink transition-colors">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <p data-modo="ejemplo" class="text-[0.7rem] text-graphite/40 mt-2">Durante la construcción, el correo y la contraseña son opcionales.</p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex items-center gap-2 text-[0.78rem] text-graphite/60 cursor-pointer">
+                            <input type="checkbox" id="remember" class="accent-ink w-3.5 h-3.5"> Mantener la sesión
+                        </label>
+                        <a href="#" onclick="olvideClave(event)" class="text-[0.78rem] text-brass-deep hover:text-ink transition-colors">¿Olvidaste la contraseña?</a>
+                    </div>
+
+                    <button type="submit" id="login-boton" class="btn btn-ink w-full">
+                        <span id="login-boton-txt">Entrar al panel</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <!-- Contraseña nueva (al abrir el enlace del correo de recuperación) -->
+                <form id="form-clave-nueva" class="hidden space-y-5" novalidate>
+                    <div>
+                        <label class="field-label" for="clave-recuperada">Contraseña nueva</label>
+                        <input id="clave-recuperada" type="password" autocomplete="new-password" class="field-input" placeholder="Mínimo 8 caracteres">
+                    </div>
+                    <div>
+                        <label class="field-label" for="clave-recuperada-2">Repite la contraseña</label>
+                        <input id="clave-recuperada-2" type="password" autocomplete="new-password" class="field-input">
+                    </div>
+                    <button type="submit" class="btn btn-ink w-full">
+                        Guardar y entrar <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <p id="login-error" class="hidden text-[0.78rem] text-[#8a3d3d] text-center mt-5" role="alert"></p>
+                <p id="login-aviso" class="hidden text-[0.78rem] text-moss text-center mt-5" role="status"></p>
+
+                <div class="mt-10 pt-6 border-t border-line flex items-center justify-between text-[0.78rem]">
+                    <a href="index.html" class="text-graphite/55 hover:text-ink transition-colors inline-flex items-center gap-2">
+                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Volver al sitio
+                    </a>
+                    <span class="text-graphite/35" id="version">v1.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PANEL ================= -->
+    <div id="app" class="min-h-[calc(100vh-33px)]">
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="bg-ink text-white w-[260px] flex flex-col">
+            <div class="p-6 border-b border-line-light flex items-center gap-3">
+                <img src="logo-blanco.png" alt="Hotel Cabaleón" class="h-12 w-auto object-contain">
+                <span class="flex flex-col leading-none">
+                    <span class="font-display text-lg tracking-[0.2em] uppercase">Cabaleón</span>
+                    <span class="text-[0.45rem] tracking-[0.35em] uppercase mt-1 text-white/45">Panel · Tena</span>
+                </span>
+            </div>
+
+            <nav class="flex-1 py-4">
+                <span class="block px-5 pb-2 pt-3 micro text-white/30">General</span>
+                <a class="nav-item is-active" data-view="resumen"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Resumen</a>
+                <a class="nav-item" data-view="reservas"><i data-lucide="calendar-check" class="w-4 h-4"></i> Reservas <span id="nav-pendientes" class="ml-auto pill pill-amber hidden"></span></a>
+                <a class="nav-item" data-view="disponibilidad"><i data-lucide="calendar-days" class="w-4 h-4"></i> Disponibilidad</a>
+                <a class="nav-item" data-view="estadisticas"><i data-lucide="chart-no-axes-combined" class="w-4 h-4"></i> Estadísticas</a>
+                <span class="block px-5 pb-2 pt-5 micro text-white/30">Hotel</span>
+                <a class="nav-item" data-view="habitaciones"><i data-lucide="bed-double" class="w-4 h-4"></i> Habitaciones y tarifas</a>
+                <a class="nav-item" data-view="mensajes" data-modo="ejemplo"><i data-lucide="message-square" class="w-4 h-4"></i> Mensajes <span class="ml-auto pill pill-amber">3</span></a>
+                <a class="nav-item" data-view="ajustes"><i data-lucide="settings" class="w-4 h-4"></i> Ajustes</a>
+            </nav>
+
+            <div class="p-4 border-t border-line-light">
+                <div class="flex items-center gap-3 px-2 py-2">
+                    <span id="side-inicial" class="w-9 h-9 rounded-full bg-brass/20 text-brass flex items-center justify-center font-display text-lg shrink-0">P</span>
+                    <span class="min-w-0">
+                        <span class="block text-[0.8rem] text-white truncate">Propietario</span>
+                        <span id="side-email" class="block text-[0.68rem] text-white/40 truncate">—</span>
+                    </span>
+                </div>
+                <button onclick="logout()" class="nav-item w-full mt-1"><i data-lucide="log-out" class="w-4 h-4"></i> Cerrar sesión</button>
+            </div>
+        </aside>
+
+        <!-- Contenido -->
+        <div class="flex flex-col min-w-0">
+
+            <!-- Topbar -->
+            <header class="bg-white border-b border-line px-5 sm:px-8 py-4 flex items-center justify-between gap-4 sticky top-0 z-40">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-ink" aria-label="Menú"><i data-lucide="menu" class="w-5 h-5"></i></button>
+                    <div class="min-w-0">
+                        <h1 id="view-title" class="font-display text-2xl text-ink leading-none">Resumen</h1>
+                        <p id="view-date" class="text-[0.7rem] text-graphite/45 mt-1">—</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <a href="index.html" target="_blank" class="btn btn-outline btn-sm hidden sm:inline-flex">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Ver sitio
+                    </a>
+                    <button onclick="refrescarAhora()" aria-label="Actualizar" title="Actualizar" class="w-9 h-9 border border-line flex items-center justify-center text-ink hover:bg-bone transition-colors">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="irAPendientes()" aria-label="Reservas por confirmar" title="Reservas por confirmar" class="w-9 h-9 border border-line flex items-center justify-center text-ink hover:bg-bone transition-colors relative">
+                        <i data-lucide="bell" class="w-4 h-4"></i>
+                        <span id="campana-punto" class="hidden absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-brass rounded-full"></span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="p-5 sm:p-8 flex-1 max-w-[1200px] w-full">
+
+                <!-- ---------- RESUMEN ---------- -->
+                <section class="view is-active" data-view="resumen">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+                        <div class="card p-5">
+                            <span class="micro text-graphite/40">Reservas del mes</span>
+                            <div class="flex items-end gap-2 mt-3">
+                                <span id="kpi-reservas" class="font-display text-4xl text-ink leading-none">0</span>
+                                <span id="kpi-reservas-pill" class="pill pill-amber mb-1 hidden"></span>
+                            </div>
+                            <span class="block text-[0.68rem] text-graphite/45 mt-1.5">Llegadas de este mes</span>
+                        </div>
+                        <div class="card p-5">
+                            <span class="micro text-graphite/40">Ocupación del mes</span>
+                            <div class="mt-3">
+                                <span id="kpi-ocupacion" class="font-display text-4xl text-ink leading-none">0%</span>
+                            </div>
+                            <span class="block text-[0.68rem] text-graphite/45 mt-1.5">Noches pagadas o confirmadas</span>
+                        </div>
+                        <div class="card p-5">
+                            <span class="micro text-graphite/40">Ventas del mes</span>
+                            <div class="mt-3">
+                                <span id="kpi-ventas" class="font-display text-3xl text-ink leading-none">$0</span>
+                            </div>
+                            <span id="kpi-ventas-nota" class="block text-[0.68rem] text-graphite/45 mt-1.5">COP · reservas pagadas o confirmadas</span>
+                        </div>
+                        <button type="button" onclick="irAPendientes()" class="card p-5 text-left hover:border-ink transition-colors">
+                            <span class="micro text-graphite/40">Por confirmar</span>
+                            <div class="flex items-end gap-2 mt-3">
+                                <span id="kpi-pendientes" class="font-display text-4xl text-ink leading-none">0</span>
+                                <span id="kpi-pendientes-pill" class="pill pill-amber mb-1 hidden">Revisar</span>
+                            </div>
+                            <span class="block text-[0.68rem] text-graphite/45 mt-1.5">Reservas sin pago confirmado</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 card">
+                            <div class="flex items-center justify-between p-5 border-b border-line">
+                                <h3 class="font-display text-xl text-ink">Próximas llegadas</h3>
+                                <button class="chip" onclick="nav('reservas')">Ver todas</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr><th>Huésped</th><th>Habitación</th><th>Entrada</th><th>Noches</th><th>Estado</th></tr>
+                                    </thead>
+                                    <tbody id="llegadas-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card p-5">
+                            <h3 class="font-display text-xl text-ink mb-1">Ocupación por habitación</h3>
+                            <p class="text-[0.7rem] text-graphite/45 mb-5">Próximos 30 días</p>
+                            <div class="space-y-5" id="ocupacion-body"></div>
+                            <div class="mt-6 pt-5 border-t border-line">
+                                <h4 class="micro text-graphite/40 mb-4">Actividad reciente</h4>
+                                <ul class="space-y-3.5" id="actividad-body"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ---------- RESERVAS ---------- -->
+                <section class="view" data-view="reservas">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-5">
+                        <div class="flex flex-wrap gap-2" id="reserva-filtros">
+                            <button class="chip is-active" data-estado="todas">Todas</button>
+                            <button class="chip" data-estado="pendiente">Pendientes</button>
+                            <button class="chip" data-estado="vigente">Pagadas y confirmadas</button>
+                            <button class="chip" data-estado="cancelada">Canceladas</button>
+                        </div>
+                        <div class="relative sm:ml-auto">
+                            <i data-lucide="search" class="w-4 h-4 text-graphite/35 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                            <input id="reserva-buscar" type="search" placeholder="Nombre, orden o celular…" class="field-input pl-9 py-2 text-sm sm:w-64">
+                        </div>
+                        <button class="btn btn-ink btn-sm" onclick="abrirNuevaReserva()">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Nueva
+                        </button>
+                    </div>
+
+                    <div class="card overflow-x-auto">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Huésped</th><th>Habitación</th><th>Fechas</th><th>Huéspedes</th><th>Canal</th><th>Total</th><th>Estado</th><th></th></tr>
+                            </thead>
+                            <tbody id="reservas-body"></tbody>
+                        </table>
+                    </div>
+                    <p id="reservas-vacio" class="hidden text-center text-sm text-graphite/45 py-10">No hay reservas con ese criterio.</p>
+                </section>
+
+                <!-- ---------- DISPONIBILIDAD ---------- -->
+                <section class="view" data-view="disponibilidad">
+                    <div class="card p-5 sm:p-7">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 id="cal-titulo" class="font-display text-2xl text-ink">—</h3>
+                            <div class="flex gap-2">
+                                <button class="w-9 h-9 border border-line flex items-center justify-center text-ink hover:bg-bone transition-colors" onclick="moverMes(-1)" aria-label="Mes anterior"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <button class="w-9 h-9 border border-line flex items-center justify-center text-ink hover:bg-bone transition-colors" onclick="moverMes(1)" aria-label="Mes siguiente"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1.5 text-center mb-1.5">
+                            <span class="micro text-graphite/35">L</span><span class="micro text-graphite/35">M</span><span class="micro text-graphite/35">M</span>
+                            <span class="micro text-graphite/35">J</span><span class="micro text-graphite/35">V</span><span class="micro text-graphite/35">S</span><span class="micro text-graphite/35">D</span>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1.5" id="calendario"></div>
+                        <div class="flex flex-wrap gap-5 mt-6 pt-5 border-t border-line text-[0.72rem] text-graphite/55">
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 border border-line bg-white"></span> Disponible</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-[rgba(201,160,99,.3)]"></span> Ocupación parcial</span>
+                            <span class="flex items-center gap-2"><span class="w-3 h-3 bg-[rgba(160,60,60,.25)]"></span> Completo</span>
+                            <span class="text-graphite/40">Cuentan las reservas pagadas o confirmadas.</span>
+                        </div>
+                        <div id="cal-detalle" class="mt-6 pt-6 border-t border-line"></div>
+                    </div>
+                </section>
+
+                <!-- ---------- ESTADÍSTICAS ---------- -->
+                <section class="view" data-view="estadisticas">
+                    <!-- Un solo filtro arriba: todo lo de abajo usa el mismo período -->
+                    <div class="flex flex-col lg:flex-row lg:items-center gap-3 mb-6">
+                        <div class="flex flex-wrap gap-2" id="est-periodos" role="group" aria-label="Período">
+                            <button class="chip" data-dias="1">Hoy</button>
+                            <button class="chip" data-dias="7">7 días</button>
+                            <button class="chip is-active" data-dias="30">30 días</button>
+                            <button class="chip" data-dias="90">90 días</button>
+                            <button class="chip" data-dias="365">12 meses</button>
+                        </div>
+                        <span id="est-rango" class="text-[0.72rem] text-graphite/45"></span>
+                        <label class="lg:ml-auto flex items-center gap-2 text-[0.75rem] text-graphite/60 cursor-pointer">
+                            <input type="checkbox" id="est-no-medir" class="accent-ink w-3.5 h-3.5"> No contar mis visitas en este navegador
+                        </label>
+                    </div>
+                    <p id="est-aviso" class="hidden mb-6 p-4 bg-white border border-line text-[0.8rem] text-graphite/65 leading-relaxed"></p>
+
+                    <div id="est-contenido" class="transition-opacity duration-300">
+                        <div id="est-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6"></div>
+
+                        <figure class="card p-5 sm:p-6 mb-6">
+                            <figcaption class="flex items-start justify-between gap-4 mb-4">
+                                <span>
+                                    <span class="block font-display text-xl text-ink">Visitas por día</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Pasa el cursor o el dedo sobre la línea para ver cada día</span>
+                                </span>
+                                <button type="button" class="chip shrink-0" data-ver-tabla="est-dias">Ver tabla</button>
+                            </figcaption>
+                            <div id="est-dias" class="relative" tabindex="0" aria-label="Visitas por día. Usa las flechas para recorrer los días."></div>
+                            <div id="est-dias-tabla" class="hidden overflow-x-auto max-h-80"></div>
+                        </figure>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4">
+                                    <span class="block font-display text-xl text-ink">De dónde llegan</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Visitas por fuente, con las que escribieron y reservaron</span>
+                                </figcaption>
+                                <div id="est-fuentes"></div>
+                            </figure>
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4">
+                                    <span class="block font-display text-xl text-ink">Camino a la reserva</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Cuántas visitas llegan a cada paso</span>
+                                </figcaption>
+                                <div id="est-embudo"></div>
+                            </figure>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4"><span class="block font-display text-xl text-ink">Dispositivos</span></figcaption>
+                                <div id="est-dispositivos"></div>
+                                <div id="est-equipos" class="mt-5 pt-4 border-t border-line grid grid-cols-2 gap-4"></div>
+                            </figure>
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4"><span class="block font-display text-xl text-ink">Desde dónde visitan</span></figcaption>
+                                <div id="est-ubicacion"></div>
+                            </figure>
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="flex items-start justify-between gap-4 mb-4">
+                                    <span class="block font-display text-xl text-ink">Horas de visita</span>
+                                    <button type="button" class="chip shrink-0" data-ver-tabla="est-horas">Ver tabla</button>
+                                </figcaption>
+                                <div id="est-horas"></div>
+                                <div id="est-horas-tabla" class="hidden overflow-x-auto max-h-72"></div>
+                                <p id="est-horas-nota" class="text-[0.74rem] text-graphite/60 mt-4"></p>
+                            </figure>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4">
+                                    <span class="block font-display text-xl text-ink">Lo que más miran</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Porcentaje de visitas que llegaron a cada sección</span>
+                                </figcaption>
+                                <div id="est-secciones"></div>
+                            </figure>
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4">
+                                    <span class="block font-display text-xl text-ink">Qué hacen en la página</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Cada vez que alguien tocó estos botones</span>
+                                </figcaption>
+                                <div id="est-interacciones"></div>
+                            </figure>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4">
+                                    <span class="block font-display text-xl text-ink">Habitaciones de interés</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Fichas abiertas y veces que se agregaron a una reserva</span>
+                                </figcaption>
+                                <div id="est-habitaciones"></div>
+                            </figure>
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4">
+                                    <span class="block font-display text-xl text-ink">Sitios y campañas</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Quién enlaza la página y qué enlaces con seguimiento funcionan</span>
+                                </figcaption>
+                                <div id="est-campanas"></div>
+                            </figure>
+                            <figure class="card p-5 sm:p-6">
+                                <figcaption class="mb-4">
+                                    <span class="block font-display text-xl text-ink">Preguntas al asistente</span>
+                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Temas más consultados en el chat de la página</span>
+                                </figcaption>
+                                <div id="est-temas"></div>
+                            </figure>
+                        </div>
+                    </div>
+
+                    <!-- Enlaces con seguimiento -->
+                    <figure class="card p-5 sm:p-6">
+                        <figcaption class="mb-5">
+                            <span class="block font-display text-xl text-ink">Enlaces con seguimiento</span>
+                            <span class="block text-[0.76rem] text-graphite/55 mt-1 max-w-3xl leading-relaxed">
+                                Usa un enlace distinto en cada lugar donde compartas la página: la biografía de Instagram, los estados de WhatsApp,
+                                el perfil de Google o un volante con código QR. Así, en "De dónde llegan" verás cuántas visitas y reservas trae cada uno.
+                            </span>
+                        </figcaption>
+                        <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                            <div>
+                                <label class="field-label" for="enl-lugar">Dónde lo vas a publicar</label>
+                                <select id="enl-lugar" class="field-input"></select>
+                            </div>
+                            <div>
+                                <label class="field-label" for="enl-campana">Nombre de la campaña (opcional)</label>
+                                <input id="enl-campana" class="field-input" placeholder="Ej.: temporada de diciembre" maxlength="40" autocomplete="off">
+                            </div>
+                            <button type="button" class="btn btn-ink" onclick="copiarEnlace()"><i data-lucide="copy" class="w-4 h-4"></i> Copiar enlace</button>
+                        </div>
+                        <div class="mt-3 flex items-start gap-3 bg-bone border border-line px-4 py-3">
+                            <i data-lucide="link" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
+                            <code id="enl-url" class="text-[0.78rem] text-ink break-all"></code>
+                        </div>
+                    </figure>
+                </section>
+
+                <!-- ---------- HABITACIONES ---------- -->
+                <section class="view" data-view="habitaciones">
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="habitaciones-body"></div>
+                    <div class="mt-6 p-5 bg-white border border-line text-[0.8rem] text-graphite/65 flex gap-3">
+                        <i data-lucide="info" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
+                        <span>
+                            Las tarifas, los festivos y cuántas habitaciones hay de cada tipo se cambian en <strong class="font-medium text-ink">index.html</strong>
+                            (TARIFAS, FESTIVOS y UNIDADES). La página, el carrito, el cobro con Bold y este panel leen de ahí, así que siempre coinciden.
+                        </span>
+                    </div>
+                </section>
+
+                <!-- ---------- MENSAJES (solo en el modo de ejemplo) ---------- -->
+                <section class="view" data-view="mensajes">
+                    <div class="card divide-y divide-line" id="mensajes-body"></div>
+                </section>
+
+                <!-- ---------- AJUSTES ---------- -->
+                <section class="view" data-view="ajustes">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="card p-6">
+                            <h3 class="font-display text-xl text-ink mb-1">Datos del hotel</h3>
+                            <p class="text-[0.78rem] text-graphite/50 mb-6">Así aparecen en la página pública y en las confirmaciones. Se cambian en index.html.</p>
+                            <div class="space-y-4">
+                                <div><label class="field-label">Nombre</label><input class="field-input" value="Hotel Cabaleón" readonly></div>
+                                <div><label class="field-label">Correo</label><input class="field-input" value="informacion@hotelcabaleon.com" readonly></div>
+                                <div><label class="field-label">Teléfono y WhatsApp</label><input class="field-input" value="311 888 4430" readonly></div>
+                                <div><label class="field-label">Dirección</label><input class="field-input" value="Ramal de Escalante, Vereda Escalante, Tena, Cundinamarca" readonly></div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div><label class="field-label">Check-in</label><input class="field-input" value="15:00" readonly></div>
+                                    <div><label class="field-label">Check-out</label><input class="field-input" value="14:00" readonly></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card p-6">
+                            <h3 class="font-display text-xl text-ink mb-1">Cuenta</h3>
+                            <p class="text-[0.78rem] text-graphite/50 mb-6">Tu acceso al panel.</p>
+                            <div class="space-y-4">
+                                <div><label class="field-label" for="ajuste-email">Correo de acceso</label><input id="ajuste-email" class="field-input" value="—" readonly></div>
+                                <div data-modo="conectado" class="space-y-4">
+                                    <div><label class="field-label" for="clave-nueva">Contraseña nueva</label><input id="clave-nueva" type="password" autocomplete="new-password" class="field-input" placeholder="Mínimo 8 caracteres"></div>
+                                    <div><label class="field-label" for="clave-repetir">Repite la contraseña</label><input id="clave-repetir" type="password" autocomplete="new-password" class="field-input"></div>
+                                </div>
+                            </div>
+                            <button data-modo="conectado" class="btn btn-ink btn-sm mt-5" onclick="cambiarClave()">Cambiar contraseña</button>
+                            <div data-modo="ejemplo" class="mt-6 p-4 bg-bone border border-line text-[0.78rem] text-graphite/60 flex gap-3">
+                                <i data-lucide="info" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
+                                Al conectar el panel con la base de reservas (Supabase), la entrada pide correo y contraseña
+                                y desde aquí se puede cambiar la contraseña. Pasos en LEEME-RESERVAS-SUPABASE.txt.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <div id="sidebar-scrim" class="hidden fixed inset-0 bg-ink/50 z-50 lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- ================= VENTANA (detalle y nueva reserva) ================= -->
+    <div id="modal" class="hidden fixed inset-0 z-[80] bg-ink/60 flex items-end sm:items-center justify-center sm:p-6" role="dialog" aria-modal="true">
+        <div class="bg-white w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto relative">
+            <button onclick="cerrarModal()" aria-label="Cerrar" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full border border-line bg-white flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+            <div id="modal-contenido"></div>
+        </div>
+    </div>
+
+    <div id="toast"><i data-lucide="check" class="w-4 h-4 text-brass shrink-0"></i><span id="toast-text"></span></div>
+    <div id="est-tip" role="tooltip"></div>
+
+    <script>
+        /* =========================================================
+           Conexión con la base de reservas (ver LEEME-RESERVAS-SUPABASE.txt)
+             supabase     → Project URL de Supabase (https://xxxx.supabase.co)
+             llavePublica → Publishable key de Supabase (sb_publishable_…).
+                            Es pública: las reservas las protegen el inicio de
+                            sesión y las reglas de la base (solo entran los
+                            correos de la tabla panel_acceso).
+             servidor     → Opcional. Dirección del servidor de reservas y pagos
+                            (la misma de BOLD.servidor en index.html). Permite
+                            consultar en Bold un pago que quedó en proceso.
+           Vacíos: el panel muestra datos de ejemplo y no pide contraseña.
+           ========================================================= */
+        const CONEXION = {
+            supabase: '',
+            llavePublica: '',
+            servidor: ''
+        };
+        const CONECTADO = !!(CONEXION.supabase.trim() && CONEXION.llavePublica.trim());
+
+        /* Habitaciones. Tarifas, unidades y festivos se leen de index.html
+           (TARIFAS, UNIDADES y FESTIVOS); estos valores son solo de respaldo. */
+        const NOMBRES = { suite: 'Suite Cabaleón', cabana: 'Cabaña Cabaleón', cuadruple: 'Habitación Familiar Cuádruple', triple: 'Habitación Estándar Triple' };
+        const CORTOS = { suite: 'Suite', cabana: 'Cabaña', cuadruple: 'Familiar Cuádruple', triple: 'Estándar Triple' };
+        const CAPACIDAD = { suite: 4, cabana: 2, cuadruple: 4, triple: 3 };
+        let TARIFAS = {
+            suite:     { finde: 270000, semana: 270000 },
+            cabana:    { finde: 290000, semana: 290000 },
+            cuadruple: { finde: 260000, semana: 260000 },
+            triple:    { finde: 250000, semana: 250000 }
+        };
+        let UNIDADES = { suite: 2, cabana: 1, cuadruple: 6, triple: 7 };
+        let FESTIVOS = new Set();
+
+        const ESTADOS = {
+            pendiente:  { txt: 'Pendiente',      pill: 'pill-amber', icono: 'calendar-plus', accion: 'Nueva reserva de ' },
+            pagada:     { txt: 'Pagada',         pill: 'pill-green', icono: 'badge-check',   accion: 'Pago recibido de ' },
+            confirmada: { txt: 'Confirmada',     pill: 'pill-green', icono: 'check-circle',  accion: 'Reserva confirmada de ' },
+            cancelada:  { txt: 'Cancelada',      pill: 'pill-red',   icono: 'x-circle',      accion: 'Reserva cancelada de ' },
+            rechazada:  { txt: 'Pago rechazado', pill: 'pill-gray',  icono: 'circle-slash',  accion: 'Pago rechazado de ' },
+            anulada:    { txt: 'Anulada',        pill: 'pill-gray',  icono: 'undo-2',        accion: 'Pago anulado de ' }
+        };
+        const CANALES = { bold: 'Web · Bold', whatsapp: 'Web · WhatsApp', manual: 'Panel' };
+        const OCUPAN = ['pagada', 'confirmada'];             // apartan habitación (también en la página)
+        const VIGENTES = ['pendiente', 'pagada', 'confirmada'];
+        const GRUPOS = { todas: null, pendiente: ['pendiente'], vigente: OCUPAN, cancelada: ['cancelada', 'rechazada', 'anulada'] };
+
+        /* =========================================================
+           Utilidades
+           ========================================================= */
+        const COP = n => '$' + Math.round(Number(n) || 0).toLocaleString('es-CO');
+        const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const normalizar = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        const iso = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const hoyISO = () => iso(new Date());
+        const fechaD = s => new Date(s + 'T12:00:00');
+        const sumarDias = (s, n) => { const d = fechaD(s); d.setDate(d.getDate() + n); return iso(d); };
+        const nochesEntre = (a, b) => Math.round((fechaD(b) - fechaD(a)) / 86400000);
+        const fechaCorta = s => fechaD(s).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }).replace('.', '');
+        const fechaLarga = s => capitalize(fechaD(s).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }));
+        const plural = (n, uno, varios) => n + ' ' + (n === 1 ? uno : varios);
+        const textoHabitaciones = h => Object.keys(h || {}).filter(k => Number(h[k]) > 0)
+            .map(k => (CORTOS[k] || k) + (h[k] > 1 ? ' × ' + h[k] : '')).join(', ');
+        const aleatorio = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 32]).join('');
+        const estadoPill = e => '<span class="pill ' + (ESTADOS[e] ? ESTADOS[e].pill : 'pill-gray') + '">' + (ESTADOS[e] ? ESTADOS[e].txt : esc(e)) + '</span>';
+        const porId = id => reservas.find(r => String(r.id) === String(id));
+
+        function haceCuanto(ts) {
+            const min = Math.round((Date.now() - Date.parse(ts)) / 60000);
+            if (!(min >= 1)) return 'ahora';
+            if (min < 60) return 'hace ' + min + ' min';
+            const h = Math.round(min / 60);
+            if (h < 24) return 'hace ' + h + ' h';
+            const d = Math.round(h / 24);
+            if (d === 1) return 'ayer';
+            if (d < 7) return 'hace ' + d + ' días';
+            return new Date(ts).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }).replace('.', '');
+        }
+
+        /* Tarifas, unidades y festivos publicados en index.html (misma fuente que la página y el cobro) */
+        async function leerTarifasDelSitio() {
+            try {
+                const html = await (await fetch('index.html', { cache: 'no-store' })).text();
+                const bloque = (inicio, fin) => {
+                    const a = html.indexOf(inicio);
+                    if (a < 0) return '';
+                    const b = html.indexOf(fin, a + inicio.length);
+                    return b < 0 ? '' : html.slice(a + inicio.length, b);
+                };
+                const t = {};
+                for (const m of bloque('const TARIFAS = {', '};').matchAll(/(\w+)\s*:\s*\{\s*finde\s*:\s*(\d+)\s*,\s*semana\s*:\s*(\d+)\s*\}/g)) t[m[1]] = { finde: +m[2], semana: +m[3] };
+                const u = {};
+                for (const m of bloque('const UNIDADES = {', '}').matchAll(/(\w+)\s*:\s*(\d+)/g)) u[m[1]] = +m[2];
+                if (Object.keys(t).length) TARIFAS = t;
+                if (Object.keys(u).length) UNIDADES = u;
+                FESTIVOS = new Set(bloque('const FESTIVOS = new Set([', ']);').match(/\d{4}-\d{2}-\d{2}/g) || []);
+            } catch (e) { /* sin acceso a index.html: quedan los valores de respaldo */ }
+        }
+
+        /* =========================================================
+           Reservas: de Supabase o, sin conexión, de ejemplo
+           ========================================================= */
+        let reservas = [];
+
+        function reservasDeEjemplo() {
+            const hoy = hoyISO();
+            const hace = horas => new Date(Date.now() - horas * 3600000).toISOString();
+            const r = (i, dias, noches, nombre, habs, personas, canal, estado, total, horas) => ({
+                id: 'ejemplo-' + i, orden: 'CAB-EJEMPLO-' + i, creada: hace(horas + 30), actualizada: hace(horas),
+                estado, canal, llegada: sumarDias(hoy, dias), salida: sumarDias(hoy, dias + noches), noches,
+                habitaciones: habs, huespedes: personas, mascotas: 0, codigo: null, modalidad: 'anticipo',
+                total, monto: Math.round(total / 2), pagado: estado === 'pagada' ? Math.round(total / 2) : 0,
+                metodo_pago: estado === 'pagada' ? 'PSE' : null, nombre, tipo_documento: 'CC', documento: '1000000000',
+                celular: '3000000000', correo: '', notas: null
+            });
+            return [
+                r(1, -2, 3, 'Alexi García', { suite: 1 }, 2, 'whatsapp', 'confirmada', 810000, 70),
+                r(2, 1, 2, 'Diana Alarcón Roa', { triple: 1 }, 3, 'bold', 'pagada', 500000, 3),
+                r(3, 4, 3, 'German Manrique', { cuadruple: 1 }, 4, 'whatsapp', 'pendiente', 780000, 6),
+                r(4, 5, 1, 'Laura Ospina', { cabana: 1 }, 2, 'manual', 'confirmada', 290000, 26),
+                r(5, 11, 3, 'Familia Rincón', { cuadruple: 2 }, 8, 'bold', 'pagada', 1560000, 50),
+                r(6, 12, 1, 'Camilo Vega', { triple: 1 }, 2, 'whatsapp', 'cancelada', 250000, 52),
+                r(7, 18, 3, 'Mónica Salazar', { suite: 1 }, 2, 'bold', 'pagada', 810000, 2),
+                r(8, 19, 1, 'Andrés Beltrán', { triple: 1 }, 3, 'whatsapp', 'pendiente', 250000, 9)
+            ];
+        }
+
+        async function cargarReservas() {
+            if (!CONECTADO) return;
+            reservas = await api('GET', 'reservas?select=*&salida=gte.' + sumarDias(hoyISO(), -400) + '&order=llegada.asc&limit=2000') || [];
+        }
+
+        /* Habitaciones de cada tipo ocupadas la noche de un día */
+        function ocupadasLaNoche(dia, excluirId) {
+            const occ = {};
+            reservas.forEach(r => {
+                if (!OCUPAN.includes(r.estado) || String(r.id) === String(excluirId) || !(r.llegada <= dia && dia < r.salida)) return;
+                Object.keys(r.habitaciones || {}).forEach(k => { occ[k] = (occ[k] || 0) + (Number(r.habitaciones[k]) || 0); });
+            });
+            return occ;
+        }
+
+        function libresEntre(llegada, salida, excluirId) {
+            const libres = { ...UNIDADES };
+            for (let noche = llegada; noche < salida; noche = sumarDias(noche, 1)) {
+                const occ = ocupadasLaNoche(noche, excluirId);
+                Object.keys(UNIDADES).forEach(k => { libres[k] = Math.min(libres[k], Math.max(0, UNIDADES[k] - (occ[k] || 0))); });
+            }
+            return libres;
+        }
+
+        function faltaCupo(llegada, salida, habs, excluirId) {
+            const libres = libresEntre(llegada, salida, excluirId);
+            const quedan = n => n === 1 ? 'queda 1' : n ? 'quedan ' + n : 'no queda ninguna';
+            return Object.keys(habs || {}).filter(k => habs[k] > (libres[k] || 0))
+                .map(k => (CORTOS[k] || k) + ' (' + quedan(libres[k] || 0) + ')');
+        }
+
+        /* Mismo cálculo de la página: viernes, sábado y víspera de festivo con tarifa de fin de semana */
+        function estimarTotal(llegada, salida, habs) {
+            let total = 0;
+            for (let noche = llegada; noche < salida; noche = sumarDias(noche, 1)) {
+                const dia = fechaD(noche).getDay();
+                const finde = dia === 5 || dia === 6 || FESTIVOS.has(sumarDias(noche, 1));
+                Object.keys(habs).forEach(k => { if (TARIFAS[k]) total += habs[k] * (finde ? TARIFAS[k].finde : TARIFAS[k].semana); });
+            }
+            return total;
+        }
+
+        /* =========================================================
+           Supabase: sesión y datos (API REST, sin librerías)
+           ========================================================= */
+        const CLAVE_SESION = 'cabaleon-panel';
+        const urlSupabase = ruta => CONEXION.supabase.trim().replace(/\/+$/, '') + ruta;
+        let sesion = null;
+        let renovando = null;
+
+        async function auth(ruta, cuerpo, token, metodo) {
+            let r;
+            try {
+                r = await fetch(urlSupabase('/auth/v1/' + ruta), {
+                    method: metodo || 'POST',
+                    headers: { apikey: CONEXION.llavePublica.trim(), 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
+                    body: cuerpo ? JSON.stringify(cuerpo) : undefined
+                });
+            } catch (e) {
+                throw new Error('No hay conexión con la base de reservas. Revisa tu internet.');
+            }
+            const j = await r.json().catch(() => ({}));
+            if (!r.ok) {
+                const e = new Error(j.msg || j.error_description || j.message || 'Error ' + r.status);
+                e.status = r.status;
+                e.codigo = j.error_code || j.code || j.error;
+                throw e;
+            }
+            return j;
+        }
+
+        function mensajeAuth(e) {
+            if (e.codigo === 'invalid_credentials' || e.codigo === 'invalid_grant' || e.status === 400) return 'Correo o contraseña incorrectos.';
+            if (e.status === 429) return 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.';
+            if (e.codigo === 'email_not_confirmed') return 'Ese correo aún no está confirmado.';
+            if (e.codigo === 'weak_password' || e.codigo === 'same_password') return 'Elige una contraseña distinta y más segura (mínimo 8 caracteres).';
+            return e.message;
+        }
+
+        function guardarSesion(recordar) {
+            try {
+                (recordar ? localStorage : sessionStorage).setItem(CLAVE_SESION, JSON.stringify(sesion));
+                (recordar ? sessionStorage : localStorage).removeItem(CLAVE_SESION);
+            } catch (e) { /* navegación privada: la sesión dura mientras la pestaña esté abierta */ }
+        }
+        function leerSesion() {
+            try { return JSON.parse(localStorage.getItem(CLAVE_SESION) || sessionStorage.getItem(CLAVE_SESION) || 'null'); } catch (e) { return null; }
+        }
+        function recordando() {
+            try { return !!localStorage.getItem(CLAVE_SESION); } catch (e) { return false; }
+        }
+        function borrarSesion() {
+            sesion = null;
+            try { localStorage.removeItem(CLAVE_SESION); sessionStorage.removeItem(CLAVE_SESION); } catch (e) {}
+        }
+
+        function aplicarSesion(j, recordar) {
+            sesion = {
+                access_token: j.access_token,
+                refresh_token: j.refresh_token,
+                expires_at: j.expires_at || Math.floor(Date.now() / 1000) + (j.expires_in || 3600),
+                email: (j.user && j.user.email) || (sesion && sesion.email) || ''
+            };
+            guardarSesion(recordar);
+        }
+
+        async function tokenVigente() {
+            if (!sesion) throw new Error('Tu sesión terminó. Vuelve a entrar.');
+            if (sesion.expires_at - 60 > Date.now() / 1000) return sesion.access_token;
+            if (!renovando) {
+                const recordar = recordando();
+                renovando = auth('token?grant_type=refresh_token', { refresh_token: sesion.refresh_token })
+                    .then(j => aplicarSesion(j, recordar))
+                    .finally(() => { renovando = null; });
+            }
+            try {
+                await renovando;
+            } catch (e) {
+                sesionVencida();
+                throw new Error('Tu sesión terminó. Vuelve a entrar.');
+            }
+            return sesion.access_token;
+        }
+
+        async function api(metodo, ruta, cuerpo, extra) {
+            const token = await tokenVigente();
+            let r;
+            try {
+                r = await fetch(urlSupabase('/rest/v1/' + ruta), {
+                    method: metodo,
+                    headers: { apikey: CONEXION.llavePublica.trim(), Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', ...(extra || {}) },
+                    body: cuerpo ? JSON.stringify(cuerpo) : undefined
+                });
+            } catch (e) {
+                throw new Error('No hay conexión con la base de reservas. Revisa tu internet.');
+            }
+            if (r.status === 401) {
+                sesionVencida();
+                throw new Error('Tu sesión terminó. Vuelve a entrar.');
+            }
+            const texto = await r.text();
+            if (!r.ok) {
+                let j = {};
+                try { j = JSON.parse(texto); } catch (e) {}
+                throw new Error(j.message || 'La base de reservas respondió con un error (' + r.status + ').');
+            }
+            return texto ? JSON.parse(texto) : null;
+        }
+
+        /* =========================================================
+           Entrada al panel
+           ========================================================= */
+        const loginForm = document.getElementById('login-form');
+
+        function avisoLogin(texto, esError) {
+            const error = document.getElementById('login-error');
+            const aviso = document.getElementById('login-aviso');
+            error.textContent = esError ? texto : '';
+            aviso.textContent = esError ? '' : texto;
+            error.classList.toggle('hidden', !(esError && texto));
+            aviso.classList.toggle('hidden', !(!esError && texto));
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const clave = document.getElementById('password').value;
+            avisoLogin('');
+
+            if (!CONECTADO) {
+                // Modo de ejemplo: el correo es opcional; vacío entra como invitado
+                if (email && !/^\S+@\S+\.\S+$/.test(email)) return avisoLogin('Escribe un correo válido o deja el campo vacío.', true);
+                return enterPanel(email || 'Acceso de prueba');
+            }
+
+            if (!/^\S+@\S+\.\S+$/.test(email) || !clave) return avisoLogin('Escribe tu correo y tu contraseña.', true);
+            const boton = document.getElementById('login-boton');
+            const txt = document.getElementById('login-boton-txt');
+            boton.disabled = true;
+            txt.textContent = 'Entrando…';
+            try {
+                aplicarSesion(await auth('token?grant_type=password', { email, password: clave }), document.getElementById('remember').checked);
+                await entrarConectado();
+            } catch (err) {
+                avisoLogin(mensajeAuth(err), true);
+            } finally {
+                boton.disabled = false;
+                txt.textContent = 'Entrar al panel';
+            }
+        });
+
+        document.getElementById('toggle-pw').addEventListener('click', () => {
+            const pw = document.getElementById('password');
+            pw.type = pw.type === 'password' ? 'text' : 'password';
+            lucide.createIcons();
+        });
+
+        /* Con sesión iniciada: revisa que el correo tenga acceso y carga las reservas */
+        async function entrarConectado() {
+            const acceso = await api('GET', 'panel_acceso?select=correo');
+            if (!acceso || !acceso.length) {
+                try { await auth('logout', null, sesion.access_token); } catch (e) {}
+                borrarSesion();
+                throw new Error('Este correo no tiene acceso al panel. Hay que agregarlo en la tabla panel_acceso de Supabase.');
+            }
+            await leerTarifasDelSitio();
+            await cargarReservas();
+            document.getElementById('password').value = '';
+            enterPanel(sesion.email);
+            iniciarActualizacion();
+        }
+
+        function enterPanel(email) {
+            document.getElementById('side-email').textContent = email;
+            document.getElementById('side-inicial').textContent = (email || 'P').charAt(0).toUpperCase();
+            document.getElementById('ajuste-email').value = email;
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('app').classList.add('is-shown');
+            document.getElementById('view-date').textContent = capitalize(
+                new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+            );
+            renderTodo();
+            window.scrollTo(0, 0);
+        }
+
+        function mostrarLogin() {
+            document.getElementById('app').classList.remove('is-shown');
+            document.getElementById('login').style.display = '';
+            document.getElementById('password').value = '';
+            window.scrollTo(0, 0);
+        }
+
+        async function logout() {
+            if (CONECTADO && sesion) {
+                try { await auth('logout', null, sesion.access_token); } catch (e) { /* la sesión se borra igual */ }
+            }
+            borrarSesion();
+            clearInterval(temporizador);
+            if (CONECTADO) reservas = [];
+            cerrarModal();
+            mostrarLogin();
+        }
+
+        function sesionVencida() {
+            borrarSesion();
+            clearInterval(temporizador);
+            cerrarModal();
+            mostrarLogin();
+            avisoLogin('Tu sesión terminó. Vuelve a entrar.', true);
+        }
+
+        /* --- Contraseña olvidada: Supabase envía un enlace que vuelve a este panel --- */
+        async function olvideClave(e) {
+            e.preventDefault();
+            if (!CONECTADO) return toast('Disponible cuando el panel esté conectado a la base de reservas.');
+            const email = document.getElementById('email').value.trim();
+            if (!/^\S+@\S+\.\S+$/.test(email)) return avisoLogin('Escribe tu correo arriba y vuelve a tocar «¿Olvidaste la contraseña?».', true);
+            try {
+                await auth('recover?redirect_to=' + encodeURIComponent(location.origin + location.pathname), { email });
+                avisoLogin('Si ese correo tiene acceso, en unos minutos te llega un enlace para crear una contraseña nueva.');
+            } catch (err) {
+                avisoLogin(mensajeAuth(err), true);
+            }
+        }
+
+        function revisarEnlaceDeRecuperacion() {
+            const h = new URLSearchParams(location.hash.slice(1));
+            if (!h.toString()) return false;
+            history.replaceState(null, '', location.pathname);
+            if (h.get('error_description') || h.get('error')) {
+                avisoLogin('El enlace para cambiar la contraseña venció o ya se usó. Pide uno nuevo.', true);
+                return false;
+            }
+            if (h.get('type') !== 'recovery' || !h.get('access_token')) return false;
+            sesion = {
+                access_token: h.get('access_token'),
+                refresh_token: h.get('refresh_token'),
+                expires_at: Math.floor(Date.now() / 1000) + Number(h.get('expires_in') || 3600),
+                email: ''
+            };
+            loginForm.classList.add('hidden');
+            document.getElementById('form-clave-nueva').classList.remove('hidden');
+            document.getElementById('login-titulo').textContent = 'Crea tu nueva contraseña';
+            document.getElementById('login-subtitulo').textContent = 'Después entras directo al panel.';
+            return true;
+        }
+
+        document.getElementById('form-clave-nueva').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const a = document.getElementById('clave-recuperada').value;
+            const b = document.getElementById('clave-recuperada-2').value;
+            if (a.length < 8) return avisoLogin('La contraseña debe tener al menos 8 caracteres.', true);
+            if (a !== b) return avisoLogin('Las contraseñas no coinciden.', true);
+            try {
+                const usuario = await auth('user', { password: a }, sesion.access_token, 'PUT');
+                sesion.email = usuario.email || '';
+                guardarSesion(false);
+                document.getElementById('form-clave-nueva').classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                await entrarConectado();
+                toast('Contraseña guardada.');
+            } catch (err) {
+                avisoLogin(mensajeAuth(err), true);
+            }
+        });
+
+        async function cambiarClave() {
+            const a = document.getElementById('clave-nueva').value;
+            const b = document.getElementById('clave-repetir').value;
+            if (a.length < 8) return toast('La contraseña debe tener al menos 8 caracteres.');
+            if (a !== b) return toast('Las contraseñas no coinciden.');
+            try {
+                await auth('user', { password: a }, await tokenVigente(), 'PUT');
+                document.getElementById('clave-nueva').value = '';
+                document.getElementById('clave-repetir').value = '';
+                toast('Contraseña actualizada.');
+            } catch (err) {
+                toast(mensajeAuth(err));
+            }
+        }
+
+        /* --- Actualización automática mientras el panel está abierto --- */
+        let temporizador = null;
+        let escuchandoVisibilidad = false;
+        function iniciarActualizacion() {
+            clearInterval(temporizador);
+            temporizador = setInterval(refrescar, 60000);
+            if (!escuchandoVisibilidad) {
+                escuchandoVisibilidad = true;
+                document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refrescar(); });
+            }
+        }
+        async function refrescar() {
+            if (!CONECTADO || !sesion || document.visibilityState !== 'visible') return;
+            try {
+                await cargarReservas();
+                renderTodo();
+            } catch (e) { /* se reintenta en el siguiente ciclo */ }
+        }
+        async function refrescarAhora() {
+            if (vistaActual === 'estadisticas') return cargarEstadisticas();
+            if (!CONECTADO) return toast('Modo de ejemplo: no hay datos que actualizar.');
+            try {
+                await cargarReservas();
+                renderTodo();
+                toast('Reservas actualizadas.');
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        /* =========================================================
+           Navegación entre vistas
+           ========================================================= */
+        const titulos = {
+            resumen: 'Resumen',
+            reservas: 'Reservas',
+            disponibilidad: 'Disponibilidad',
+            estadisticas: 'Estadísticas',
+            habitaciones: 'Habitaciones y tarifas',
+            mensajes: 'Mensajes',
+            ajustes: 'Ajustes'
+        };
+
+        let vistaActual = 'resumen';
+        function nav(view) {
+            vistaActual = view;
+            document.querySelectorAll('.nav-item[data-view]').forEach(n => n.classList.toggle('is-active', n.dataset.view === view));
+            document.querySelectorAll('.view').forEach(v => v.classList.toggle('is-active', v.dataset.view === view));
+            document.getElementById('view-title').textContent = titulos[view] || '';
+            if (window.innerWidth < 1024) closeSidebar();
+            window.scrollTo(0, 0);
+            if (view === 'estadisticas') cargarEstadisticas();
+        }
+
+        document.querySelectorAll('.nav-item[data-view]').forEach(n => {
+            n.addEventListener('click', () => nav(n.dataset.view));
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('is-open');
+            document.getElementById('sidebar-scrim').classList.toggle('hidden');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('is-open');
+            document.getElementById('sidebar-scrim').classList.add('hidden');
+        }
+
+        function irAPendientes() {
+            nav('reservas');
+            elegirFiltro('pendiente');
+        }
+
+        /* =========================================================
+           Resumen
+           ========================================================= */
+        function renderResumen() {
+            const hoy = hoyISO();
+            const mes = hoy.slice(0, 7);
+            const delMes = reservas.filter(r => r.llegada.slice(0, 7) === mes && VIGENTES.includes(r.estado));
+            const pendientes = reservas.filter(r => r.estado === 'pendiente' && r.salida >= hoy);
+
+            document.getElementById('kpi-reservas').textContent = delMes.length;
+            const pendMes = delMes.filter(r => r.estado === 'pendiente').length;
+            const pill = document.getElementById('kpi-reservas-pill');
+            pill.textContent = pendMes + ' por confirmar';
+            pill.classList.toggle('hidden', !pendMes);
+
+            const [y, m] = mes.split('-').map(Number);
+            const dias = new Date(y, m, 0).getDate();
+            const unidades = Object.values(UNIDADES).reduce((a, b) => a + b, 0);
+            let ocupadas = 0;
+            for (let d = 1; d <= dias; d++) {
+                const occ = ocupadasLaNoche(mes + '-' + String(d).padStart(2, '0'));
+                ocupadas += Object.keys(UNIDADES).reduce((s, k) => s + Math.min(UNIDADES[k], occ[k] || 0), 0);
+            }
+            document.getElementById('kpi-ocupacion').textContent = Math.round(100 * ocupadas / ((unidades * dias) || 1)) + '%';
+
+            const confirmadas = delMes.filter(r => OCUPAN.includes(r.estado));
+            const enLinea = confirmadas.reduce((s, r) => s + (r.pagado || 0), 0);
+            document.getElementById('kpi-ventas').textContent = COP(confirmadas.reduce((s, r) => s + (r.total || 0), 0));
+            document.getElementById('kpi-ventas-nota').textContent = enLinea
+                ? 'COP · ' + COP(enLinea) + ' ya pagados con Bold'
+                : 'COP · reservas pagadas o confirmadas';
+
+            document.getElementById('kpi-pendientes').textContent = pendientes.length;
+            document.getElementById('kpi-pendientes-pill').classList.toggle('hidden', !pendientes.length);
+            document.getElementById('campana-punto').classList.toggle('hidden', !pendientes.length);
+            const navPend = document.getElementById('nav-pendientes');
+            navPend.textContent = pendientes.length;
+            navPend.classList.toggle('hidden', !pendientes.length);
+
+            renderLlegadas();
+            renderOcupacion();
+            renderActividad();
+        }
+
+        function renderLlegadas() {
+            const hoy = hoyISO();
+            const proximas = reservas
+                .filter(r => r.llegada >= hoy && VIGENTES.includes(r.estado))
+                .sort((a, b) => a.llegada.localeCompare(b.llegada))
+                .slice(0, 6);
+            document.getElementById('llegadas-body').innerHTML = proximas.length ? proximas.map(r => `<tr class="fila" onclick="abrirReserva('${esc(r.id)}')">
+                    <td class="text-ink">${esc(r.nombre)}</td>
+                    <td class="text-graphite/70">${esc(textoHabitaciones(r.habitaciones))}</td>
+                    <td class="text-graphite/70">${fechaCorta(r.llegada)}</td>
+                    <td class="text-graphite/70">${r.noches}</td>
+                    <td>${estadoPill(r.estado)}</td>
+                </tr>`).join('')
+                : '<tr><td colspan="5" class="text-graphite/45 text-center py-8">No hay llegadas próximas.</td></tr>';
+        }
+
+        function renderOcupacion() {
+            const hoy = hoyISO();
+            document.getElementById('ocupacion-body').innerHTML = Object.keys(UNIDADES).map(k => {
+                let noches = 0;
+                for (let i = 0; i < 30; i++) noches += Math.min(UNIDADES[k], ocupadasLaNoche(sumarDias(hoy, i))[k] || 0);
+                const valor = Math.round(100 * noches / ((UNIDADES[k] || 1) * 30));
+                return `<div>
+                    <div class="flex justify-between text-[0.78rem] mb-1.5">
+                        <span class="text-graphite/70">${CORTOS[k] || k}</span>
+                        <span class="text-ink font-medium">${valor}%</span>
+                    </div>
+                    <div class="h-1.5 bg-bone overflow-hidden">
+                        <div class="h-full bg-brass" style="width:${valor}%"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderActividad() {
+            const recientes = reservas.slice().sort((a, b) => String(b.actualizada).localeCompare(String(a.actualizada))).slice(0, 5);
+            document.getElementById('actividad-body').innerHTML = recientes.length ? recientes.map(r => `
+                <li class="flex items-start gap-3 cursor-pointer group" onclick="abrirReserva('${esc(r.id)}')">
+                    <i data-lucide="${(ESTADOS[r.estado] || ESTADOS.pendiente).icono}" class="w-3.5 h-3.5 text-brass shrink-0 mt-0.5"></i>
+                    <span class="text-[0.78rem] text-graphite/70 leading-snug group-hover:text-ink">${(ESTADOS[r.estado] || ESTADOS.pendiente).accion}${esc(r.nombre)}
+                        <span class="block text-graphite/35 text-[0.68rem]">${haceCuanto(r.actualizada)} · ${CANALES[r.canal] || ''}</span>
+                    </span>
+                </li>`).join('')
+                : '<li class="text-[0.78rem] text-graphite/45">Aún no hay movimientos.</li>';
+        }
+
+        /* =========================================================
+           Reservas
+           ========================================================= */
+        let filtroReserva = 'todas';
+
+        function renderReservas() {
+            const q = normalizar(document.getElementById('reserva-buscar').value);
+            const hoy = hoyISO();
+            const grupo = GRUPOS[filtroReserva];
+            const filas = reservas
+                .filter(r => !grupo || grupo.includes(r.estado))
+                .filter(r => !q || normalizar([r.nombre, r.orden, r.celular, r.correo, r.documento].join(' ')).includes(q))
+                .sort((a, b) => {
+                    // primero las que no han terminado (por llegada), después las pasadas (la más reciente primero)
+                    const fa = a.salida >= hoy, fb = b.salida >= hoy;
+                    if (fa !== fb) return fa ? -1 : 1;
+                    return fa ? a.llegada.localeCompare(b.llegada) : b.llegada.localeCompare(a.llegada);
+                });
+            document.getElementById('reservas-body').innerHTML = filas.map(r => `<tr class="fila" onclick="abrirReserva('${esc(r.id)}')">
+                <td><span class="block text-ink">${esc(r.nombre)}</span><span class="block text-[0.66rem] text-graphite/40">${esc(r.orden)}</span></td>
+                <td class="text-graphite/70">${esc(textoHabitaciones(r.habitaciones))}</td>
+                <td class="text-graphite/70">${fechaCorta(r.llegada)} – ${fechaCorta(r.salida)}</td>
+                <td class="text-graphite/70">${r.huespedes}</td>
+                <td class="text-graphite/70">${CANALES[r.canal] || esc(r.canal)}</td>
+                <td class="text-graphite/70">${COP(r.total)}${r.pagado ? `<span class="block text-[0.66rem] text-moss">Pagado ${COP(r.pagado)}</span>` : ''}</td>
+                <td>${estadoPill(r.estado)}</td>
+                <td class="text-right"><i data-lucide="chevron-right" class="w-4 h-4 text-graphite/30 inline"></i></td>
+            </tr>`).join('');
+            document.getElementById('reservas-vacio').classList.toggle('hidden', filas.length > 0);
+        }
+
+        function elegirFiltro(estado) {
+            filtroReserva = estado;
+            document.querySelectorAll('#reserva-filtros .chip').forEach(c => c.classList.toggle('is-active', c.dataset.estado === estado));
+            renderReservas();
+            lucide.createIcons();
+        }
+
+        document.getElementById('reserva-filtros').addEventListener('click', (e) => {
+            const btn = e.target.closest('.chip');
+            if (btn) elegirFiltro(btn.dataset.estado);
+        });
+        document.getElementById('reserva-buscar').addEventListener('input', () => { renderReservas(); lucide.createIcons(); });
+
+        /* --- Detalle de una reserva --- */
+        function abrirReserva(id) {
+            const r = porId(id);
+            if (!r) return;
+            const saldo = Math.max(0, (r.total || 0) - (r.pagado || 0));
+            const tel = String(r.celular || '').replace(/\D/g, '');
+            const wa = tel ? 'https://wa.me/' + (tel.length === 10 ? '57' + tel : tel) : '';
+            const dato = (titulo, valor) => valor || valor === 0
+                ? `<div><dt class="field-label mb-1">${titulo}</dt><dd class="text-[0.86rem] text-ink leading-snug">${valor}</dd></div>` : '';
+            const pago = r.pagado
+                ? COP(r.pagado) + (saldo ? ' · saldo al llegar ' + COP(saldo) : ' · sin saldo pendiente')
+                : (r.monto && r.canal !== 'manual' ? 'Sin pago confirmado · para confirmar: ' + COP(r.monto) + (r.modalidad === 'total' ? ' (total)' : ' (anticipo)') : '');
+            const boton = (texto, accion, clase, icono) =>
+                `<button type="button" onclick="${accion}" class="btn ${clase} btn-sm"><i data-lucide="${icono}" class="w-3.5 h-3.5"></i> ${texto}</button>`;
+            const idSeguro = esc(r.id);
+
+            const acciones = [];
+            if (!OCUPAN.includes(r.estado)) acciones.push(boton('Marcar como confirmada', `cambiarEstado('${idSeguro}', 'confirmada')`, 'btn-ink', 'check'));
+            if (r.canal === 'bold' && r.estado === 'pendiente' && CONEXION.servidor.trim()) acciones.push(boton('Consultar pago en Bold', `consultarPagoBold('${idSeguro}')`, 'btn-outline', 'refresh-cw'));
+            if (wa) acciones.push(`<a href="${wa}?text=${encodeURIComponent('¡Hola, ' + (r.nombre || '').split(' ')[0] + '! Te escribimos de Hotel Cabaleón por tu reserva ' + r.orden + '.')}" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WhatsApp</a>`);
+            if (r.estado !== 'cancelada') acciones.push(boton('Cancelar', `cambiarEstado('${idSeguro}', 'cancelada')`, 'btn-outline', 'x'));
+
+            abrirModal(`
+                <div class="p-6 sm:p-8 border-b border-line">
+                    <span class="micro text-brass-deep">${CANALES[r.canal] || ''} · ${esc(r.orden)}</span>
+                    <h3 class="font-display text-3xl text-ink leading-tight mt-2 pr-10">${esc(r.nombre)}</h3>
+                    <div class="mt-3 flex flex-wrap items-center gap-2">${estadoPill(r.estado)}
+                        <span class="text-[0.7rem] text-graphite/45">Creada ${haceCuanto(r.creada)} · actualizada ${haceCuanto(r.actualizada)}</span>
+                    </div>
+                </div>
+                <dl class="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                    ${dato('Llegada', fechaLarga(r.llegada) + ' · desde 3:00 p. m.')}
+                    ${dato('Salida', fechaLarga(r.salida) + ' · hasta 2:00 p. m.')}
+                    ${dato('Habitaciones', esc(textoHabitaciones(r.habitaciones)) + ' · ' + plural(r.noches, 'noche', 'noches'))}
+                    ${dato('Huéspedes', plural(r.huespedes, 'huésped', 'huéspedes') + (r.mascotas ? ' · ' + plural(r.mascotas, 'mascota', 'mascotas') : ''))}
+                    ${dato('Total de la estadía', COP(r.total) + (r.codigo ? ' · código ' + esc(r.codigo) : ''))}
+                    ${dato('Pago', pago + (r.metodo_pago ? ' · ' + esc(r.metodo_pago) : ''))}
+                    ${dato('Documento', esc([r.tipo_documento, r.documento].filter(Boolean).join(' ')))}
+                    ${dato('Celular', tel ? `<a href="${wa}" target="_blank" rel="noopener" class="border-b border-brass hover:text-brass-deep">${esc(r.celular)}</a>` : '')}
+                    ${dato('Correo', r.correo ? `<a href="mailto:${esc(r.correo)}" class="border-b border-brass hover:text-brass-deep break-all">${esc(r.correo)}</a>` : '')}
+                </dl>
+                ${r.estado === 'pagada' ? '<p class="mx-6 sm:mx-8 mb-5 p-3 bg-bone border border-line text-[0.74rem] text-graphite/60">Si cancelas una reserva pagada, el dinero no se devuelve solo: la devolución se hace desde el panel de Bold.</p>' : ''}
+                <div class="px-6 sm:px-8 pb-6">
+                    <label class="field-label" for="r-notas">Notas internas</label>
+                    <textarea id="r-notas" class="field-input" rows="3" maxlength="500" placeholder="Ej.: pagó el saldo por transferencia, llega tarde, celebra aniversario…">${esc(r.notas)}</textarea>
+                    <button type="button" onclick="guardarNotas('${idSeguro}')" class="text-[0.72rem] text-brass-deep border-b border-brass/50 hover:text-ink mt-2">Guardar notas</button>
+                </div>
+                <div class="px-6 sm:px-8 pb-8 flex flex-wrap gap-3">${acciones.join('')}</div>
+            `);
+        }
+
+        async function actualizarReserva(id, cambios) {
+            const r = porId(id);
+            if (!CONECTADO) {
+                Object.assign(r, cambios, { actualizada: new Date().toISOString() });
+                toast('Modo de ejemplo: el cambio no se guarda.');
+                return;
+            }
+            const filas = await api('PATCH', 'reservas?id=eq.' + encodeURIComponent(id), cambios, { Prefer: 'return=representation' });
+            if (!filas || !filas.length) throw new Error('No se pudo guardar el cambio. Vuelve a cargar el panel.');
+            Object.assign(r, filas[0]);
+        }
+
+        async function cambiarEstado(id, estado) {
+            const r = porId(id);
+            if (!r) return;
+            if (estado === 'cancelada' && !confirm('¿Cancelar la reserva de ' + r.nombre + '?' +
+                (OCUPAN.includes(r.estado) ? ' Sus habitaciones vuelven a ofrecerse en la página para esas fechas.' : ''))) return;
+            if (estado === 'confirmada') {
+                const faltan = faltaCupo(r.llegada, r.salida, r.habitaciones, r.id);
+                if (faltan.length && !confirm('Ya no hay cupo en ' + faltan.join(', ') + ' para esas fechas. ¿Confirmar de todas formas?')) return;
+                if (!faltan.length && r.canal !== 'manual' && !confirm('¿Confirmar la reserva de ' + r.nombre + '? Úsalo cuando el pago llegó por otro medio (transferencia, efectivo…). Sus habitaciones dejan de ofrecerse en la página para esas fechas.')) return;
+            }
+            try {
+                await actualizarReserva(id, { estado });
+                if (CONECTADO) toast(estado === 'cancelada' ? 'Reserva cancelada.' : 'Reserva confirmada.');
+                renderTodo();
+                abrirReserva(id);
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        async function guardarNotas(id) {
+            try {
+                await actualizarReserva(id, { notas: document.getElementById('r-notas').value.trim().slice(0, 500) || null });
+                if (CONECTADO) toast('Notas guardadas.');
+                renderTodo();
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        /* Pago con Bold que quedó en proceso (por ejemplo, PSE): se consulta en Bold y se anota */
+        async function consultarPagoBold(id) {
+            const r = porId(id);
+            if (!r) return;
+            try {
+                const resp = await fetch(CONEXION.servidor.trim().replace(/\/+$/, '') + '/estado?orden=' + encodeURIComponent(r.orden));
+                const j = await resp.json().catch(() => ({}));
+                if (!resp.ok) throw new Error(j.error || 'Bold no respondió. Intenta en unos minutos.');
+                toast({
+                    APPROVED: 'Bold confirma el pago.', PENDING: 'El pago sigue en proceso.', PROCESSING: 'El pago sigue en proceso.',
+                    REJECTED: 'Bold rechazó el pago.', FAILED: 'El pago no se completó.', VOIDED: 'El pago fue anulado.',
+                    NO_TRANSACTION_FOUND: 'Bold aún no tiene un pago con este número.'
+                }[j.estado] || 'Estado en Bold: ' + j.estado);
+                await cargarReservas();
+                renderTodo();
+                abrirReserva(id);
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        /* --- Nueva reserva (por teléfono, WhatsApp o en recepción) --- */
+        function abrirNuevaReserva() {
+            const hoy = hoyISO();
+            abrirModal(`
+                <form id="form-nueva" class="p-6 sm:p-8" novalidate>
+                    <span class="micro text-brass-deep">Registrada por el hotel</span>
+                    <h3 class="font-display text-3xl text-ink mt-2 mb-6 pr-10">Nueva reserva</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2"><label class="field-label" for="n-nombre">Nombre del titular</label><input id="n-nombre" class="field-input" maxlength="60" autocomplete="off"></div>
+                        <div><label class="field-label" for="n-celular">Celular</label><input id="n-celular" class="field-input" inputmode="tel" maxlength="20" autocomplete="off"></div>
+                        <div><label class="field-label" for="n-correo">Correo</label><input id="n-correo" type="email" class="field-input" maxlength="80" autocomplete="off"></div>
+                        <div><label class="field-label" for="n-llegada">Llegada</label><input id="n-llegada" type="date" class="field-input" value="${hoy}"></div>
+                        <div><label class="field-label" for="n-salida">Salida</label><input id="n-salida" type="date" class="field-input" value="${sumarDias(hoy, 1)}"></div>
+                    </div>
+                    <span class="field-label mt-6">Habitaciones</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="n-habs">
+                        ${Object.keys(UNIDADES).map(k => `<label class="border border-line p-3 flex items-center justify-between gap-3">
+                            <span class="min-w-0"><span class="block text-[0.82rem] text-ink">${CORTOS[k] || k}</span><span class="block text-[0.68rem] text-graphite/45" data-libres="${k}"></span></span>
+                            <input type="number" min="0" max="${UNIDADES[k]}" value="0" data-hab="${k}" class="field-input w-20 text-center py-2">
+                        </label>`).join('')}
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                        <div><label class="field-label" for="n-huespedes">Huéspedes</label><input id="n-huespedes" type="number" min="1" max="60" value="2" class="field-input"></div>
+                        <div><label class="field-label" for="n-total">Total (COP)</label><input id="n-total" type="number" min="0" step="1000" class="field-input"></div>
+                        <div><label class="field-label" for="n-estado">Estado</label>
+                            <select id="n-estado" class="field-input">
+                                <option value="confirmada">Confirmada (aparta las habitaciones)</option>
+                                <option value="pendiente">Pendiente de pago (no aparta)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p id="n-tarifa" class="text-[0.72rem] text-graphite/50 mt-2"></p>
+                    <div class="mt-4"><label class="field-label" for="n-notas">Notas internas</label><textarea id="n-notas" class="field-input" rows="2" maxlength="500"></textarea></div>
+                    <p id="n-aviso" class="hidden text-[0.76rem] text-[#8a6a34] bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] px-3 py-2 mt-4"></p>
+                    <p id="n-error" class="hidden text-[0.78rem] text-[#8a3d3d] mt-4" role="alert"></p>
+                    <div class="flex flex-wrap gap-3 mt-6">
+                        <button type="submit" class="btn btn-ink"><i data-lucide="save" class="w-4 h-4"></i> Guardar reserva</button>
+                        <button type="button" onclick="cerrarModal()" class="btn btn-outline">Cancelar</button>
+                    </div>
+                </form>`);
+            const form = document.getElementById('form-nueva');
+            form.addEventListener('input', actualizarNuevaReserva);
+            form.addEventListener('submit', guardarNuevaReserva);
+            actualizarNuevaReserva();
+            document.getElementById('n-nombre').focus();
+        }
+
+        function leerNuevaReserva() {
+            const v = id => document.getElementById(id).value.trim();
+            const habs = {};
+            document.querySelectorAll('#n-habs input[data-hab]').forEach(i => {
+                const n = parseInt(i.value, 10) || 0;
+                if (n > 0) habs[i.dataset.hab] = n;
+            });
+            return { nombre: v('n-nombre'), celular: v('n-celular'), correo: v('n-correo'), llegada: v('n-llegada'), salida: v('n-salida'), habs };
+        }
+
+        /* Muestra cuántas quedan libres en esas fechas y la tarifa de la página */
+        function actualizarNuevaReserva() {
+            const d = leerNuevaReserva();
+            const fechasOk = d.llegada && d.salida && d.salida > d.llegada;
+            const libres = fechasOk ? libresEntre(d.llegada, d.salida) : null;
+            document.querySelectorAll('#n-habs [data-libres]').forEach(el => {
+                el.textContent = libres ? plural(libres[el.dataset.libres], 'libre', 'libres') + ' en esas fechas' : '';
+            });
+            const faltan = fechasOk ? faltaCupo(d.llegada, d.salida, d.habs) : [];
+            const aviso = document.getElementById('n-aviso');
+            aviso.textContent = faltan.length ? 'No hay cupo suficiente en ' + faltan.join(', ') + '. Si la guardas como confirmada, esas fechas quedan sobrevendidas.' : '';
+            aviso.classList.toggle('hidden', !faltan.length);
+            const estimado = fechasOk && Object.keys(d.habs).length ? estimarTotal(d.llegada, d.salida, d.habs) : 0;
+            document.getElementById('n-total').placeholder = estimado ? String(estimado) : '';
+            document.getElementById('n-tarifa').textContent = estimado
+                ? 'Tarifa de la página: ' + COP(estimado) + ' por ' + plural(nochesEntre(d.llegada, d.salida), 'noche', 'noches') + '. Si dejas el total vacío, se usa este valor.'
+                : '';
+        }
+
+        async function guardarNuevaReserva(e) {
+            e.preventDefault();
+            const d = leerNuevaReserva();
+            const error = document.getElementById('n-error');
+            const fallo = texto => { error.textContent = texto; error.classList.remove('hidden'); };
+            error.classList.add('hidden');
+            if (d.nombre.length < 3) return fallo('Escribe el nombre del titular.');
+            if (!d.llegada || !d.salida || d.salida <= d.llegada) return fallo('Revisa las fechas: la salida debe ser después de la llegada.');
+            if (!Object.keys(d.habs).length) return fallo('Indica al menos una habitación.');
+            if (d.correo && !/^\S+@\S+\.\S+$/.test(d.correo)) return fallo('Revisa el correo o déjalo vacío.');
+            const estado = document.getElementById('n-estado').value === 'pendiente' ? 'pendiente' : 'confirmada';
+            const faltan = faltaCupo(d.llegada, d.salida, d.habs);
+            if (estado === 'confirmada' && faltan.length && !confirm('No hay cupo suficiente en ' + faltan.join(', ') + '. ¿Guardar la reserva de todas formas?')) return;
+
+            const fila = {
+                orden: 'MAN-' + hoyISO().slice(2).replace(/-/g, '') + '-' + aleatorio(4),
+                canal: 'manual', estado,
+                llegada: d.llegada, salida: d.salida, noches: nochesEntre(d.llegada, d.salida), habitaciones: d.habs,
+                huespedes: Math.min(60, Math.max(1, parseInt(document.getElementById('n-huespedes').value, 10) || 1)), mascotas: 0,
+                total: parseInt(document.getElementById('n-total').value, 10) || estimarTotal(d.llegada, d.salida, d.habs),
+                monto: 0, nombre: d.nombre.slice(0, 60), celular: d.celular || null, correo: d.correo || null,
+                notas: document.getElementById('n-notas').value.trim().slice(0, 500) || null
+            };
+            try {
+                if (CONECTADO) {
+                    const filas = await api('POST', 'reservas', fila, { Prefer: 'return=representation' });
+                    reservas.push(filas[0]);
+                    toast('Reserva guardada.');
+                } else {
+                    const ahora = new Date().toISOString();
+                    reservas.push({ ...fila, id: 'ejemplo-' + Date.now(), creada: ahora, actualizada: ahora, pagado: 0 });
+                    toast('Modo de ejemplo: la reserva no se guarda.');
+                }
+                cerrarModal();
+                renderTodo();
+            } catch (err) {
+                fallo(err.message);
+            }
+        }
+
+        /* =========================================================
+           Disponibilidad (calendario del mes)
+           ========================================================= */
+        let mesCalendario = { y: new Date().getFullYear(), m: new Date().getMonth() };
+        let diaElegido = '';
+
+        function moverMes(delta) {
+            const d = new Date(mesCalendario.y, mesCalendario.m + delta, 1);
+            mesCalendario = { y: d.getFullYear(), m: d.getMonth() };
+            renderCalendario();
+            lucide.createIcons();
+        }
+
+        function elegirDia(dia) {
+            diaElegido = dia;
+            renderCalendario();
+            lucide.createIcons();
+        }
+
+        function renderCalendario() {
+            const { y, m } = mesCalendario;
+            document.getElementById('cal-titulo').textContent = capitalize(new Date(y, m, 1).toLocaleDateString('es-CO', { month: 'long', year: 'numeric' }));
+            const offset = (new Date(y, m, 1).getDay() + 6) % 7;   // la rejilla empieza el lunes
+            const dias = new Date(y, m + 1, 0).getDate();
+            const total = Object.values(UNIDADES).reduce((a, b) => a + b, 0);
+            const hoy = hoyISO();
+            let html = '';
+            for (let i = 0; i < offset; i++) html += '<div class="cal-day is-muted"></div>';
+            for (let d = 1; d <= dias; d++) {
+                const dia = iso(new Date(y, m, d));
+                const occ = ocupadasLaNoche(dia);
+                const ocupadas = Object.keys(UNIDADES).reduce((s, k) => s + Math.min(UNIDADES[k], occ[k] || 0), 0);
+                const libres = total - ocupadas;
+                let cls = 'cal-day';
+                let tag = '';
+                if (!libres) { cls += ' is-full'; tag = 'Lleno'; }
+                else if (ocupadas) { cls += ' is-partial'; tag = plural(libres, 'libre', 'libres'); }
+                if (dia < hoy) cls += ' is-past';
+                if (dia === diaElegido) cls += ' is-elegido';
+                html += `<button type="button" class="${cls}" onclick="elegirDia('${dia}')"><span>${d}</span>${tag ? `<span class="text-[0.55rem] font-normal">${tag}</span>` : ''}</button>`;
+            }
+            document.getElementById('calendario').innerHTML = html;
+            renderDetalleDia();
+        }
+
+        function renderDetalleDia() {
+            const cont = document.getElementById('cal-detalle');
+            if (!diaElegido) {
+                cont.innerHTML = '<p class="text-[0.78rem] text-graphite/50">Toca un día para ver cuántas habitaciones quedan libres y quién se hospeda esa noche.</p>';
+                return;
+            }
+            const occ = ocupadasLaNoche(diaElegido);
+            const esaNoche = r => r.llegada <= diaElegido && diaElegido < r.salida;
+            const hospedados = reservas.filter(r => OCUPAN.includes(r.estado) && esaNoche(r));
+            const pendientes = reservas.filter(r => r.estado === 'pendiente' && esaNoche(r));
+            cont.innerHTML = `
+                <h4 class="font-display text-xl text-ink mb-4">Noche del ${fechaLarga(diaElegido).toLowerCase()}</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                    ${Object.keys(UNIDADES).map(k => {
+                        const libres = Math.max(0, UNIDADES[k] - (occ[k] || 0));
+                        return `<div class="border border-line p-3">
+                            <span class="block text-[0.72rem] text-graphite/55">${CORTOS[k] || k}</span>
+                            <span class="font-display text-2xl ${libres ? 'text-ink' : 'text-[#8a3d3d]'}">${libres}</span>
+                            <span class="text-[0.7rem] text-graphite/45">de ${UNIDADES[k]} libres</span>
+                        </div>`;
+                    }).join('')}
+                </div>
+                ${hospedados.length
+                    ? `<span class="micro text-graphite/40 block mb-2">Hospedados esa noche</span>
+                       <ul class="divide-y divide-line border-y border-line">${hospedados.map(r => `
+                           <li class="py-2.5 flex justify-between gap-3 text-[0.8rem] cursor-pointer hover:text-brass-deep" onclick="abrirReserva('${esc(r.id)}')">
+                               <span class="text-ink">${esc(r.nombre)}</span><span class="text-graphite/50 text-right">${esc(textoHabitaciones(r.habitaciones))}</span>
+                           </li>`).join('')}</ul>`
+                    : '<p class="text-[0.78rem] text-graphite/50">Nadie hospedado esa noche.</p>'}
+                ${pendientes.length ? `<p class="text-[0.72rem] text-[#8a6a34] mt-3">${plural(pendientes.length, 'reserva pendiente', 'reservas pendientes')} de pago para esa noche (no apartan habitación).</p>` : ''}`;
+        }
+
+        /* =========================================================
+           Habitaciones y tarifas (se leen de index.html)
+           ========================================================= */
+        function renderHabitaciones() {
+            document.getElementById('habitaciones-body').innerHTML = Object.keys(UNIDADES).map(k => `
+                <div class="card p-5">
+                    <h3 class="font-display text-lg text-ink leading-tight mb-1">${NOMBRES[k] || k}</h3>
+                    <p class="micro text-graphite/40 mb-5">${plural(UNIDADES[k], 'unidad', 'unidades')} · hasta ${CAPACIDAD[k] || '—'} huéspedes</p>
+                    <dl class="space-y-3 text-[0.8rem]">${!TARIFAS[k]
+                        ? '<div class="text-graphite/55">Sin tarifa en index.html</div>'
+                        : TARIFAS[k].finde === TARIFAS[k].semana
+                        ? `<div class="flex justify-between gap-3"><dt class="text-graphite/55">Por noche, cualquier día</dt><dd class="text-ink">${COP(TARIFAS[k].semana)}</dd></div>`
+                        : `<div class="flex justify-between gap-3"><dt class="text-graphite/55">Fin de semana y festivos</dt><dd class="text-ink">${COP(TARIFAS[k].finde)}</dd></div>
+                           <div class="flex justify-between gap-3"><dt class="text-graphite/55">Domingo a jueves</dt><dd class="text-ink">${COP(TARIFAS[k].semana)}</dd></div>`}
+                    </dl>
+                </div>`).join('');
+        }
+
+        /* =========================================================
+           Mensajes (solo modo de ejemplo: los mensajes reales llegan al WhatsApp del hotel)
+           ========================================================= */
+        const mensajes = [
+            { nombre: 'Paula Girón',   canal: 'WhatsApp', hace: 'hace 1 h', texto: 'Hola, ¿tienen disponibilidad para 2 personas el fin de semana del 20? Gracias.', leido: false },
+            { nombre: 'Jorge Medina',  canal: 'Correo',   hace: 'hace 4 h', texto: '¿El desayuno incluye opciones sin gluten? Viajamos con un niño.', leido: false },
+            { nombre: 'Sara Cardona',  canal: 'WhatsApp', hace: 'ayer',      texto: '¿Se puede llegar en carro particular hasta el hotel? ¿Cómo está la vía?', leido: false },
+            { nombre: 'Tomás Ruiz',    canal: 'Correo',   hace: 'hace 3 días', texto: 'Gracias por la estadía, todo excelente. ¿Me pueden enviar la factura?', leido: true }
+        ];
+
+        function renderMensajes() {
+            document.getElementById('mensajes-body').innerHTML = mensajes.map(m => `
+                <div class="p-5 flex gap-4 ${m.leido ? '' : 'bg-bone/60'}">
+                    <span class="w-9 h-9 rounded-full bg-ink/5 text-ink flex items-center justify-center font-display text-base shrink-0">${m.nombre.charAt(0)}</span>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <span class="text-[0.86rem] text-ink font-medium">${m.nombre}</span>
+                            <span class="pill pill-gray">${m.canal}</span>
+                            ${m.leido ? '' : '<span class="w-1.5 h-1.5 bg-brass rounded-full"></span>'}
+                            <span class="text-[0.68rem] text-graphite/40 ml-auto">${m.hace}</span>
+                        </div>
+                        <p class="text-[0.83rem] text-graphite/70 leading-snug mb-3">${m.texto}</p>
+                        <button class="btn btn-outline btn-sm" onclick="toast('Modo de ejemplo: los mensajes reales llegan al WhatsApp del hotel.')">
+                            <i data-lucide="reply" class="w-3.5 h-3.5"></i> Responder
+                        </button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderTodo() {
+            renderResumen();
+            renderReservas();
+            renderCalendario();
+            renderHabitaciones();
+            if (!CONECTADO) renderMensajes();
+            lucide.createIcons();
+        }
+
+        /* =========================================================
+           Estadísticas de la página
+           index.html mide las visitas y lo que hacen, sin datos
+           personales, y el servidor de reservas lo guarda en Supabase
+           (tabla eventos). Aquí se pide el resumen del período a la
+           función estadisticas y se dibuja. Sin conexión, datos de ejemplo.
+           ========================================================= */
+        const AZUL = '#1C4A62';
+        const DORADO = '#A8834A';
+        const RAMPA_EMBUDO = ['#9DB7C6', '#6E93A8', '#45708A', '#2A5570', '#163B52', '#0A212E'];
+        const SECCIONES = {
+            inicio: 'Portada', destacados: 'Destacados', hotel: 'El hotel', habitaciones: 'Habitaciones', servicios: 'Servicios',
+            eventos: 'Eventos', planes: 'Planes', restaurante: 'Restaurante Mangolé', bar: 'Cabalante Bar', galeria: 'Galería',
+            resenas: 'Reseñas', informacion: 'Antes de tu llegada', reservar: 'Reservar', faq: 'Preguntas frecuentes',
+            catalogo: 'Catálogo de ofertas', contacto: 'Contacto'
+        };
+        const INTERACCIONES = {
+            whatsapp: ['message-circle', 'Escribieron por WhatsApp'], llamada: ['phone', 'Llamaron'], correo: ['mail', 'Enviaron un correo'],
+            como_llegar: ['navigation', 'Abrieron cómo llegar'], red_social: ['share-2', 'Fueron a las redes'],
+            documento: ['file-text', 'Abrieron un documento'], ficha_habitacion: ['bed-double', 'Abrieron una habitación'],
+            galeria: ['images', 'Abrieron fotos de la galería'], plan: ['sparkles', 'Pidieron un plan'],
+            asistente: ['message-square', 'Abrieron el asistente'], asistente_tema: ['circle-help', 'Preguntaron al asistente'],
+            pedido_mangole: ['utensils', 'Enviaron un pedido a Mangolé'], fechas: ['calendar', 'Eligieron fechas'],
+            habitacion_agregada: ['plus', 'Agregaron una habitación'], carrito: ['key', 'Abrieron su reserva'],
+            datos_completos: ['user-check', 'Completaron sus datos'], reserva_whatsapp: ['send', 'Enviaron la reserva por WhatsApp'],
+            pago_iniciado: ['credit-card', 'Abrieron el pago con Bold'], pago: ['badge-check', 'Volvieron del pago con Bold']
+        };
+        const PASOS_EMBUDO = {
+            visita: 'Visitaron la página', reservar: 'Llegaron a Reservar', fechas: 'Eligieron fechas',
+            habitacion: 'Agregaron una habitación', datos: 'Completaron sus datos', confirmo: 'Enviaron su reserva'
+        };
+        const TEMAS = {
+            precios: 'Precios', incluye_tarifa: 'Qué incluye la tarifa', descuento: 'Descuentos', temporada: 'Temporadas y festivos',
+            planes: 'Planes', pasadia: 'Pasadía', habitaciones: 'Habitaciones', suite: 'Suite', cabana: 'Cabaña', triple: 'Habitación triple',
+            cuadruple: 'Habitación cuádruple', comparar: 'Comparar habitaciones', capacidad: 'Capacidad', camas: 'Camas',
+            hotel_general: 'Sobre el hotel', reservar: 'Cómo reservar', pago: 'Formas de pago', cancelar: 'Cancelaciones',
+            formas_reserva: 'Dónde reservar', confirmacion: 'Confirmación', horarios: 'Horarios', desayuno: 'Desayuno', comidas: 'Comidas',
+            pedido: 'Pedidos', bar: 'Bar', dieta: 'Dietas especiales', piscina: 'Piscina', humedas: 'Sauna y turco', gimnasio: 'Gimnasio',
+            recreacion: 'Recreación', experiencias: 'Experiencias', servicios: 'Servicios', aire: 'Aire acondicionado', tv: 'Televisión',
+            bano: 'Baño', balcon: 'Balcón', caja_fuerte: 'Cajilla de seguridad', limpieza: 'Limpieza', ropa_cama: 'Ropa de cama',
+            wifi: 'Wifi', parqueadero: 'Parqueadero', ubicacion: 'Ubicación', via: 'Estado de la vía', distancia: 'Distancia',
+            transporte: 'Transporte', pueblo: 'Pueblos cercanos', salud: 'Centros de salud', clima: 'Clima', llevar: 'Qué llevar',
+            actividades: 'Actividades', atardecer: 'Atardecer', tranquilidad: 'Tranquilidad', llegar_tarde: 'Llegar tarde',
+            mascotas: 'Mascotas', ninos: 'Niños', cuna: 'Cuna', accesibilidad: 'Accesibilidad', fumar: 'Fumar', eventos: 'Eventos',
+            resenas: 'Reseñas', anfitriones: 'Anfitriones', contacto: 'Contacto', rnt: 'Registro de turismo', idiomas: 'Idiomas',
+            sin_respuesta: 'Preguntas que no entendió'
+        };
+        const CONVERSACION = ['saludo', 'ayuda', 'gracias', 'ok', 'despedida'];
+        const DIAS_SEMANA = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados', 'domingos'];
+        const ICONOS_EQUIPO = { Celular: 'smartphone', Computador: 'monitor', Tablet: 'tablet' };
+        /* [id, texto, utm_source, utm_medium, campaña por defecto]. Los nombres coinciden con los de index.html */
+        const LUGARES_ENLACE = [
+            ['instagram-bio', 'Instagram · biografía', 'instagram', 'social', 'biografia'],
+            ['instagram', 'Instagram · historias y publicaciones', 'instagram', 'social', 'publicaciones'],
+            ['facebook', 'Facebook', 'facebook', 'social', 'publicaciones'],
+            ['whatsapp', 'WhatsApp · estados y mensajes', 'whatsapp', 'social', 'mensajes'],
+            ['google', 'Google · perfil del negocio', 'google', 'perfil', 'perfil'],
+            ['tiktok', 'TikTok', 'tiktok', 'social', 'perfil'],
+            ['qr', 'Volante o código QR', 'qr', 'impreso', 'volante'],
+            ['correo', 'Correo a clientes', 'email', 'correo', 'boletin'],
+            ['anuncio', 'Anuncio pagado en redes', 'facebook', 'cpc', 'anuncio']
+        ];
+
+        const num = n => Math.round(Number(n) || 0).toLocaleString('es-CO');
+        const pct = (a, b) => (b ? Math.round(100 * (a || 0) / b) : 0);
+        const pctDecimal = (a, b) => (b ? (100 * (a || 0) / b).toFixed(1).replace('.', ',') : '0') + ' %';
+        const duracionTxt = s => { s = Math.round(s || 0); return s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + String(s % 60).padStart(2, '0') + ' s'; };
+        const horaTxt = h => (h === 0 ? '12 a. m.' : h < 12 ? h + ' a. m.' : h === 12 ? '12 m.' : (h - 12) + ' p. m.');
+        const legible = id => { const t = String(id || '').replace(/[_-]+/g, ' ').trim(); return t ? t.charAt(0).toUpperCase() + t.slice(1) : 'Otro'; };
+        const nombrePais = c => { try { return new Intl.DisplayNames(['es'], { type: 'region' }).of(c) || c; } catch (e) { return c; } };
+        const vacioEst = texto => '<p class="text-[0.78rem] text-graphite/45 py-2">' + (texto || 'Sin datos en este período.') + '</p>';
+
+        let diasEstadisticas = 30;
+        let datosEstadisticas = null;
+        let consultaEstadisticas = 0;
+
+        async function cargarEstadisticas() {
+            const hasta = hoyISO();
+            const desde = sumarDias(hasta, -(diasEstadisticas - 1));
+            document.getElementById('est-rango').textContent = desde === hasta ? fechaLarga(hasta) : fechaCorta(desde) + ' – ' + fechaCorta(hasta);
+            const id = ++consultaEstadisticas;
+            const cont = document.getElementById('est-contenido');
+            cont.classList.add('is-cargando');   // se mantiene lo anterior, atenuado, mientras llega lo nuevo
+            try {
+                const d = CONECTADO ? await api('POST', 'rpc/estadisticas', { desde, hasta }) : estadisticasDeEjemplo(desde, hasta);
+                if (id !== consultaEstadisticas) return;
+                datosEstadisticas = d;
+                renderEstadisticas(d);
+            } catch (e) {
+                if (id === consultaEstadisticas) avisoEstadisticas('No se pudieron cargar las estadísticas: ' + e.message);
+            } finally {
+                if (id === consultaEstadisticas) cont.classList.remove('is-cargando');
+            }
+        }
+
+        function avisoEstadisticas(texto) {
+            const aviso = document.getElementById('est-aviso');
+            aviso.textContent = texto;
+            aviso.classList.toggle('hidden', !texto);
+        }
+
+        function renderEstadisticas(d) {
+            const r = d.resumen || {};
+            avisoEstadisticas(!CONECTADO
+                ? 'Datos de ejemplo. Al conectar el panel con Supabase aquí aparecen las visitas reales de la página.'
+                : !r.visitas ? 'Aún no hay visitas registradas en este período. Se llenan solas cuando la página está publicada y conectada al servidor de reservas.' : '');
+            renderKpis(r, d.anterior || {});
+            graficoDias(d.por_dia || []);
+            barras('est-fuentes', d.fuentes || [], {
+                total: r.visitas,
+                nota: f => num(f.whatsapp) + ' escribieron por WhatsApp · ' + num(f.reservas) + (f.reservas === 1 ? ' reserva' : ' reservas')
+            });
+            embudo(d.embudo || []);
+            barras('est-dispositivos', d.dispositivos || [], { total: r.visitas, icono: f => ICONOS_EQUIPO[f.nombre] || 'circle' });
+            document.getElementById('est-equipos').innerHTML = [['Navegador', d.navegadores], ['Sistema', d.sistemas]].map(([titulo, filas]) =>
+                '<div class="min-w-0"><span class="micro text-graphite/40 block mb-2">' + titulo + '</span>' +
+                ((filas || []).slice(0, 4).map(f => '<span class="flex justify-between gap-2 text-[0.74rem] py-0.5"><span class="truncate text-graphite/70">' + esc(f.nombre) +
+                    '</span><span class="text-ink">' + pct(f.visitas, r.visitas) + ' %</span></span>').join('') || vacioEst()) + '</div>').join('');
+            ubicacion(d.paises || [], d.ciudades || [], r.visitas);
+            graficoHoras(d.horas || [], d.dias_semana || []);
+            const vistas = {};
+            (d.secciones || []).forEach(s => { vistas[s.nombre] = s.visitas; });
+            barras('est-secciones', Object.keys(SECCIONES).filter(k => vistas[k]).map(k => ({ nombre: SECCIONES[k], visitas: vistas[k] })),
+                { total: r.visitas, vacio: 'Aún no hay secciones vistas en este período.' });
+            barras('est-interacciones', (d.interacciones || []).filter(i => INTERACCIONES[i.tipo]), {
+                valor: i => i.total, icono: i => INTERACCIONES[i.tipo][0], nombre: i => INTERACCIONES[i.tipo][1],
+                nota: i => 'en ' + num(i.visitas) + (i.visitas === 1 ? ' visita' : ' visitas') +
+                    (i.tipo === 'whatsapp' && (d.whatsapp_desde || []).length
+                        ? ' · más desde: ' + d.whatsapp_desde.slice(0, 3).map(w => SECCIONES[w.nombre] || w.nombre).join(', ') : '')
+            });
+            barras('est-habitaciones', d.habitaciones || [], {
+                valor: h => h.fichas, nombre: h => NOMBRES[h.nombre] || legible(h.nombre),
+                nota: h => num(h.agregadas) + (h.agregadas === 1 ? ' vez agregada' : ' veces agregada') + ' a una reserva',
+                vacio: 'Nadie ha abierto todavía la ficha de una habitación.'
+            });
+            campanas(d.referentes || [], d.campanas || []);
+            barras('est-temas', (d.temas || []).filter(t => !CONVERSACION.includes(t.nombre)), {
+                valor: t => t.total, nombre: t => TEMAS[t.nombre] || legible(t.nombre), vacio: 'Nadie ha usado el asistente en este período.'
+            });
+            lucide.createIcons();
+        }
+
+        function renderKpis(r, a) {
+            const cambio = (actual, antes) => {
+                if (!antes) return '';
+                const v = Math.round(100 * ((actual || 0) - antes) / antes);
+                const sube = v >= 0;
+                return '<span class="flex items-center gap-1.5 mt-2 text-[0.7rem] ' + (sube ? 'text-moss' : 'text-[#8a3d3d]') + '">' +
+                    '<i data-lucide="' + (sube ? 'trending-up' : 'trending-down') + '" class="w-3.5 h-3.5"></i>' +
+                    (sube ? '+' : '−') + Math.abs(v) + ' %<span class="text-graphite/40">vs. período anterior</span></span>';
+            };
+            const tarjetas = [
+                ['Visitas', num(r.visitas), num(r.paginas) + ' páginas abiertas', cambio(r.visitas, a.visitas)],
+                ['Visitantes', num(r.visitantes), num(r.nuevos) + ' llegaron por primera vez', cambio(r.visitantes, a.visitantes)],
+                ['Tiempo promedio', duracionTxt(r.duracion), 'Con la página a la vista, por visita', ''],
+                ['Interactuaron', pct(r.interactuaron, r.visitas) + ' %', num(r.interactuaron) + ' visitas tocaron algún botón', ''],
+                ['Escribieron por WhatsApp', num(r.whatsapp), pct(r.whatsapp, r.visitas) + ' % de las visitas', cambio(r.whatsapp, a.whatsapp)],
+                ['Reservas enviadas', num(r.reservas), 'Por WhatsApp o pagando con Bold', cambio(r.reservas, a.reservas)],
+                ['Pagos aprobados', num(r.pagos), 'Con Bold, desde la página', ''],
+                ['Conversión', pctDecimal(r.reservas, r.visitas), 'De las visitas terminan en reserva', '']
+            ];
+            document.getElementById('est-kpis').innerHTML = tarjetas.map(([etiqueta, valor, nota, delta]) =>
+                '<div class="card p-5"><span class="micro text-graphite/40">' + etiqueta + '</span>' +
+                '<span class="block est-kpi-valor mt-3">' + valor + '</span>' + delta +
+                '<span class="block text-[0.68rem] text-graphite/45 mt-1.5">' + nota + '</span></div>').join('');
+        }
+
+        /* Barras horizontales de una serie (un solo color); el valor va al final de la barra */
+        function barras(id, filas, op = {}) {
+            const cont = document.getElementById(id);
+            const valor = op.valor || (f => f.visitas);
+            const nombre = op.nombre || (f => f.nombre);
+            if (!filas.length) { cont.innerHTML = vacioEst(op.vacio); return; }
+            const max = Math.max(1, ...filas.map(f => valor(f) || 0));
+            cont.innerHTML = filas.map(f => {
+                const v = valor(f) || 0;
+                const p = op.total ? pct(v, op.total) : null;
+                const etiqueta = String(nombre(f) || 'Otro');
+                const nota = op.nota ? op.nota(f) : '';
+                return '<div class="est-fila" tabindex="0" data-tip="' + esc(etiqueta) + '" data-tip-valor="' + num(v) +
+                        (p !== null ? ' · ' + p + ' %' : '') + '" data-tip-nota="' + esc(nota) + '">' +
+                    '<span class="flex items-center gap-2 min-w-0 text-[0.8rem] text-graphite/80">' +
+                        (op.icono ? '<i data-lucide="' + op.icono(f) + '" class="w-3.5 h-3.5 text-brass shrink-0"></i>' : '') +
+                        '<span class="truncate">' + esc(etiqueta) + '</span></span>' +
+                    '<span class="text-[0.8rem] text-ink text-right whitespace-nowrap">' + num(v) +
+                        (p !== null ? '<span class="text-graphite/40"> · ' + p + ' %</span>' : '') + '</span>' +
+                    '<span class="est-pista"><span class="est-barra" style="width:' + Math.max(1.5, 100 * v / max).toFixed(1) + '%' +
+                        (op.color ? ';background:' + op.color(f) : '') + '"></span></span>' +
+                    (nota ? '<span class="est-nota">' + esc(nota) + '</span>' : '') +
+                '</div>';
+            }).join('');
+        }
+
+        /* Camino a la reserva: un solo tono, de claro a oscuro según el paso */
+        function embudo(pasos) {
+            const cont = document.getElementById('est-embudo');
+            const base = pasos[0] ? pasos[0].visitas : 0;
+            if (!base) { cont.innerHTML = vacioEst(); return; }
+            barras('est-embudo', pasos, {
+                total: base, nombre: p => PASOS_EMBUDO[p.paso] || p.paso,
+                color: p => RAMPA_EMBUDO[Math.max(0, pasos.indexOf(p))] || AZUL,
+                nota: p => { const i = pasos.indexOf(p); return i ? pct(p.visitas, pasos[i - 1].visitas) + ' % del paso anterior' : ''; }
+            });
+            const ultimo = pasos[pasos.length - 1];
+            cont.insertAdjacentHTML('beforeend', '<p class="text-[0.76rem] text-graphite/65 mt-4 pt-4 border-t border-line">De cada 100 visitas, <strong class="font-medium text-ink">' +
+                pctDecimal(ultimo.visitas, base).replace(' %', '') + '</strong> envían una reserva.</p>');
+        }
+
+        function ubicacion(paises, ciudades, total) {
+            const cont = document.getElementById('est-ubicacion');
+            if (!paises.length && !ciudades.length) { cont.innerHTML = vacioEst('La ubicación aparece cuando la página está publicada (la calcula Cloudflare).'); return; }
+            cont.innerHTML = '<span class="micro text-graphite/40 block mb-1">Países</span><div id="est-paises"></div>' +
+                '<span class="micro text-graphite/40 block mt-4 mb-1">Ciudades</span><div id="est-ciudades"></div>';
+            barras('est-paises', paises.slice(0, 5), { total, nombre: p => nombrePais(p.nombre) });
+            barras('est-ciudades', ciudades.slice(0, 6), { total, nombre: c => c.nombre });
+        }
+
+        function campanas(referentes, lista) {
+            const cont = document.getElementById('est-campanas');
+            if (!referentes.length && !lista.length) {
+                cont.innerHTML = vacioEst('Todavía no hay sitios ni campañas. Crea abajo un enlace con seguimiento para cada lugar donde compartas la página.');
+                return;
+            }
+            cont.innerHTML = '<span class="micro text-graphite/40 block mb-1">Sitios que enlazan la página</span><div id="est-referentes"></div>' +
+                '<span class="micro text-graphite/40 block mt-4 mb-1">Enlaces con seguimiento</span><div id="est-lista-campanas"></div>';
+            barras('est-referentes', referentes.slice(0, 5), { vacio: 'Ninguno en este período.' });
+            barras('est-lista-campanas', lista.slice(0, 6), {
+                nombre: c => legible(c.nombre) + ' · ' + c.fuente,
+                nota: c => (c.medio ? c.medio + ' · ' : '') + num(c.reservas) + (c.reservas === 1 ? ' reserva' : ' reservas'),
+                vacio: 'Ninguno en este período.'
+            });
+        }
+
+        /* Visitas por día: área de una serie con cruz que sigue al cursor (o a las flechas del teclado) */
+        function graficoDias(dias) {
+            const cont = document.getElementById('est-dias');
+            document.getElementById('est-dias-tabla').innerHTML = '<table class="est-tabla"><thead><tr><th>Día</th><th>Visitas</th><th>Visitantes</th><th>WhatsApp</th><th>Reservas</th></tr></thead><tbody>' +
+                dias.map(d => '<tr><td>' + fechaLarga(d.dia) + '</td><td>' + num(d.visitas) + '</td><td>' + num(d.visitantes) + '</td><td>' + num(d.whatsapp) + '</td><td>' + num(d.reservas) + '</td></tr>').join('') +
+                '</tbody></table>';
+            if (!dias.length) { cont.innerHTML = vacioEst(); return; }
+            const W = Math.max(300, cont.clientWidth || 720), H = 240, izq = 42, der = 14, arr = 24, aba = 28;
+            const n = dias.length, ancho = W - izq - der, alto = H - arr - aba;
+            const maximo = Math.max(...dias.map(d => d.visitas));
+            const tope = topeEje(maximo);
+            const x = i => izq + (n === 1 ? ancho / 2 : i * ancho / (n - 1));
+            const y = v => arr + alto * (1 - v / tope);
+            const linea = dias.map((d, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(d.visitas).toFixed(1)).join('');
+            const cada = Math.max(1, Math.ceil(n / 6));
+            const iMax = dias.findIndex(d => d.visitas === maximo);
+            let svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Visitas por día" style="display:block">';
+            [0, tope / 2, tope].forEach(v => {
+                svg += '<line x1="' + izq + '" x2="' + (W - der) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="rgba(10,33,46,.09)" stroke-width="1"/>' +
+                       '<text x="' + (izq - 10) + '" y="' + (y(v) + 3.5) + '" text-anchor="end" font-size="10.5" fill="rgba(32,41,46,.45)">' + num(v) + '</text>';
+            });
+            if (n > 1) svg += '<path d="' + linea + 'L' + x(n - 1).toFixed(1) + ' ' + y(0) + 'L' + x(0).toFixed(1) + ' ' + y(0) + 'Z" fill="' + AZUL + '" fill-opacity=".1"/>' +
+                               '<path d="' + linea + '" fill="none" stroke="' + AZUL + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+            else svg += '<circle cx="' + x(0) + '" cy="' + y(dias[0].visitas) + '" r="4.5" fill="' + AZUL + '" stroke="#fff" stroke-width="2"/>';
+            if (maximo) svg += '<text x="' + x(iMax) + '" y="' + (y(maximo) - 10) + '" text-anchor="' + (iMax === 0 ? 'start' : iMax === n - 1 ? 'end' : 'middle') +
+                               '" font-size="11" font-weight="600" fill="#0A212E">' + num(maximo) + '</text>';
+            dias.forEach((d, i) => {
+                if (i % cada && i !== n - 1) return;
+                if (i !== n - 1 && n - 1 - i < cada * 0.6) return;   // evita que choque con la última fecha
+                svg += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="' + (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle') +
+                       '" font-size="10.5" fill="rgba(32,41,46,.5)">' + fechaCorta(d.dia) + '</text>';
+            });
+            svg += '<line class="est-cruz" x1="0" x2="0" y1="' + arr + '" y2="' + (H - aba) + '" stroke="' + AZUL + '" stroke-opacity=".4" stroke-width="1" visibility="hidden"/>' +
+                   '<circle class="est-punto" r="4.5" fill="' + AZUL + '" stroke="#fff" stroke-width="2" visibility="hidden"/>' +
+                   '<rect class="est-captura" x="' + (izq - 6) + '" y="0" width="' + (ancho + 12) + '" height="' + H + '" fill="transparent"/></svg>';
+            cont.innerHTML = svg;
+
+            const svgEl = cont.querySelector('svg');
+            const cruz = cont.querySelector('.est-cruz');
+            const punto = cont.querySelector('.est-punto');
+            let actual = -1;
+            const mostrar = (i, cx, cy) => {
+                actual = Math.max(0, Math.min(n - 1, i));
+                const d = dias[actual];
+                cruz.setAttribute('x1', x(actual)); cruz.setAttribute('x2', x(actual)); cruz.setAttribute('visibility', 'visible');
+                punto.setAttribute('cx', x(actual)); punto.setAttribute('cy', y(d.visitas)); punto.setAttribute('visibility', 'visible');
+                const caja = svgEl.getBoundingClientRect();
+                mostrarTip('<strong>' + num(d.visitas) + '</strong> visitas · ' + fechaLarga(d.dia) +
+                    '<br>' + num(d.visitantes) + ' visitantes · ' + num(d.whatsapp) + ' WhatsApp · ' + num(d.reservas) + ' reservas',
+                    cx != null ? cx : caja.left + x(actual), cy != null ? cy : caja.top + y(d.visitas));
+            };
+            const ocultar = () => { cruz.setAttribute('visibility', 'hidden'); punto.setAttribute('visibility', 'hidden'); ocultarTip(); };
+            cont.querySelector('.est-captura').addEventListener('pointermove', e => {
+                const caja = svgEl.getBoundingClientRect();
+                mostrar(n === 1 ? 0 : Math.round((e.clientX - caja.left - izq) / (ancho / (n - 1))), e.clientX, e.clientY);
+            });
+            cont.querySelector('.est-captura').addEventListener('pointerleave', ocultar);
+            cont.onkeydown = e => {
+                if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+                e.preventDefault();
+                mostrar(actual < 0 ? n - 1 : actual + (e.key === 'ArrowRight' ? 1 : -1));
+            };
+            cont.onblur = ocultar;
+        }
+
+        /* Tope del eje: un número redondo y par, para que la mitad también sea redonda */
+        function topeEje(maximo) {
+            if (maximo <= 2) return 2;
+            const potencia = Math.pow(10, Math.floor(Math.log10(maximo)));
+            const tope = [1, 2, 4, 6, 8, 10].map(m => m * potencia).find(t => t >= maximo);
+            return tope % 2 ? tope * 2 : tope;
+        }
+
+        /* Horas de visita: columnas; la hora con más visitas, en dorado */
+        function graficoHoras(horas, dias) {
+            const cont = document.getElementById('est-horas');
+            const nota = document.getElementById('est-horas-nota');
+            const total = horas.reduce((s, v) => s + v, 0);
+            document.getElementById('est-horas-tabla').innerHTML = '<table class="est-tabla"><thead><tr><th>Hora</th><th>Visitas</th></tr></thead><tbody>' +
+                horas.map((v, h) => '<tr><td>' + horaTxt(h) + ' – ' + horaTxt((h + 1) % 24) + '</td><td>' + num(v) + '</td></tr>').join('') + '</tbody></table>';
+            if (!total) { cont.innerHTML = vacioEst(); nota.textContent = ''; return; }
+            const max = Math.max(...horas);
+            const pico = horas.indexOf(max);
+            cont.innerHTML = '<div class="flex items-end gap-[2px] h-36">' + horas.map((v, h) =>
+                '<span class="est-col' + (h === pico ? ' is-pico' : '') + '" tabindex="0" style="height:' + Math.max(1.5, 100 * v / max).toFixed(1) + '%"' +
+                ' data-tip="' + horaTxt(h) + ' – ' + horaTxt((h + 1) % 24) + '" data-tip-valor="' + num(v) + ' visitas"></span>').join('') + '</div>' +
+                '<div class="grid grid-cols-4 mt-2 text-[0.66rem] text-graphite/45"><span>12 a. m.</span><span>6 a. m.</span><span>12 m.</span><span>6 p. m.</span></div>';
+            const mejorDia = dias.length ? dias.indexOf(Math.max(...dias)) : -1;
+            nota.innerHTML = 'Más visitas ' + (mejorDia >= 0 && dias[mejorDia] ? 'los <strong class="font-medium text-ink">' + DIAS_SEMANA[mejorDia] + '</strong>, ' : '') +
+                'entre <strong class="font-medium text-ink">' + horaTxt(pico) + ' y ' + horaTxt((pico + 1) % 24) + '</strong>.';
+        }
+
+        /* Aviso flotante de los gráficos: el valor primero, después la etiqueta */
+        function mostrarTip(html, cx, cy) {
+            const tip = document.getElementById('est-tip');
+            tip.innerHTML = html;
+            tip.classList.add('is-visible');
+            const izquierda = Math.min(cx + 14, window.innerWidth - tip.offsetWidth - 8);
+            const arriba = cy - tip.offsetHeight - 12 < 8 ? cy + 18 : cy - tip.offsetHeight - 12;
+            tip.style.left = Math.max(8, izquierda) + 'px';
+            tip.style.top = arriba + 'px';
+        }
+        function ocultarTip() { document.getElementById('est-tip').classList.remove('is-visible'); }
+        function tipDe(el) {
+            return '<strong>' + esc(el.dataset.tipValor || '') + '</strong> ' + esc(el.dataset.tip || '') +
+                (el.dataset.tipNota ? '<br>' + esc(el.dataset.tipNota) : '');
+        }
+
+        function prepararEstadisticas() {
+            const vista = document.querySelector('.view[data-view="estadisticas"]');
+            vista.addEventListener('pointermove', e => {
+                const el = e.target.closest('[data-tip]');
+                if (el) mostrarTip(tipDe(el), e.clientX, e.clientY);
+                else if (!e.target.closest('.est-captura')) ocultarTip();
+            });
+            vista.addEventListener('pointerleave', ocultarTip);
+            vista.addEventListener('focusin', e => {
+                const el = e.target.closest('[data-tip]');
+                if (!el) return;
+                const caja = el.getBoundingClientRect();
+                mostrarTip(tipDe(el), caja.left + caja.width / 2, caja.top);
+            });
+            vista.addEventListener('focusout', ocultarTip);
+
+            document.getElementById('est-periodos').addEventListener('click', e => {
+                const btn = e.target.closest('.chip');
+                if (!btn) return;
+                diasEstadisticas = Number(btn.dataset.dias);
+                document.querySelectorAll('#est-periodos .chip').forEach(c => c.classList.toggle('is-active', c === btn));
+                cargarEstadisticas();
+            });
+
+            /* Cada gráfico tiene su versión en tabla */
+            document.querySelectorAll('[data-ver-tabla]').forEach(btn => btn.addEventListener('click', () => {
+                const grafico = document.getElementById(btn.dataset.verTabla);
+                const tabla = document.getElementById(btn.dataset.verTabla + '-tabla');
+                const verTabla = tabla.classList.contains('hidden');
+                tabla.classList.toggle('hidden', !verTabla);
+                grafico.classList.toggle('hidden', verTabla);
+                btn.textContent = verTabla ? 'Ver gráfico' : 'Ver tabla';
+            }));
+
+            /* "No contar mis visitas": la página y el panel están en el mismo sitio y comparten esta marca */
+            const noMedir = document.getElementById('est-no-medir');
+            try { noMedir.checked = localStorage.getItem('cabaleon-no-medir') === '1'; } catch (e) { /* sin almacenamiento */ }
+            noMedir.addEventListener('change', () => {
+                try {
+                    if (noMedir.checked) localStorage.setItem('cabaleon-no-medir', '1');
+                    else localStorage.removeItem('cabaleon-no-medir');
+                    toast(noMedir.checked ? 'Listo: las visitas desde este navegador ya no se cuentan.' : 'Las visitas desde este navegador vuelven a contarse.');
+                } catch (e) {
+                    toast('Este navegador no permite guardar la preferencia.');
+                }
+            });
+
+            const lugar = document.getElementById('enl-lugar');
+            lugar.innerHTML = LUGARES_ENLACE.map(([id, texto]) => '<option value="' + id + '">' + texto + '</option>').join('');
+            lugar.addEventListener('change', pintarEnlace);
+            document.getElementById('enl-campana').addEventListener('input', pintarEnlace);
+            pintarEnlace();
+
+            /* El gráfico de días se vuelve a dibujar cuando cambia el ancho disponible */
+            let anchoDias = 0;
+            new ResizeObserver(entradas => {
+                const ancho = Math.round(entradas[0].contentRect.width);
+                if (ancho && ancho !== anchoDias && datosEstadisticas) {
+                    anchoDias = ancho;
+                    graficoDias(datosEstadisticas.por_dia || []);
+                }
+            }).observe(document.getElementById('est-dias'));
+        }
+
+        function enlaceConSeguimiento() {
+            const l = LUGARES_ENLACE.find(x => x[0] === document.getElementById('enl-lugar').value) || LUGARES_ENLACE[0];
+            const campana = normalizar(document.getElementById('enl-campana').value).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || l[4];
+            const base = location.origin + location.pathname.replace(/admin\.html$/i, '');
+            return base + '?utm_source=' + l[2] + '&utm_medium=' + l[3] + '&utm_campaign=' + campana;
+        }
+        function pintarEnlace() { document.getElementById('enl-url').textContent = enlaceConSeguimiento(); }
+        function copiarEnlace() {
+            const url = enlaceConSeguimiento();
+            (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+                .then(() => toast('Enlace copiado. Pégalo donde vayas a publicarlo.'))
+                .catch(() => {
+                    const r = document.createRange();
+                    r.selectNodeContents(document.getElementById('enl-url'));
+                    getSelection().removeAllRanges();
+                    getSelection().addRange(r);
+                    toast('Selecciona y copia el enlace (Ctrl+C).');
+                });
+        }
+
+        /* Datos de ejemplo con la misma forma que la función estadisticas de Supabase */
+        function estadisticasDeEjemplo(desde, hasta) {
+            let semilla = 11;
+            const azar = () => { semilla = (semilla * 16807) % 2147483647; return semilla / 2147483647; };
+            const por_dia = [];
+            for (let dia = desde; dia <= hasta; dia = sumarDias(dia, 1)) {
+                const dow = fechaD(dia).getDay();
+                const visitas = Math.round((dow === 5 || dow === 6 ? 64 : dow === 0 ? 46 : 31) * (0.75 + azar() * 0.5));
+                por_dia.push({ dia, visitas, visitantes: Math.round(visitas * 0.86),
+                    whatsapp: Math.round(visitas * (0.06 + azar() * 0.05)), reservas: Math.round(visitas * (0.012 + azar() * 0.02)) });
+            }
+            const suma = k => por_dia.reduce((s, d) => s + d[k], 0);
+            const visitas = suma('visitas');
+            const parte = p => Math.max(0, Math.round(visitas * p));
+            const lista = (filas, campo = 'visitas') => filas.map(([nombre, p]) => ({ nombre, [campo]: parte(p) }));
+            const reservas = suma('reservas');
+            return {
+                desde, hasta,
+                resumen: { visitas, visitantes: suma('visitantes'), nuevos: Math.round(suma('visitantes') * 0.71), duracion: 152,
+                    interactuaron: parte(0.57), whatsapp: suma('whatsapp'), reservas, pagos: Math.round(reservas * 0.45), paginas: parte(1.21) },
+                anterior: { visitas: Math.round(visitas * 0.87), visitantes: Math.round(suma('visitantes') * 0.9),
+                    whatsapp: Math.round(suma('whatsapp') * 0.82), reservas: Math.round(reservas * 0.94) },
+                por_dia,
+                fuentes: [['Instagram', 0.31, 0.022], ['Google', 0.27, 0.034], ['Directo', 0.18, 0.02], ['WhatsApp', 0.11, 0.03],
+                          ['Facebook', 0.08, 0.012], ['Código QR', 0.03, 0.04], ['Otros sitios', 0.02, 0.01]]
+                    .map(([nombre, p, r]) => ({ nombre, visitas: parte(p), whatsapp: Math.round(parte(p) * 0.09), reservas: Math.round(parte(p) * r) })),
+                referentes: lista([['google.com', 0.2], ['l.instagram.com', 0.13], ['m.facebook.com', 0.05], ['tripadvisor.com.co', 0.012]]),
+                campanas: [['biografia', 'Instagram', 'Redes', 0.12], ['mensajes', 'WhatsApp', 'Redes', 0.06], ['volante', 'Código QR', 'Impreso', 0.03]]
+                    .map(([nombre, fuente, medio, p]) => ({ nombre, fuente, medio, visitas: parte(p), reservas: Math.round(parte(p) * 0.03) })),
+                dispositivos: lista([['Celular', 0.74], ['Computador', 0.22], ['Tablet', 0.04]]),
+                navegadores: lista([['Chrome', 0.47], ['Safari', 0.27], ['Instagram', 0.14], ['Samsung Internet', 0.07], ['Edge', 0.03]]),
+                sistemas: lista([['Android', 0.52], ['iOS', 0.31], ['Windows', 0.13], ['macOS', 0.04]]),
+                paises: lista([['CO', 0.93], ['US', 0.03], ['ES', 0.015], ['MX', 0.01]]),
+                ciudades: [['Bogotá', 0.55], ['Girardot', 0.06], ['Fusagasugá', 0.05], ['Medellín', 0.04], ['Soacha', 0.03]]
+                    .map(([nombre, p]) => ({ nombre, pais: 'CO', visitas: parte(p) })),
+                entradas: lista([['inicio', 0.81], ['habitaciones', 0.08], ['reservar', 0.06], ['planes', 0.05]]),
+                secciones: lista([['inicio', 1], ['destacados', 0.9], ['hotel', 0.78], ['habitaciones', 0.66], ['servicios', 0.52], ['eventos', 0.41],
+                                  ['planes', 0.38], ['restaurante', 0.33], ['bar', 0.29], ['galeria', 0.27], ['resenas', 0.24], ['informacion', 0.21],
+                                  ['reservar', 0.46], ['faq', 0.14], ['catalogo', 0.11], ['contacto', 0.12]]),
+                interacciones: [['ficha_habitacion', 0.34, 0.24], ['galeria', 0.29, 0.15], ['fechas', 0.21, 0.21], ['habitacion_agregada', 0.19, 0.14],
+                                ['whatsapp', 0.12, 0.1], ['como_llegar', 0.08, 0.07], ['asistente', 0.07, 0.07], ['asistente_tema', 0.11, 0.05],
+                                ['carrito', 0.06, 0.05], ['datos_completos', 0.06, 0.06], ['documento', 0.03, 0.03], ['llamada', 0.02, 0.02],
+                                ['reserva_whatsapp', 0.012, 0.012], ['pago_iniciado', 0.014, 0.013]]
+                    .map(([tipo, t, v]) => ({ tipo, total: parte(t), visitas: parte(v) })),
+                whatsapp_desde: lista([['reservar', 0.04], ['botón flotante', 0.03], ['habitaciones', 0.02]], 'total'),
+                habitaciones: [['suite', 0.14, 0.07], ['cabana', 0.1, 0.05], ['cuadruple', 0.06, 0.04], ['triple', 0.05, 0.03]]
+                    .map(([nombre, f, a]) => ({ nombre, fichas: parte(f), agregadas: parte(a) })),
+                temas: lista([['precios', 0.03], ['reservar', 0.02], ['mascotas', 0.015], ['pasadia', 0.012], ['ubicacion', 0.01], ['desayuno', 0.008], ['sin_respuesta', 0.006]], 'total'),
+                planes: lista([['romantica', 0.02], ['familia', 0.012], ['pasadia', 0.01]], 'total'),
+                horas: [2, 1, 1, 0, 0, 1, 3, 6, 9, 12, 13, 14, 15, 14, 13, 13, 15, 18, 22, 26, 24, 17, 9, 4].map(v => Math.round(v * visitas / 270)),
+                dias_semana: [10, 9, 10, 11, 18, 20, 14].map(v => Math.round(v * visitas / 92)),
+                embudo: [['visita', 1], ['reservar', 0.46], ['fechas', 0.21], ['habitacion', 0.14], ['datos', 0.06], ['confirmo', reservas / visitas]]
+                    .map(([paso, p]) => ({ paso, visitas: parte(p) }))
+            };
+        }
+
+        /* =========================================================
+           Ventana y aviso flotante
+           ========================================================= */
+        function abrirModal(html) {
+            document.getElementById('modal-contenido').innerHTML = html;
+            document.getElementById('modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            lucide.createIcons();
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('modal').addEventListener('click', (e) => { if (e.target.id === 'modal') cerrarModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModal(); });
+
+        let toastTimer;
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-text').textContent = msg;
+            t.classList.add('is-visible');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('is-visible'), 3600);
+        }
+
+        /* =========================================================
+           Inicio
+           ========================================================= */
+        document.querySelectorAll('[data-modo]').forEach(el => {
+            if (el.dataset.modo !== (CONECTADO ? 'conectado' : 'ejemplo')) el.remove();
+        });
+
+        prepararEstadisticas();
+
+        if (!CONECTADO) {
+            reservas = reservasDeEjemplo();
+            leerTarifasDelSitio().then(() => { if (document.getElementById('app').classList.contains('is-shown')) renderTodo(); });
+        } else if (!revisarEnlaceDeRecuperacion()) {
+            sesion = leerSesion();
+            if (sesion) {
+                document.getElementById('login-boton-txt').textContent = 'Entrando…';
+                entrarConectado()
+                    .catch(e => { borrarSesion(); avisoLogin(e.message.indexOf('sesión') >= 0 ? '' : e.message, true); })
+                    .finally(() => { document.getElementById('login-boton-txt').textContent = 'Entrar al panel'; });
+            }
+        }
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
