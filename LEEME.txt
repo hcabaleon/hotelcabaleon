@@ -1,0 +1,51 @@
+ARCHIVOS DE HOTEL CABALEON - QUE SUBIR AL HOSTING
+=================================================
+
+Todo esta en esta misma carpeta, sin subcarpetas. Se sube TODO junto a index.html,
+con los mismos nombres (respetando mayusculas, espacios y tildes), MENOS la lista
+"NO HACE FALTA SUBIR" del final.
+
+CORREGIDO EL 5 DE OCTUBRE DE 2026
+---------------------------------
+La version anterior de este archivo decia que las fotos originales, los afiches del
+restaurante, los logos y las piezas graficas NO los usaba la pagina. No es asi: la
+pagina SI los usa y tienen que estar en el hosting. Si faltan, esas imagenes no cargan.
+
+  - Fotos originales "lugar-NN 1.jpg" a "lugar-NN 78.jpg"
+      Galeria (al tocar "Ver todas") y enlaces "Ver foto original" de la galeria
+      y de cada habitacion.
+  - Afiches "restaurante 1.jpg" a "restaurante 10.jpg"
+      Carta de favoritos de Mangole ("Ver afiche").
+  - Piezas graficas
+      bienvenido.jpg, cabalante menu.jpg, experiencias.jpg, flyer1.jpg,
+      reglas piscina.jpg, sauna y turcos.jpg   (seccion "Antes de tu llegada")
+  - Logos
+      isotipo-transparente.png (seccion "Hotel Cabaleon"), logo.jpg, logo2.jpg,
+      logo3.jpg, logo4.jpg
+
+Tambien se usan: todas las foto-*.jpg y foto-*-sm.jpg, plato-*, clip-*, portada-*,
+logo-*.png, panorama.jpg, guia-bienvenida.jpg, reglamento-piscina.jpg, los 3 PDF,
+favicon.png, apple-touch-icon.png, lucide.min.js, tailwindcss.js, index.html y
+admin.html (panel del hotel).
+
+SUBIR POR LA WEB DE GITHUB
+--------------------------
+Subir en tandas de maximo 100 archivos: desde el navegador, GitHub no recibe mas
+de 100 archivos en una misma subida y los que sobran quedan por fuera.
+Despues de subir, revisar en la pagina publicada la galeria completa, la carta de
+Mangole, las habitaciones y "Antes de tu llegada".
+
+NO HACE FALTA SUBIR (la pagina no los usa)
+------------------------------------------
+Videos originales (19, cerca de 125 MB). La pagina usa las versiones cortas
+portada-*.mp4 y clip-*.mp4:
+  - video lugar1.mp4 a video lugar13.mp4
+  - video lugar 14.mp4, video lugar 15.mp4, video lugar 16.mp4
+  - video1.mp4, video1vertical.mp4, video2.mp4
+
+Documentos de trabajo (no publicar):
+  - LEEME.txt, LEEME-PAGOS-BOLD.txt, LEEME-RESERVAS-SUPABASE.txt
+  - supabase-reservas.sql      (se pega en Supabase)
+  - servidor-pagos-bold.js     (se publica en Cloudflare; si queda en GitHub no es un riesgo)
+  - Brief_Landing_TALA_1550_Andrea.docx
+  - WhatsApp Audio 2026-09-27 at 11.28.17 AM.ogg

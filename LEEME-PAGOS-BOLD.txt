@@ -1,0 +1,117 @@
+PAGO EN LINEA CON BOLD - HOTEL CABALEON
+=======================================
+
+QUE HACE
+--------
+La seccion "Reservar" funciona en 4 pasos:
+  01 Fechas y huespedes   02 Habitaciones (una o varias, de cualquier tipo)
+  03 Titular              04 Metodo de pago
+Con Supabase conectado (ver LEEME-RESERVAS-SUPABASE.txt), cada reserva queda
+guardada para el panel del hotel (admin.html) y la pagina solo ofrece las
+habitaciones con cupo en las fechas elegidas. Sin Supabase no revisa cupo.
+Mientras el cliente elige, se arma en vivo una FACTURA PROFORMA con cada linea
+(noches de fin de semana / entre semana, Pet Friendly, descuentos), el total y
+lo que paga hoy. El cliente elige pagar el anticipo del 50 % o el total, y el
+medio: "Pago en linea" (Bold: tarjeta, PSE...) o "Pago asistido" (WhatsApp).
+Al terminar, Bold lo devuelve a la pagina, que verifica el pago con Bold, le
+muestra el resultado y deja la factura con el numero de orden y el sello
+"Pagado" / "Anticipo pagado", lista para imprimir o guardar en PDF.
+
+CARRITO "TU RESERVA": en cuanto el cliente elige una habitacion aparece un boton
+flotante con el total (ej.: "Tu reserva  $1.590.000  3 noches  Ver"). Al tocarlo
+se abre el detalle: fechas, habitaciones con + / - y "Quitar", Pet Friendly,
+codigo, total, y si paga hoy el 50 % o el total. "Continuar con la reserva" lo
+lleva al paso que le falta (datos o pago). El boton se oculta cuando la factura
+o el paso de pago ya estan en pantalla. La reserva queda guardada en el
+navegador del cliente hasta que la paga (si vuelve otro dia, la encuentra armada).
+En computador la factura acompana al cliente mientras baja por los pasos.
+
+Mientras el servidor de pagos no este configurado, la opcion "Pago en linea"
+NO aparece y la reserva se confirma con "Pago asistido" por WhatsApp (el
+mensaje lleva la factura completa).
+
+CUANTAS HABITACIONES SE PUEDEN RESERVAR
+---------------------------------------
+En index.html:  const UNIDADES = { suite: 2, cabana: 1, cuadruple: 6, triple: 7 };
+Es cuantas hay de cada tipo: el maximo en una misma reserva y, con Supabase, el
+cupo total de cada noche. CONFIRMAR CON EL HOTEL cuantas hay de cada tipo
+(15 habitaciones y 1 cabana en total).
+
+ARCHIVOS
+--------
+- index.html               Pagina. Solo hay que poner la direccion del servidor.
+- servidor-pagos-bold.js   Servidor de reservas y pagos (Cloudflare Worker).
+                           Guarda las llaves secretas, calcula el valor y firma
+                           cada pago; con Supabase, ademas guarda las reservas,
+                           revisa el cupo y recibe los avisos de Bold.
+                           No tiene llaves adentro; subirlo a GitHub no es un riesgo.
+- LEEME-RESERVAS-SUPABASE.txt  Base de reservas, cupo y panel del hotel.
+
+LO QUE SE NECESITA
+------------------
+1. Cuenta de Bold con "Boton de pagos" / pagos en linea activo.
+2. Las llaves de Bold:
+   panel de Bold > Integraciones > Llaves de integracion > Boton de pagos >
+   "Activar llaves". Hay dos juegos: PRUEBAS y PRODUCCION.
+     - Llave de identidad (se puede mostrar, es publica)
+     - Llave secreta (NUNCA va en la pagina ni se comparte)
+3. Una cuenta gratuita de Cloudflare (https://dash.cloudflare.com).
+
+PASO 1 - PUBLICAR EL SERVIDOR DE PAGOS (una sola vez)
+-----------------------------------------------------
+a. Cloudflare > Workers & Pages > Create > Create Worker.
+   Nombre sugerido: pagos-cabaleon  > Deploy.
+b. "Edit code": borrar todo, pegar el contenido de servidor-pagos-bold.js > Deploy.
+c. Settings > Variables and Secrets > Add, y crear estas tres:
+     BOLD_LLAVE_IDENTIDAD   tipo Text     llave de identidad de Bold
+     BOLD_LLAVE_SECRETA     tipo Secret   llave secreta de Bold
+     SITIO_URL              tipo Text     direccion publica de la pagina, sin "/" al final
+                                          ej.: https://hotelcabaleon.com
+                                          o    https://USUARIO.github.io/REPOSITORIO
+   Guardar (Deploy).
+d. Abrir la direccion del Worker (ej.: https://pagos-cabaleon.TU-CUENTA.workers.dev).
+   Debe mostrar: {"ok":true, ... "configurado":true}
+
+PASO 2 - CONECTAR LA PAGINA
+---------------------------
+En index.html buscar  const BOLD = {  y poner la direccion del Worker:
+
+    const BOLD = {
+        servidor: 'https://pagos-cabaleon.TU-CUENTA.workers.dev',
+        retorno: ''
+    };
+
+Subir index.html. La pagina debe estar publicada en https (GitHub Pages lo es).
+
+PASO 3 - PROBAR (con las llaves de PRUEBAS)
+-------------------------------------------
+En la pasarela aparece la etiqueta amarilla "Modo de pruebas"; no se cobra nada.
+  Tarjeta aprobada:   4111 1111 1111 1111  (Visa)  o  5100 0100 0000 0015 (Mastercard)
+  Tarjeta rechazada:  4970 1100 0000 0062
+  Tarjeta con error:  5204 7300 0000 8404
+  PSE:                "BANCO QUE APRUEBA" / "BANCO QUE RECHAZA"
+
+PASO 4 - PASAR A PRODUCCION
+---------------------------
+En Cloudflare cambiar BOLD_LLAVE_IDENTIDAD y BOLD_LLAVE_SECRETA por las llaves de
+PRODUCCION y guardar. No hay que tocar la pagina.
+
+COMO SE VE CADA PAGO EN BOLD
+----------------------------
+- Numero de orden:  CAB-AAMMDD-XXXXXX (el mismo que ve el cliente y que llega por WhatsApp)
+- Descripcion:      Anticipo 50% · Suite Cabaleon · 02/10 al 04/10
+- Datos extra 1:    habitacion, fechas, huespedes y mascotas
+- Datos extra 2:    nombre y celular del titular
+
+IMPORTANTE
+----------
+- Precios: el servidor lee TARIFAS, UNIDADES, TARIFA_MASCOTA, ANTICIPO, FESTIVOS y
+  CODIGOS_PROMO de la pagina publicada (index.html). Se cambian ahi, como
+  siempre, pero sin cambiar el formato de esas lineas. Asi nadie puede pagar
+  un valor distinto al publicado.
+- Si la pagina se muda a otro dominio, actualizar SITIO_URL en Cloudflare.
+- Para probar desde otra direccion (por ejemplo un servidor local), agregar en
+  Cloudflare la variable ORIGENES_PERMITIDOS con esa direccion
+  (ej.: http://localhost:5500). Varias se separan con coma.
+- El texto "si en esas fechas no hubiera cupo, te ofrecemos otra fecha o te
+  devolvemos el anticipo" esta en la ventana de pago: confirmarlo con el hotel.

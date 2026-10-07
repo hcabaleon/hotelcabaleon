@@ -1,0 +1,172 @@
+RESERVAS EN SUPABASE Y PANEL DEL HOTEL - HOTEL CABALEON
+=======================================================
+
+QUE HACE
+--------
+Con Supabase conectado:
+- Cada reserva de la pagina queda guardada: las que se pagan con Bold y las de
+  "Pago asistido" por WhatsApp (con el mismo numero de orden que lleva el mensaje).
+- Cuando Bold aprueba un pago, la reserva pasa sola a "Pagada" (aviso automatico
+  de Bold), aunque el cliente cierre la pagina antes de volver.
+- La pagina solo ofrece las habitaciones con cupo en las fechas elegidas. Cuenta
+  las reservas pagadas o confirmadas y las que se estan pagando en ese momento.
+- El panel del hotel (admin.html) pide correo y contrasena y muestra las reservas
+  reales: resumen del mes, proximas llegadas, calendario de disponibilidad, el
+  detalle de cada reserva (confirmar, cancelar, notas, WhatsApp del huesped) y
+  "Nueva" para registrar las reservas que llegan por telefono o en recepcion.
+
+IMPORTANTE: para que el cupo de la pagina sea real, toda reserva que NO entre por
+la pagina (telefono, WhatsApp directo, Booking, recepcion...) se registra en el
+panel con "Nueva" como "Confirmada".
+
+Sin Supabase todo sigue como antes: cobro con Bold y pago asistido por WhatsApp,
+sin guardar reservas ni revisar cupo. El panel muestra datos de ejemplo.
+
+ARCHIVOS
+--------
+- supabase-reservas.sql   Crea la tabla de reservas y sus reglas de seguridad.
+                          Se pega en Supabase; no hace falta subirlo al hosting.
+- servidor-pagos-bold.js  Servidor de reservas y pagos (Cloudflare Worker).
+                          Guarda las reservas, revisa el cupo y recibe los avisos
+                          de Bold. Ver tambien LEEME-PAGOS-BOLD.txt.
+- index.html              Pagina. Consulta el cupo y guarda las reservas a traves
+                          del servidor. No se toca para conectar Supabase.
+- admin.html              Panel del hotel. Se conecta directo a Supabase.
+
+PASO 1 - CREAR EL PROYECTO EN SUPABASE (una sola vez)
+-----------------------------------------------------
+a. https://supabase.com > New project. Nombre sugerido: hotel-cabaleon.
+   Region: la mas cercana (por ejemplo East US). Dejar activado "Enable Data API".
+   Guardar en un lugar seguro la contrasena de la base de datos que pide
+   (no se usa en la pagina).
+b. Abrir supabase-reservas.sql y cambiar, en la ultima linea, el correo
+   propietario@hotelcabaleon.com por el correo real del propietario (en minusculas).
+c. Supabase > SQL Editor > New query > pegar todo el archivo > Run.
+   Debe decir "Success. No rows returned".
+
+PASO 2 - USUARIO DEL PANEL
+--------------------------
+a. Authentication > Users > Add user > Create new user: el mismo correo del
+   paso 1b y una contrasena de al menos 8 caracteres. Marcar "Auto Confirm User".
+b. Authentication > Sign In / Providers: desactivar "Allow new users to sign up"
+   y guardar. Asi nadie mas puede crearse un usuario.
+c. Para dar acceso a otra persona: crear su usuario (2a), agregar su correo al
+   final de supabase-reservas.sql y volver a ejecutarlo (Run). No borra datos.
+
+PASO 3 - CONECTAR EL SERVIDOR DE RESERVAS Y PAGOS (Cloudflare)
+--------------------------------------------------------------
+(Si el Worker aun no existe, primero seguir LEEME-PAGOS-BOLD.txt.)
+a. En Supabase copiar:
+     Project URL      https://xxxx.supabase.co   (Project Settings > Data API,
+                                                  o el boton "Connect" del proyecto)
+     Publishable key  sb_publishable_...          (Project Settings > API Keys)
+     Secret key       sb_secret_...               (Project Settings > API Keys;
+                                                  "Create new secret key" si no hay)
+b. Cloudflare > Workers > pagos-cabaleon > "Edit code": borrar todo, pegar el
+   contenido actualizado de servidor-pagos-bold.js > Deploy.
+c. Settings > Variables and Secrets > Add:
+     SUPABASE_URL             tipo Text     Project URL
+     SUPABASE_LLAVE_SECRETA   tipo Secret   Secret key (sb_secret_...)
+   Deploy.
+d. Abrir la direccion del Worker. Debe mostrar "configurado":true y "reservas":true
+
+La Secret key de Supabase y la llave secreta de Bold SOLO van en Cloudflare:
+nunca en index.html, en admin.html ni en GitHub.
+
+PASO 4 - AVISO AUTOMATICO DE BOLD (webhook)
+-------------------------------------------
+Panel de Bold > Integraciones > Webhooks > agregar esta direccion:
+   https://pagos-cabaleon.TU-CUENTA.workers.dev/webhook-bold
+Mientras se prueba con las llaves de PRUEBAS de Bold, agregar en Cloudflare la
+variable BOLD_PRUEBAS con el valor si (tipo Text): Bold firma sus avisos de prueba
+de otra forma. Al pasar a produccion, BORRAR esa variable.
+Sin webhook tambien funciona, pero la reserva solo pasa a "Pagada" cuando el
+cliente vuelve a la pagina o cuando en el panel se toca "Consultar pago en Bold".
+
+PASO 5 - CONECTAR EL PANEL (admin.html)
+---------------------------------------
+En admin.html buscar  const CONEXION = {  y completar:
+
+    const CONEXION = {
+        supabase: 'https://xxxx.supabase.co',
+        llavePublica: 'sb_publishable_...',
+        servidor: 'https://pagos-cabaleon.TU-CUENTA.workers.dev'
+    };
+
+La Publishable key si puede ir en admin.html: es publica por diseno. Las
+reservas las protegen el inicio de sesion y las reglas de la base (solo entran
+los correos de la tabla panel_acceso).
+Subir admin.html. Entrar con el correo y la contrasena del paso 2.
+
+PASO 6 - RECUPERAR LA CONTRASENA (opcional)
+-------------------------------------------
+"Olvidaste la contrasena?" envia un enlace por correo que vuelve al panel.
+a. Supabase > Authentication > URL Configuration > Site URL: la direccion del
+   panel, por ejemplo https://hotelcabaleon.com/admin.html
+b. El correo gratuito de Supabase solo llega a los miembros del equipo del
+   proyecto (y maximo 2 por hora). Para que le llegue al propietario:
+     - invitarlo al equipo (Organization > Team > Invite), o
+     - configurar un SMTP propio (Authentication > Emails > SMTP Settings).
+   Si no se hace nada de esto y se olvida la contrasena: Authentication > Users >
+   borrar el usuario y crearlo otra vez (2a). Las reservas no se pierden.
+Con la sesion iniciada, la contrasena tambien se cambia en el panel > Ajustes.
+
+PASO 7 - PROBAR
+---------------
+1. En la pagina, elegir fechas y una habitacion, y confirmar por "Pago asistido".
+   En el panel debe aparecer como "Pendiente", canal "Web · WhatsApp", con el
+   mismo numero de orden del mensaje.
+2. Pagar con Bold (llaves de PRUEBAS, tarjeta 4111 1111 1111 1111). La reserva
+   debe quedar "Pagada" y el dia debe restar cupo en el calendario.
+3. Registrar en el panel una reserva "Nueva" que ocupe todas las suites para
+   unas fechas: en la pagina, la suite debe salir "Sin cupo en estas fechas".
+
+COMO SE VEN LAS RESERVAS EN EL PANEL
+------------------------------------
+Estados:
+  Pendiente       Hecha en la pagina, sin pago confirmado. No aparta habitacion
+                  (salvo los 30 minutos en que se esta pagando con Bold).
+  Pagada          Bold confirmo el pago (anticipo o total). Aparta habitacion.
+  Confirmada      El hotel la confirmo en el panel (transferencia, efectivo,
+                  reserva por telefono...). Aparta habitacion.
+  Cancelada       Cancelada por el hotel. Libera la habitacion. Si estaba pagada
+                  con Bold, la devolucion se hace en el panel de Bold.
+  Pago rechazado  El pago con Bold no se completo.
+  Anulada         Bold anulo el pago.
+Canal: "Web · Bold", "Web · WhatsApp" o "Panel" (registrada a mano).
+Numero de orden: CAB-AAMMDD-XXXXXX (pagina) o MAN-AAMMDD-XXXX (panel). El de la
+pagina es el mismo que ve el cliente, el que llega por WhatsApp y el de Bold.
+
+LIMITES A TENER EN CUENTA
+-------------------------
+- Plan gratuito de Supabase: si el proyecto pasa una semana sin actividad, se
+  pausa. Las visitas a la pagina consultan el cupo en la base, lo que puede
+  ayudar a mantenerlo activo, pero no es una garantia. Si se pausa: Supabase >
+  el proyecto > "Restore project". Mientras tanto el cobro con Bold sigue
+  funcionando (sin guardar reservas ni revisar cupo) y el panel no carga.
+  Para evitarlo del todo: plan Pro de Supabase (unos 25 USD al mes).
+- Si dos personas pagan la ultima habitacion casi al mismo tiempo, las dos
+  pueden quedar pagadas. En el panel ese dia se ve "Lleno" y el hotel decide.
+- Las tarifas, festivos y unidades se siguen cambiando en index.html (TARIFAS,
+  FESTIVOS y UNIDADES). El panel las muestra, pero no las cambia.
+
+ESTADISTICAS DE VISITAS (seccion "Estadisticas" del panel)
+-----------------------------------------------------------
+- No hay que hacer nada aparte: el mismo supabase-reservas.sql crea la tabla de
+  visitas y el servidor de Cloudflare (paso 3) las guarda. Funciona apenas la
+  pagina tenga puesta la direccion del servidor y Supabase este conectado.
+- Que mide: visitas y visitantes, de donde llegan (Google, Instagram, Facebook,
+  WhatsApp, enlaces con campana...), celular o computador, pais y ciudad, horas
+  y dias con mas visitas, secciones vistas, clics a WhatsApp, llamadas y mapas,
+  habitaciones mas vistas, preguntas al asistente y el camino de la reserva
+  (fechas > habitacion > datos > confirmo).
+- Es anonimo: no guarda nombres, correos ni direcciones IP. Respeta a quien
+  tenga activado "No rastrear" en su navegador. No usa cookies de terceros.
+- "No contar mis visitas": casilla en Estadisticas. Marcarla en cada celular o
+  computador del hotel para que las visitas del equipo no inflen los numeros.
+- Enlaces con seguimiento: al final de Estadisticas hay un generador. Elegir
+  donde se va a publicar (bio de Instagram, perfil de Google, codigo QR...) y
+  copiar el enlace. Asi el panel muestra cuantas visitas y reservas trajo cada uno.
+- Se guardan los ultimos 400 dias; lo mas viejo se borra solo.
+- Los bloqueadores de anuncios pueden ocultar algunas visitas: los numeros son
+  una muy buena guia, no un conteo exacto.
