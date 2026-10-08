@@ -187,6 +187,32 @@
 
         /* ---------- El hotel: presentación y recorrido ---------- */
         html.pantallas #hotel .pantalla > .grid.mb-14 { margin-bottom: 0; }
+        /* Video vertical: tan alto como permita la pantalla, sin pasar del ancho de su columna */
+        .hotel-video { aspect-ratio: 4 / 3; width: 100%; }
+        html.pantallas .hotel-video { width: min(100%, calc((100svh - var(--alto-nav) - 4rem) * 4 / 3)); margin-inline: auto; }
+        /* Computador: texto del hotel más grande y con más contraste */
+        @media (min-width: 1024px) {
+            #hotel .hotel-intro-texto .lead { font-size: clamp(1.05rem, min(1.35vw, 2.4vh), 1.3rem); line-height: 1.7; color: rgba(32, 41, 46, 0.88); max-width: 40rem; }
+            #hotel .hotel-intro-texto p.body-sm { font-size: clamp(0.9rem, min(1.1vw, 2vh), 1.05rem); line-height: 1.75; color: rgba(32, 41, 46, 0.75); max-width: 40rem; }
+            #hotel .hotel-intro-texto .display-lg { font-size: clamp(2.2rem, min(4.2vw, 6.4vh), 3.9rem); }
+            html.pantallas #hotel .hotel-intro-datos { margin-top: clamp(1rem, 3vh, 2.5rem); }
+            html.pantallas #hotel .hotel-intro-datos .pt-8 { padding-top: clamp(0.9rem, 2.4vh, 2rem); }
+            html.pantallas #hotel .hotel-intro-datos .mt-8 { margin-top: clamp(0.75rem, 2vh, 2rem); }
+            html.pantallas #hotel .hotel-intro-texto > img { margin-bottom: clamp(0.75rem, 2vh, 1.5rem); }
+            /* Texto centrado */
+            #hotel .hotel-intro-texto { text-align: center; }
+            #hotel .hotel-intro-texto > img, #hotel .hotel-intro-texto > p, #hotel .hotel-intro-datos > .grid { margin-inline: auto; }
+            #hotel .hotel-intro-texto > .eyebrow { justify-content: center; }
+            #hotel .hotel-intro-datos > .flex { justify-content: center; }
+        }
+        /* Computador: sin el isotipo ni el párrafo que repite las cifras; en pantallas bajas, el segundo párrafo en 3 líneas */
+        @media (min-width: 1024px) {
+            html.pantallas #hotel .hotel-intro-texto > img, html.pantallas #hotel .hotel-intro-texto p.recorte-bajo { display: none !important; }
+        }
+        @media (min-width: 1024px) and (max-height: 820px) {
+            html.pantallas #hotel .hotel-intro-texto p.body-sm.solo-amplio { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+            html.pantallas #hotel .hotel-intro-texto .lead { margin-bottom: 0.75rem; }
+        }
         html.pantallas #hotel .pantalla > div[role="tablist"] { margin-top: clamp(1rem, 3vh, 4rem); }
         html.pantallas #steps .aspect-\[4\/3\] { aspect-ratio: auto; height: clamp(170px, 44vh, 560px); }
         html.pantallas #steps .step-panel .mb-8 { margin-bottom: clamp(0.75rem, 2vh, 2rem); }
@@ -432,11 +458,18 @@
             html.pantallas #contacto .lg\:col-span-5 > div.flex .btn { padding: 0.75rem 1.1rem; }
         }
 
+        /* ---------- Computadores muy bajos (740 px de alto o menos, ej. 1280 x 720) ---------- */
+        @media (min-width: 1024px) and (max-height: 740px) {
+            html.pantallas #servicios .atajos-servicios { display: none; }
+            html.pantallas #servicios p.mb-7 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+            html.pantallas #restaurante .text-\[0\.72rem\].mt-6 { display: none; }
+        }
+
         /* ---------- Pantallas bajas (laptops de 768 px de alto o menos) ---------- */
         html.pantallas .display-xl { font-size: clamp(2.4rem, min(7.2vw, 8.6vh), 5.6rem); }
         html.pantallas #bebidas-grid ul.space-y-2\.5 > * + * { margin-top: clamp(0.25rem, 0.8vh, 0.625rem); }
         html.pantallas #bebidas-grid h4 { margin-bottom: clamp(0.5rem, 1.2vh, 1rem); font-size: clamp(1.25rem, 2.8vh, 1.5rem); }
-        @media (max-height: 820px) {
+        @media (max-height: 920px) {
             html.pantallas #bebidas-grid .bebida-fila { font-size: 0.8rem; line-height: 1.45; }
             html.pantallas #bar .bg-white.border > .mb-8 p { display: none; }
             html.pantallas .room-card .img-zoom > :first-child { height: clamp(110px, 17vh, 200px); }
@@ -2076,9 +2109,9 @@
         <div class="shell">
 
             <div class="pantalla">
-            <!-- Encabezado -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end mb-14 sm:mb-20 reveal">
-                <div class="lg:col-span-7">
+            <!-- Encabezado: texto y video -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-20 items-center mb-14 sm:mb-20 reveal hotel-intro">
+                <div class="lg:col-span-6 hotel-intro-texto">
                     <img src="isotipo-transparente.png" alt="" class="w-10 h-auto mb-6" loading="lazy">
                     <span class="eyebrow mb-6">Hotel Cabaleón</span>
                     <h2 class="display-lg text-ink mb-6">
@@ -2101,29 +2134,32 @@
                         Es un lugar amplio, con 15 habitaciones y una cabaña. Así podemos ofrecer una atención
                         personalizada, en la que el cuidado de cada huésped es la prioridad: esa es nuestra vocación boutique.
                     </p>
+
+                    <div class="hotel-intro-datos mt-10">
+                        <div class="grid grid-cols-3 gap-5 sm:gap-8 hairline-t pt-8 max-w-xl">
+                            <div>
+                                <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2 whitespace-nowrap"><span data-contar="9000">9.000</span> m²</span>
+                                <span class="block micro text-graphite/45">Zona turística</span>
+                            </div>
+                            <div>
+                                <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2"><span data-contar="16">16</span></span>
+                                <span class="block micro text-graphite/45">Habitaciones y cabaña</span>
+                            </div>
+                            <div>
+                                <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2"><span data-contar="2">2</span> h</span>
+                                <span class="block micro text-graphite/45">Desde Bogotá</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="lg:col-span-5">
-                    <div class="grid grid-cols-3 gap-5 sm:gap-8 hairline-t pt-8">
-                        <div>
-                            <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2 whitespace-nowrap">9.000 m²</span>
-                            <span class="block micro text-graphite/45">Zona turística</span>
-                        </div>
-                        <div>
-                            <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2">16</span>
-                            <span class="block micro text-graphite/45">Habitaciones y cabaña</span>
-                        </div>
-                        <div>
-                            <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2">2 h</span>
-                            <span class="block micro text-graphite/45">Desde Bogotá</span>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-x-8 gap-y-3 mt-8">
-                        <span class="micro text-graphite/40">Blog Cabaleón · Próximamente</span>
-                        <a href="https://lamelenadelsol.com/otros/" target="_blank" rel="noopener noreferrer" class="link-arrow text-ink">
-                            Ficción Cabaleón <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
-                        </a>
-                    </div>
+                <!-- Videos de la portada, uno tras otro (solo en computador) -->
+                <div class="hidden lg:block lg:col-span-6">
+                    <figure class="hotel-video relative overflow-hidden bg-ink">
+                        <video muted playsinline preload="none" poster="portada-2.jpg" data-videos="portada-2.mp4 portada-3.mp4 portada-1.mp4"
+                               aria-label="Piscinas, jardines y montañas del Hotel Cabaleón" class="absolute inset-0 w-full h-full object-cover"></video>
+                        <figcaption class="absolute bottom-5 left-5 bg-white/95 text-ink micro px-3.5 py-2">Hotel Cabaleón · Tena</figcaption>
+                    </figure>
                 </div>
             </div>
 
@@ -6149,6 +6185,55 @@
         }
 
         /* --- Carruseles: flechas, puntos y "1 / 4" debajo de cada lista que se recorre de lado --- */
+        /* Videos de la portada en la sección del hotel: se cargan solo en computador,
+           cuando la sección está cerca, y pasan de uno a otro al terminar */
+        function prepararVideoHotel() {
+            const v = document.querySelector('.hotel-video video');
+            if (!v || !window.matchMedia('(min-width: 1024px)').matches || !('IntersectionObserver' in window)) return;
+            const lista = v.dataset.videos.split(' ');
+            let actual = 0;
+            v.addEventListener('ended', () => {
+                actual = (actual + 1) % lista.length;
+                v.src = lista[actual];
+                v.play().catch(() => {});
+            });
+            new IntersectionObserver(entradas => {
+                entradas.forEach(e => {
+                    if (e.isIntersecting) {
+                        if (!v.getAttribute('src')) v.src = lista[actual];
+                        v.play().catch(() => {});
+                    } else if (v.getAttribute('src')) v.pause();
+                });
+            }, { rootMargin: '200px 0px' }).observe(v);
+        }
+
+        /* Cifras que cuentan desde 0 la primera vez que se ven (liviano: un solo requestAnimationFrame) */
+        function prepararContadores() {
+            const cifras = [...document.querySelectorAll('[data-contar]')];
+            if (!cifras.length || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const formato = n => n.toLocaleString('es-CO');
+            const contar = el => {
+                const hasta = Number(el.dataset.contar);
+                const duracion = 1400;
+                let inicio = null;
+                const paso = ahora => {
+                    if (inicio === null) inicio = ahora;
+                    const p = Math.min((ahora - inicio) / duracion, 1);
+                    el.textContent = formato(Math.round(hasta * (1 - Math.pow(1 - p, 3))));
+                    if (p < 1) requestAnimationFrame(paso);
+                };
+                requestAnimationFrame(paso);
+            };
+            const obs = new IntersectionObserver(entradas => {
+                entradas.forEach(e => {
+                    if (!e.isIntersecting) return;
+                    obs.unobserve(e.target);
+                    contar(e.target);
+                });
+            }, { threshold: 0.6 });
+            cifras.forEach(el => { el.textContent = '0'; obs.observe(el); });
+        }
+
         function prepararCarruseles() {
             document.querySelectorAll('.carrusel, .carrusel-movil').forEach(c => {
                 if (c.dataset.listo) return;
@@ -7900,6 +7985,8 @@
             });
             const primerVideo = document.querySelector('.hero-media');
             if (primerVideo) { const r = primerVideo.play(); if (r) r.catch(() => {}); }
+            prepararVideoHotel();
+            prepararContadores();
 
             /* --- Contenido que sale de los datos: habitaciones, planes, cartas, galería y tarifas --- */
             renderHabitaciones();
