@@ -214,6 +214,23 @@
             html.pantallas #hotel .hotel-intro-texto .lead { margin-bottom: 0.75rem; }
         }
         html.pantallas #hotel .pantalla > div[role="tablist"] { margin-top: clamp(1rem, 3vh, 4rem); }
+        /* Recorrido por pasos: 4 pantallas de alto; el contenido queda fijo y avanza un paso por pantalla */
+        .recorrido-marca { display: none; }
+        html.pantallas .recorrido-scroll { position: relative; height: calc((100vh - var(--alto-nav)) * 4); height: calc((100svh - var(--alto-nav)) * 4); }
+        html.pantallas .recorrido-scroll > .recorrido-fijo {
+            position: sticky; top: var(--alto-nav);
+            height: calc(100vh - var(--alto-nav)); height: calc(100svh - var(--alto-nav));
+            scroll-snap-align: none;
+        }
+        html.pantallas .recorrido-marca {
+            display: block; position: absolute; left: 0; width: 1px; pointer-events: none;
+            height: calc(100vh - var(--alto-nav)); height: calc(100svh - var(--alto-nav));
+            scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--alto-nav);
+        }
+        html.pantallas .recorrido-marca[data-paso="0"] { top: 0; }
+        html.pantallas .recorrido-marca[data-paso="1"] { top: calc(100vh - var(--alto-nav)); top: calc(100svh - var(--alto-nav)); }
+        html.pantallas .recorrido-marca[data-paso="2"] { top: calc((100vh - var(--alto-nav)) * 2); top: calc((100svh - var(--alto-nav)) * 2); }
+        html.pantallas .recorrido-marca[data-paso="3"] { top: calc((100vh - var(--alto-nav)) * 3); top: calc((100svh - var(--alto-nav)) * 3); }
         html.pantallas #steps .aspect-\[4\/3\] { aspect-ratio: auto; height: clamp(170px, 44vh, 560px); }
         html.pantallas #steps .step-panel .mb-8 { margin-bottom: clamp(0.75rem, 2vh, 2rem); }
         html.pantallas #steps .hairline-t.mt-10 { margin-top: clamp(0.75rem, 2vh, 2.5rem); padding-top: clamp(0.6rem, 1.5vh, 1.5rem); }
@@ -2164,7 +2181,9 @@
             </div>
 
             </div>
-            <div class="pantalla">
+            <!-- Recorrido: la pantalla queda fija y cada marca (una por paso) es un punto de parada del desplazamiento -->
+            <div class="recorrido-scroll">
+            <div class="pantalla recorrido-fijo">
             <!-- Recorrido -->
             <div id="steps" class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 reveal">
 
@@ -2270,6 +2289,11 @@
                     <span class="step-name">La mesa</span>
                 </button>
             </div>
+            </div>
+            <span class="recorrido-marca" data-paso="0" aria-hidden="true"></span>
+            <span class="recorrido-marca" data-paso="1" aria-hidden="true"></span>
+            <span class="recorrido-marca" data-paso="2" aria-hidden="true"></span>
+            <span class="recorrido-marca" data-paso="3" aria-hidden="true"></span>
             </div>
 
         </div>
@@ -5946,6 +5970,7 @@
         const PASO_MS = 7000;
         const pasosNombres = ['La llegada', 'La habitación', 'La tarde', 'La mesa'];
         let pasoActual = 0;
+        let recorridoConScroll = false;   // con pantallas, el paso lo decide el desplazamiento (sin avance automático)
         let pasoTimer = null;
         let pasosVisibles = false;
         const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -5989,18 +6014,52 @@
             document.getElementById('step-current').textContent = numero;
             document.getElementById('step-badge').textContent = numero + ' · ' + pasosNombres[pasoActual];
 
-            pintarProgreso(pasoActual, pasosVisibles && !menosMovimiento);
+            pintarProgreso(pasoActual, pasosVisibles && !menosMovimiento && !recorridoConScroll);
 
             if (reiniciarTimer !== false) arrancarPasos();
         }
 
         function stepBy(delta) {
+            if (recorridoConScroll) return irAPasoConScroll(pasoActual + delta);
             setPaso(pasoActual + delta);
+        }
+
+        /* Con pantallas: el paso sigue al desplazamiento dentro del recorrido */
+        function prepararRecorridoScroll() {
+            const zona = document.querySelector('.recorrido-scroll');
+            if (!zona || !document.documentElement.classList.contains('pantallas')) return;
+            recorridoConScroll = true;
+            detenerPasos();
+            const total = zona.querySelectorAll('.recorrido-marca').length;
+            let pendiente = false;
+            const revisar = () => {
+                pendiente = false;
+                const r = zona.getBoundingClientRect();
+                if (r.bottom < 0 || r.top > innerHeight) return;
+                const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alto-nav')) || 0;
+                const i = Math.max(0, Math.min(total - 1, Math.round((nav - r.top) / (r.height / total))));
+                if (i !== pasoActual) setPaso(i, false);
+            };
+            addEventListener('scroll', () => { if (!pendiente) { pendiente = true; requestAnimationFrame(revisar); } }, { passive: true });
+            addEventListener('resize', revisar);
+            revisar();
+        }
+
+        /* Flechas y pestañas: se desplaza hasta la marca del paso (después del último, a la siguiente sección) */
+        function irAPasoConScroll(i) {
+            const marcas = document.querySelectorAll('.recorrido-marca');
+            const suave = menosMovimiento ? 'auto' : 'smooth';
+            if (i >= marcas.length) {
+                const siguiente = document.querySelector('.recorrido-scroll').closest('section').nextElementSibling;
+                if (siguiente) siguiente.scrollIntoView({ behavior: suave, block: 'start' });
+                return;
+            }
+            marcas[Math.max(0, i)].scrollIntoView({ behavior: suave, block: 'start' });
         }
 
         function arrancarPasos() {
             detenerPasos();
-            if (menosMovimiento || !pasosVisibles) return;
+            if (menosMovimiento || !pasosVisibles || recorridoConScroll) return;
             pintarProgreso(pasoActual, true);
             pasoTimer = setInterval(() => setPaso(pasoActual + 1, false), PASO_MS);
         }
@@ -8102,9 +8161,13 @@
 
             /* --- Recorrido en 4 pasos --- */
             document.querySelectorAll('.step-tab').forEach(tab => {
-                tab.addEventListener('click', () => setPaso(parseInt(tab.dataset.step, 10)));
+                tab.addEventListener('click', () => {
+                    const i = parseInt(tab.dataset.step, 10);
+                    if (recorridoConScroll) irAPasoConScroll(i); else setPaso(i);
+                });
             });
 
+            prepararRecorridoScroll();
             const zonaPasos = document.getElementById('steps');
             if (zonaPasos) {
                 zonaPasos.addEventListener('mouseenter', detenerPasos);
