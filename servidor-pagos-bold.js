@@ -17,9 +17,13 @@
      POST /webhook-bold    Aviso automático de Bold cuando un pago se aprueba,
                            se rechaza o se anula (panel de Bold →
                            Integraciones → Webhooks).
-     POST /eventos         Estadísticas anónimas de la página (visitas, de
-                           dónde llegan, clics y pasos de la reserva) para
-                           el panel. Agrega país y ciudad aproximados.
+     POST /eventos         Estadísticas anónimas de la página y del blog
+                           (visitas, de dónde llegan, clics, artículos leídos
+                           y pasos de la reserva) para el panel. Agrega país
+                           y ciudad aproximados.
+     GET  /                Estado del servidor. Incluye la versión y los tipos
+                           de evento que acepta: el panel la consulta para
+                           avisar si falta publicar esta versión en Cloudflare.
 
    Variables del Worker (Settings → Variables and Secrets):
      BOLD_LLAVE_IDENTIDAD    Llave de identidad de Bold (texto).
@@ -46,6 +50,7 @@
    (pendientes de los últimos MINUTOS_PAGO_EN_CURSO minutos).
    ===================================================================== */
 
+const VERSION = '2026-10-08';   // se muestra en GET /; súbela al publicar cambios
 const MONEDA = 'COP';
 const BOLD_API = 'https://payments.api.bold.co/v2/payment-voucher/';
 const MINUTOS_CACHE_TARIFAS = 5;
@@ -93,8 +98,9 @@ export default {
             }
             if (url.pathname === '/') {
                 return json({
-                    ok: true, servicio: 'Reservas y pagos Bold · Hotel Cabaleón',
-                    configurado: boldConfigurado(env), reservas: reservasConfiguradas(env)
+                    ok: true, servicio: 'Reservas y pagos Bold · Hotel Cabaleón', version: VERSION,
+                    configurado: boldConfigurado(env), reservas: reservasConfiguradas(env),
+                    eventos: [...TIPOS_EVENTO]
                 }, 200, cabeceras);
             }
             return json({ error: 'Ruta no encontrada.' }, 404, cabeceras);
@@ -347,7 +353,10 @@ async function avisoDeBold(request, env) {
 const TIPOS_EVENTO = new Set([
     'visita', 'seccion', 'salida', 'whatsapp', 'llamada', 'correo', 'como_llegar', 'red_social', 'documento',
     'ficha_habitacion', 'galeria', 'plan', 'asistente', 'asistente_tema', 'pedido_mangole', 'fechas',
-    'habitacion_agregada', 'carrito', 'datos_completos', 'reserva_whatsapp', 'pago_iniciado', 'pago'
+    'habitacion_agregada', 'carrito', 'datos_completos', 'reserva_whatsapp', 'pago_iniciado', 'pago',
+    /* Blog: tarjeta tocada en la portada, artículo abierto (y segundos de lectura), hasta dónde lo leyeron
+       (25, 50, 75 o 100 %) y enlaces tocados dentro del artículo */
+    'blog', 'articulo', 'lectura', 'blog_clic'
 ]);
 const DIAS_EVENTOS = 400;
 

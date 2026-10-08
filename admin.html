@@ -261,6 +261,45 @@
         .est-clave svg { width: 16px; height: 16px; color: var(--brass); flex-shrink: 0; margin-top: 0.15rem; }
         .est-clave strong { color: var(--ink); font-weight: 500; }
 
+        /* ---------- Celular ----------
+           Las tablas de reservas se vuelven tarjetas, la primera columna de las tablas de estadísticas
+           queda fija al deslizar y las cifras grandes se ajustan al ancho. */
+        @media (max-width: 639px) {
+            .data-table.en-tarjetas thead { display: none; }
+            .data-table.en-tarjetas, .data-table.en-tarjetas tbody { display: block; }
+            .data-table.en-tarjetas tr.fila {
+                display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.55rem 1rem;
+                padding: 1rem 1.1rem; border-bottom: 1px solid var(--line); position: relative;
+            }
+            .data-table.en-tarjetas tbody tr:last-child { border-bottom: none; }
+            .data-table.en-tarjetas td { display: block; padding: 0; border: none; white-space: normal; font-size: 0.8rem; min-width: 0; }
+            .data-table.en-tarjetas td[data-titulo]::before {
+                content: attr(data-titulo); display: block; margin-bottom: 0.15rem;
+                font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; color: rgba(10,33,46,.4);
+            }
+            .data-table.en-tarjetas td.celda-principal { grid-column: 1 / -1; padding-right: 5.5rem; font-size: 0.88rem; }
+            .data-table.en-tarjetas td.celda-estado { position: absolute; top: 1rem; right: 1.1rem; }
+            .data-table.en-tarjetas td.celda-flecha, .data-table.en-tarjetas td.hidden { display: none; }
+            .data-table.en-tarjetas td[colspan] { grid-column: 1 / -1; padding: 1.5rem 0; }
+
+            .est-pro th:first-child, .est-pro td:first-child {
+                position: sticky; left: 0; z-index: 1; background: #fff; padding-left: 1rem;
+                box-shadow: 1px 0 0 var(--line); min-width: 9rem; max-width: 11rem; white-space: normal;
+            }
+            .est-pro tbody tr:hover td:first-child, .est-pro tbody tr:focus-visible td:first-child { background: var(--bone); }
+            .est-pro tbody tr.is-elegida td:first-child { background: #F8F1E6; }
+            .est-pro th, .est-pro td { padding-left: 0.6rem; padding-right: 0.6rem; }
+
+            .est-kpi-valor { font-size: 1.75rem; }
+            .est-kpi-chico { font-size: 1.5rem; }
+            .est-titulo { font-size: 1.2rem; }
+            .cal-day { font-size: 0.7rem; }
+            .cal-libres { font-size: 0.6rem; font-weight: 600; letter-spacing: 0; }
+            .cal-libres .palabra { display: none; }
+            .est-seccion { padding: 0.85rem 0.8rem 0.75rem; }
+            .est-seccion .truncate { white-space: normal; line-height: 1.25; }
+        }
+
         #toast {
             position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(6rem);
             background: var(--ink); color: #fff; padding: 0.9rem 1.4rem;
@@ -448,33 +487,33 @@
 
                 <!-- ---------- RESUMEN ---------- -->
                 <section class="view is-active" data-view="resumen">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-                        <div class="card p-5">
+                    <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 mb-8">
+                        <div class="card p-4 sm:p-5">
                             <span class="micro text-graphite/40">Reservas del mes</span>
-                            <div class="flex items-end gap-2 mt-3">
-                                <span id="kpi-reservas" class="font-display text-4xl text-ink leading-none">0</span>
+                            <div class="flex flex-wrap items-end gap-2 mt-3">
+                                <span id="kpi-reservas" class="font-display text-3xl sm:text-4xl text-ink leading-none">0</span>
                                 <span id="kpi-reservas-pill" class="pill pill-amber mb-1 hidden"></span>
                             </div>
                             <span class="block text-[0.68rem] text-graphite/45 mt-1.5">Llegadas de este mes</span>
                         </div>
-                        <div class="card p-5">
+                        <div class="card p-4 sm:p-5">
                             <span class="micro text-graphite/40">Ocupación del mes</span>
                             <div class="mt-3">
-                                <span id="kpi-ocupacion" class="font-display text-4xl text-ink leading-none">0%</span>
+                                <span id="kpi-ocupacion" class="font-display text-3xl sm:text-4xl text-ink leading-none">0%</span>
                             </div>
                             <span class="block text-[0.68rem] text-graphite/45 mt-1.5">Noches pagadas o confirmadas</span>
                         </div>
-                        <div class="card p-5">
+                        <div class="card p-4 sm:p-5">
                             <span class="micro text-graphite/40">Ventas del mes</span>
                             <div class="mt-3">
-                                <span id="kpi-ventas" class="font-display text-3xl text-ink leading-none">$0</span>
+                                <span id="kpi-ventas" class="font-display text-2xl sm:text-3xl text-ink leading-none break-all">$0</span>
                             </div>
                             <span id="kpi-ventas-nota" class="block text-[0.68rem] text-graphite/45 mt-1.5">COP · reservas pagadas o confirmadas</span>
                         </div>
-                        <button type="button" onclick="irAPendientes()" class="card p-5 text-left hover:border-ink transition-colors">
+                        <button type="button" onclick="irAPendientes()" class="card p-4 sm:p-5 text-left hover:border-ink transition-colors">
                             <span class="micro text-graphite/40">Por confirmar</span>
                             <div class="flex items-end gap-2 mt-3">
-                                <span id="kpi-pendientes" class="font-display text-4xl text-ink leading-none">0</span>
+                                <span id="kpi-pendientes" class="font-display text-3xl sm:text-4xl text-ink leading-none">0</span>
                                 <span id="kpi-pendientes-pill" class="pill pill-amber mb-1 hidden">Revisar</span>
                             </div>
                             <span class="block text-[0.68rem] text-graphite/45 mt-1.5">Reservas sin pago confirmado</span>
@@ -488,7 +527,7 @@
                                 <button class="chip" onclick="nav('reservas')">Ver todas</button>
                             </div>
                             <div class="overflow-x-auto">
-                                <table class="data-table">
+                                <table class="data-table en-tarjetas">
                                     <thead>
                                         <tr><th>Huésped</th><th>Habitación</th><th>Entrada</th><th>Noches</th><th>Estado</th></tr>
                                     </thead>
@@ -528,7 +567,7 @@
                     </div>
 
                     <div class="card overflow-x-auto">
-                        <table class="data-table">
+                        <table class="data-table en-tarjetas">
                             <thead>
                                 <tr><th>Huésped</th><th>Habitación</th><th>Fechas</th><th>Huéspedes</th><th>Canal</th><th>Total</th><th>Estado</th><th></th></tr>
                             </thead>
@@ -594,6 +633,7 @@
                         <button class="est-tab is-active" role="tab" aria-selected="true" data-est-tab="resumen"><i data-lucide="layout-grid"></i> Resumen</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="origen"><i data-lucide="compass"></i> De dónde llegan</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="secciones"><i data-lucide="panels-top-left"></i> Secciones de la página</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="blog"><i data-lucide="newspaper"></i> Blog</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="reservas"><i data-lucide="calendar-check"></i> Reservas y ventas</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="habitaciones"><i data-lucide="bed-double"></i> Habitaciones y servicios</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="audiencia"><i data-lucide="users"></i> Audiencia</button>
@@ -620,6 +660,7 @@
                                             <button class="chip" data-metrica="whatsapp">WhatsApp</button>
                                             <button class="chip" data-metrica="reservas">Reservas</button>
                                             <button class="chip" data-metrica="pagadas">Pagadas</button>
+                                            <button class="chip" data-metrica="lectores">Blog</button>
                                         </span>
                                         <button type="button" class="chip" data-ver-tabla="est-dias">Ver tabla</button>
                                     </span>
@@ -687,7 +728,7 @@
                                     <span class="est-titulo">Cada sección de la página</span>
                                     <span class="est-sub">En el mismo orden de la página. Toca una para abrir su panel con estadísticas y gráficas.</span>
                                 </figcaption>
-                                <div id="est-secciones" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
+                                <div id="est-secciones" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3"></div>
                             </figure>
                             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                 <figure class="card p-5 sm:p-6">
@@ -701,6 +742,45 @@
                                 <figure class="card p-5 sm:p-6">
                                     <figcaption class="mb-4"><span class="est-titulo">Desde dónde los contactan</span><span class="est-sub">WhatsApp, llamadas, correo y cómo llegar, según dónde estaba el botón</span></figcaption>
                                     <div id="est-contactos"></div>
+                                </figure>
+                            </div>
+                        </div>
+
+                        <!-- BLOG -->
+                        <div class="est-panel" data-est-panel="blog" role="tabpanel">
+                            <p id="est-blog-aviso" class="hidden mb-5 p-4 bg-white border border-brass/50 text-[0.8rem] text-graphite/70 leading-relaxed"></p>
+                            <div id="est-kpis-blog" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                            <figure class="card mb-6">
+                                <figcaption class="p-5 sm:p-6 pb-3 sm:pb-3">
+                                    <span class="est-titulo">Cada artículo</span>
+                                    <span class="est-sub">Quién lo lee, cuánto tiempo, hasta dónde y qué hace después. Toca una fila para abrir su panel.</span>
+                                </figcaption>
+                                <div class="overflow-x-auto" id="est-tabla-blog"></div>
+                            </figure>
+                            <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="flex items-start justify-between gap-3 mb-4">
+                                    <span><span class="est-titulo">Lectores por día</span><span class="est-sub">Visitas que abrieron al menos un artículo</span></span>
+                                    <button type="button" class="chip shrink-0" data-ver-tabla="est-blog-dias">Ver tabla</button>
+                                </figcaption>
+                                <div id="est-blog-dias" class="relative" tabindex="0" aria-label="Lectores del blog por día. Usa las flechas para recorrer los días."></div>
+                                <div id="est-blog-dias-tabla" class="hidden overflow-x-auto max-h-80"></div>
+                            </figure>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Hasta dónde leen</span><span class="est-sub">De quienes empezaron a leer un artículo</span></figcaption>
+                                    <div id="est-blog-avance"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Cómo llegan al blog</span><span class="est-sub">Por la portada, por la lista o directo a un artículo</span></figcaption>
+                                    <div id="est-blog-llegada"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">De dónde vienen los lectores</span><span class="est-sub">Toca una para ver solo sus visitas</span></figcaption>
+                                    <div id="est-blog-fuentes"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Qué hacen después de leer</span><span class="est-sub">Enlaces que tocan dentro de los artículos</span></figcaption>
+                                    <div id="est-blog-destinos"></div>
                                 </figure>
                             </div>
                         </div>
@@ -1507,11 +1587,11 @@
                 .sort((a, b) => a.llegada.localeCompare(b.llegada))
                 .slice(0, 6);
             document.getElementById('llegadas-body').innerHTML = proximas.length ? proximas.map(r => `<tr class="fila" onclick="abrirReserva('${esc(r.id)}')">
-                    <td class="text-ink">${esc(r.nombre)}</td>
-                    <td class="text-graphite/70">${esc(textoHabitaciones(r.habitaciones))}</td>
-                    <td class="text-graphite/70">${fechaCorta(r.llegada)}</td>
-                    <td class="text-graphite/70">${r.noches}</td>
-                    <td>${estadoPill(r.estado)}</td>
+                    <td class="text-ink celda-principal">${esc(r.nombre)}</td>
+                    <td class="text-graphite/70" data-titulo="Habitación">${esc(textoHabitaciones(r.habitaciones))}</td>
+                    <td class="text-graphite/70" data-titulo="Entrada">${fechaCorta(r.llegada)}<span class="sm:hidden"> · ${plural(r.noches, 'noche', 'noches')}</span></td>
+                    <td class="text-graphite/70 hidden sm:table-cell">${r.noches}</td>
+                    <td class="celda-estado">${estadoPill(r.estado)}</td>
                 </tr>`).join('')
                 : '<tr><td colspan="5" class="text-graphite/45 text-center py-8">No hay llegadas próximas.</td></tr>';
         }
@@ -1565,14 +1645,14 @@
                     return fa ? a.llegada.localeCompare(b.llegada) : b.llegada.localeCompare(a.llegada);
                 });
             document.getElementById('reservas-body').innerHTML = filas.map(r => `<tr class="fila" onclick="abrirReserva('${esc(r.id)}')">
-                <td><span class="block text-ink">${esc(r.nombre)}</span><span class="block text-[0.66rem] text-graphite/40">${esc(r.orden)}</span></td>
-                <td class="text-graphite/70">${esc(textoHabitaciones(r.habitaciones))}</td>
-                <td class="text-graphite/70">${fechaCorta(r.llegada)} – ${fechaCorta(r.salida)}</td>
-                <td class="text-graphite/70">${r.huespedes}</td>
-                <td class="text-graphite/70">${CANALES[r.canal] || esc(r.canal)}</td>
-                <td class="text-graphite/70">${COP(r.total)}${r.pagado ? `<span class="block text-[0.66rem] text-moss">Pagado ${COP(r.pagado)}</span>` : ''}</td>
-                <td>${estadoPill(r.estado)}</td>
-                <td class="text-right"><i data-lucide="chevron-right" class="w-4 h-4 text-graphite/30 inline"></i></td>
+                <td class="celda-principal"><span class="block text-ink">${esc(r.nombre)}</span><span class="block text-[0.66rem] text-graphite/40">${esc(r.orden)}</span></td>
+                <td class="text-graphite/70" data-titulo="Habitación">${esc(textoHabitaciones(r.habitaciones))}</td>
+                <td class="text-graphite/70" data-titulo="Fechas">${fechaCorta(r.llegada)} – ${fechaCorta(r.salida)}</td>
+                <td class="text-graphite/70" data-titulo="Huéspedes">${r.huespedes}</td>
+                <td class="text-graphite/70" data-titulo="Canal">${CANALES[r.canal] || esc(r.canal)}</td>
+                <td class="text-graphite/70" data-titulo="Total">${COP(r.total)}${r.pagado ? `<span class="block text-[0.66rem] text-moss">Pagado ${COP(r.pagado)}</span>` : ''}</td>
+                <td class="celda-estado">${estadoPill(r.estado)}</td>
+                <td class="text-right celda-flecha"><i data-lucide="chevron-right" class="w-4 h-4 text-graphite/30 inline"></i></td>
             </tr>`).join('');
             document.getElementById('reservas-vacio').classList.toggle('hidden', filas.length > 0);
         }
@@ -1882,10 +1962,10 @@
                 let cls = 'cal-day';
                 let tag = '';
                 if (!libres) { cls += ' is-full'; tag = 'Lleno'; }
-                else if (ocupadas) { cls += ' is-partial'; tag = plural(libres, 'libre', 'libres'); }
+                else if (ocupadas) { cls += ' is-partial'; tag = libres + '<span class="palabra"> ' + (libres === 1 ? 'libre' : 'libres') + '</span>'; }
                 if (dia < hoy) cls += ' is-past';
                 if (dia === diaElegido) cls += ' is-elegido';
-                html += `<button type="button" class="${cls}" onclick="elegirDia('${dia}')"><span>${d}</span>${tag ? `<span class="text-[0.55rem] font-normal">${tag}</span>` : ''}</button>`;
+                html += `<button type="button" class="${cls}" onclick="elegirDia('${dia}')"><span>${d}</span>${tag ? `<span class="cal-libres text-[0.55rem] font-normal">${tag}</span>` : ''}</button>`;
             }
             document.getElementById('calendario').innerHTML = html;
             renderDetalleDia();
@@ -1974,17 +2054,41 @@
         const DORADO = '#A8834A';
         const RAMPA_EMBUDO = ['#9DB7C6', '#6E93A8', '#45708A', '#2A5570', '#163B52', '#0A212E'];
         const RAMPA_CALOR = ['#EEF3F6', '#C9D9E2', '#9DB7C6', '#6E93A8', '#45708A', '#1C4A62'];
+        /* Secciones de index.html, en el orden de la página. "catalogo" ya no existe (lo reemplazó el Blog):
+           se muestra solo si tiene visitas en el período consultado. */
         const SECCIONES = {
             inicio: 'Portada', destacados: 'Destacados', hotel: 'El hotel', habitaciones: 'Habitaciones', servicios: 'Servicios',
-            eventos: 'Eventos', planes: 'Planes', restaurante: 'Restaurante Mangolé', bar: 'Cabalante Bar', galeria: 'Galería',
-            resenas: 'Reseñas', informacion: 'Antes de tu llegada', reservar: 'Reservar', faq: 'Preguntas frecuentes',
-            catalogo: 'Catálogo de ofertas', contacto: 'Contacto'
+            eventos: 'Eventos', planes: 'Planes', beneficios: 'Beneficios de reservar', restaurante: 'Restaurante Mangolé', bar: 'Cabalante Bar',
+            galeria: 'Galería', resenas: 'Reseñas', informacion: 'Antes de tu llegada', reservar: 'Reservar', faq: 'Preguntas frecuentes',
+            blog: 'Blog', contacto: 'Contacto', catalogo: 'Catálogo de ofertas (ya no está)'
         };
+        const SECCIONES_ANTERIORES = ['catalogo'];
         const ICONOS_SECCION = {
             inicio: 'house', destacados: 'star', hotel: 'building-2', habitaciones: 'bed-double', servicios: 'waves', eventos: 'party-popper',
-            planes: 'sparkles', restaurante: 'utensils', bar: 'wine', galeria: 'images', resenas: 'message-square-quote', informacion: 'info',
-            reservar: 'calendar-check', faq: 'circle-help', catalogo: 'tag', contacto: 'map-pin'
+            planes: 'sparkles', beneficios: 'gem', restaurante: 'utensils', bar: 'wine', galeria: 'images', resenas: 'message-square-quote',
+            informacion: 'info', reservar: 'calendar-check', faq: 'circle-help', blog: 'newspaper', catalogo: 'tag', contacto: 'map-pin'
         };
+        /* Secciones que se muestran: las de la página y, si tienen visitas, las que ya no están */
+        const seccionesVisibles = d => Object.keys(SECCIONES).filter(k => !SECCIONES_ANTERIORES.includes(k) ||
+            (d.secciones || []).some(s => s.nombre === k && s.visitas));
+        /* Artículos del blog (blog-*.html). El id es el que envían las páginas */
+        const ARTICULOS = {
+            'como-llegar': ['Cómo llegar desde Bogotá', 'blog-como-llegar-a-tena-desde-bogota.html'],
+            'que-llevar': ['Qué llevar a clima cálido', 'blog-que-llevar-a-clima-calido.html'],
+            'plan-fin-de-semana': ['Plan de fin de semana', 'blog-plan-fin-de-semana-cerca-de-bogota.html'],
+            'pasadia': ['Pasadía cerca de Bogotá', 'blog-pasadia-cerca-de-bogota.html']
+        };
+        const nombreArticulo = id => (ARTICULOS[id] ? ARTICULOS[id][0] : legible(id));
+        /* Enlaces que tocan dentro de un artículo */
+        const DESTINOS_BLOG = {
+            reservar: ['calendar-check', 'Fueron a reservar'], whatsapp: ['message-circle', 'Escribieron por WhatsApp'],
+            habitaciones: ['bed-double', 'Vieron las habitaciones'], planes: ['sparkles', 'Vieron los planes'],
+            eventos: ['party-popper', 'Vieron los eventos'], restaurante: ['utensils', 'Vieron el restaurante'],
+            inicio: ['house', 'Fueron a la página principal'], blog: ['newspaper', 'Fueron a la lista del blog'],
+            mapa: ['navigation', 'Abrieron el mapa'], llamada: ['phone', 'Llamaron'], correo: ['mail', 'Enviaron un correo'],
+            documento: ['file-text', 'Abrieron un documento'], redes: ['share-2', 'Fueron a las redes'], articulo: ['book-open', 'Leyeron otro artículo']
+        };
+        const destinoBlog = n => { const k = String(n || '').startsWith('articulo:') ? 'articulo' : n; return DESTINOS_BLOG[k] || ['mouse-pointer-click', legible(n)]; };
         const INTERACCIONES = {
             whatsapp: ['message-circle', 'Escribieron por WhatsApp'], llamada: ['phone', 'Llamaron'], correo: ['mail', 'Enviaron un correo'],
             como_llegar: ['navigation', 'Abrieron cómo llegar'], red_social: ['share-2', 'Fueron a las redes'],
@@ -1994,7 +2098,8 @@
             pedido_mangole: ['utensils', 'Enviaron un pedido a Mangolé'], fechas: ['calendar', 'Eligieron fechas'],
             habitacion_agregada: ['plus', 'Agregaron una habitación'], carrito: ['key', 'Abrieron su reserva'],
             datos_completos: ['user-check', 'Completaron sus datos'], reserva_whatsapp: ['send', 'Enviaron la reserva por WhatsApp'],
-            pago_iniciado: ['credit-card', 'Abrieron el pago con Bold'], pago: ['badge-check', 'Volvieron del pago con Bold']
+            pago_iniciado: ['credit-card', 'Abrieron el pago con Bold'], pago: ['badge-check', 'Volvieron del pago con Bold'],
+            blog: ['newspaper', 'Abrieron un artículo desde la portada'], blog_clic: ['mouse-pointer-click', 'Tocaron un enlace dentro del blog']
         };
         const PASOS_EMBUDO = {
             visita: 'Visitaron la página', reservar: 'Llegaron a Reservar', fechas: 'Eligieron fechas',
@@ -2028,9 +2133,9 @@
         const LUGARES_CLIC = {
             'botón flotante': 'Botón flotante', 'barra del celular': 'Barra del celular', asistente: 'Asistente', pedido: 'Pedido a Mangolé',
             carrito: 'Su reserva', 'ficha de habitación': 'Ficha de habitación', 'resultado del pago': 'Resultado del pago', 'galería': 'Fotos de la galería',
-            'menú': 'Menú', 'pie de página': 'Pie de página', otro: 'Otro lugar'
+            'menú': 'Menú', 'pie de página': 'Pie de página', otro: 'Otro lugar', blog: 'Blog'
         };
-        const METRICAS = { visitas: 'visitas', visitantes: 'visitantes', interes: 'visitas con interés', whatsapp: 'escribieron por WhatsApp', reservas: 'reservas enviadas', pagadas: 'reservas pagadas' };
+        const METRICAS = { visitas: 'visitas', visitantes: 'visitantes', interes: 'visitas con interés', whatsapp: 'escribieron por WhatsApp', reservas: 'reservas enviadas', pagadas: 'reservas pagadas', lectores: 'leyeron el blog' };
         /* Reservas pagadas (pagadas con Bold o confirmadas en el panel) y sin pagar (siguen pendientes) */
         const pagadasDe = x => (x.pagadas != null ? x.pagadas : x.pagos || 0);
         const pendientesDe = x => (x.pendientes != null ? x.pendientes : Math.max(0, (x.reservas || 0) - pagadasDe(x)));
@@ -2056,7 +2161,12 @@
         const legible = id => { const t = String(id || '').replace(/[_-]+/g, ' ').trim(); return t ? t.charAt(0).toUpperCase() + t.slice(1) : 'Otro'; };
         const nombrePais = c => { try { return new Intl.DisplayNames(['es'], { type: 'region' }).of(c) || c; } catch (e) { return c; } };
         const nombreIdioma = c => { try { return capitalize(new Intl.DisplayNames(['es'], { type: 'language' }).of(c) || c); } catch (e) { return c; } };
-        const nombreLugar = l => SECCIONES[l] || LUGARES_CLIC[l] || legible(l);
+        const nombreLugar = l => {
+            const t = String(l || '');
+            const art = /^blog[/:](.+)$/.exec(t);
+            if (art) return art[1] === 'lista' ? 'Lista del blog' : 'Blog · ' + nombreArticulo(art[1]);
+            return SECCIONES[t] || LUGARES_CLIC[t] || legible(t);
+        };
         const copCorto = n => { n = Math.round(Number(n) || 0); return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e8 ? 0 : 1).replace('.', ',').replace(',0', '') + ' M' : COP(n); };
         const vacioEst = texto => '<p class="text-[0.78rem] text-graphite/45 py-2">' + (texto || 'Sin datos en este período.') + '</p>';
         const sumar = (lista, f) => lista.reduce((s, x) => s + (Number(f(x)) || 0), 0);
@@ -2102,10 +2212,21 @@
             aviso.classList.toggle('hidden', !texto);
         }
 
+        /* ¿El servidor de Cloudflare ya tiene la versión que mide el blog? (consulta una sola vez) */
+        let servidorBlog = null;     // null: sin revisar · true: listo · false: falta publicar la versión nueva
+        async function revisarServidor() {
+            if (servidorBlog !== null || !CONECTADO || !CONEXION.servidor.trim()) return;
+            try {
+                const j = await (await fetch(CONEXION.servidor.replace(/\/+$/, '') + '/', { cache: 'no-store' })).json();
+                servidorBlog = Array.isArray(j.eventos) && j.eventos.includes('articulo');
+            } catch (e) { servidorBlog = undefined; /* no se pudo revisar: no se avisa */ }
+            if (datosEstadisticas) renderBlogEst(datosEstadisticas);
+        }
+
         function renderEstadisticas(d) {
             const r = d.resumen || {};
-            avisoEstadisticas(CONECTADO && !d.mapa_calor
-                ? 'Falta un paso para ver todas las estadísticas nuevas: en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.'
+            avisoEstadisticas(CONECTADO && (!d.mapa_calor || !d.blog)
+                ? 'Falta un paso para ver todas las estadísticas nuevas (también las del blog): en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.'
                 : !CONECTADO ? 'Datos de ejemplo. Al conectar el panel con Supabase aquí aparecen las visitas reales de la página.'
                 : !r.visitas ? (origenEstadisticas ? 'No hay visitas de ' + origenEstadisticas + ' en este período.'
                     : 'Aún no hay visitas registradas en este período. Se llenan solas cuando la página está publicada y conectada al servidor de reservas.') : '');
@@ -2114,12 +2235,14 @@
             renderResumenEst(d);
             renderOrigenEst(d);
             renderSeccionesEst(d);
+            renderBlogEst(d);
             renderReservasEst(d);
             renderHabitacionesEst(d);
             renderAudienciaEst(d);
             renderAsistenteEst(d);
             tablaCampanas('est-campanas-enlaces', d.campanas || []);
             lucide.createIcons();
+            revisarServidor();
         }
 
         /* ---------- Filtro por fuente ---------- */
@@ -2179,7 +2302,7 @@
         }
         function tarjetas(id, lista, chicas) {
             document.getElementById(id).innerHTML = lista.map(([etiqueta, valor, nota, delta]) =>
-                '<div class="card p-5"><span class="micro text-graphite/40">' + etiqueta + '</span>' +
+                '<div class="card p-4 sm:p-5"><span class="micro text-graphite/40">' + etiqueta + '</span>' +
                 '<span class="block ' + (chicas ? 'est-kpi-chico' : 'est-kpi-valor') + ' mt-3">' + valor + '</span>' + (delta || '') +
                 (nota ? '<span class="block text-[0.68rem] text-graphite/45 mt-1.5 leading-snug">' + nota + '</span>' : '') + '</div>').join('');
         }
@@ -2190,7 +2313,7 @@
             const a = d.anterior || {};
             const interes = r.interes != null ? r.interes : r.interactuaron;
             tarjetas('est-kpis', [
-                ['Visitas', num(r.visitas), num(r.paginas) + ' veces abrieron la página', cambio(r.visitas, a.visitas)],
+                ['Visitas', num(r.visitas), num(r.paginas) + ' páginas vistas' + (r.paginas_blog ? ' · ' + num(r.paginas_blog) + ' del blog' : ''), cambio(r.visitas, a.visitas)],
                 ['Visitantes', num(r.visitantes), num(r.nuevos) + ' nuevos' + (r.regresaron != null ? ' · ' + num(r.regresaron) + ' volvieron' : ''), cambio(r.visitantes, a.visitantes)],
                 ['Tiempo promedio', duracionTxt(r.duracion), 'Con la página a la vista, por visita', cambio(r.duracion, a.duracion)],
                 ['Visitas con interés', pct(interes, r.visitas) + ' %', num(interes) + ' se quedaron 10 s o más o tocaron un botón', cambio(interes, a.interes)],
@@ -2253,11 +2376,15 @@
                 if (caida && pasos[0].visitas >= 10) lista.push(['route', 'Donde más visitas se pierden: de "' + PASOS_EMBUDO[caida.de] + '" a "' + PASOS_EMBUDO[caida.a] + '" (sigue el <strong>' + Math.round(caida.sigue * 100) + ' %</strong>).']);
                 if (r.reservas) lista.push(['badge-check', 'De ' + plural(r.reservas, 'reserva enviada', 'reservas enviadas') + ' desde la página, <strong>' + num(pagadasDe(r)) +
                     '</strong> ya ' + (pagadasDe(r) === 1 ? 'está pagada o confirmada' : 'están pagadas o confirmadas') + ' y ' + num(pendientesDe(r)) + ' siguen sin pagar.']);
+                const blog = d.blog || {};
+                const masLeido = (blog.articulos || [])[0];
+                if (masLeido && masLeido.lectores) lista.push(['newspaper', 'El artículo más leído del blog es <strong>' + esc(nombreArticulo(masLeido.nombre)) + '</strong> (' +
+                    plural(masLeido.lectores, 'lector', 'lectores') + (masLeido.medidos ? ', ' + pct(masLeido.final, masLeido.medidos) + ' % lo leyó hasta el final' : '') + ').']);
                 const celular = (d.dispositivos || []).find(x => x.nombre === 'Celular');
                 if (celular) lista.push(['smartphone', '<strong>' + pct(celular.visitas, r.visitas) + ' %</strong> de las visitas son desde el celular.']);
             }
             document.getElementById('est-claves').innerHTML = lista.length
-                ? lista.slice(0, 7).map(([icono, texto]) => '<li class="est-clave"><i data-lucide="' + icono + '"></i><span>' + texto + '</span></li>').join('')
+                ? lista.slice(0, 9).map(([icono, texto]) => '<li class="est-clave"><i data-lucide="' + icono + '"></i><span>' + texto + '</span></li>').join('')
                 : '<li>' + vacioEst('Las conclusiones aparecen cuando haya visitas en el período.') + '</li>';
         }
 
@@ -2325,8 +2452,9 @@
                 '</div>' +
                 '<span class="micro text-graphite/40 block mb-2">Visitas por día</span>' +
                 '<div id="est-perfil-dias" class="relative mb-6" tabindex="0" aria-label="Visitas por día de esta fuente"></div>' +
-                '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-5 border-t border-line">' +
+                '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 pt-5 border-t border-line">' +
                     '<div><span class="micro text-graphite/40 block mb-2">Secciones que más ven</span><div id="est-perfil-secciones"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Artículos del blog que leen</span><div id="est-perfil-blog"></div></div>' +
                     '<div><span class="micro text-graphite/40 block mb-2">Dispositivos</span><div id="est-perfil-equipos"></div></div>' +
                     '<div><span class="micro text-graphite/40 block mb-2">Ciudades</span><div id="est-perfil-ciudades"></div></div>' +
                 '</div></div>';
@@ -2337,6 +2465,10 @@
             });
             barras('est-perfil-secciones', (d.secciones || []).filter(s => SECCIONES[s.nombre]).slice(0, 5), {
                 total: r.visitas, nombre: s => SECCIONES[s.nombre], dato: s => 'data-seccion="' + s.nombre + '"'
+            });
+            barras('est-perfil-blog', ((d.blog || {}).articulos || []).slice(0, 4), {
+                valor: x => x.lectores, total: r.visitas, nombre: x => nombreArticulo(x.nombre), dato: x => 'data-articulo="' + esc(x.nombre) + '"',
+                nota: x => x.reservas ? plural(x.reservas, 'reserva', 'reservas') : '', vacio: 'Nadie de esta fuente leyó el blog.'
             });
             barras('est-perfil-equipos', d.dispositivos || [], { total: r.visitas, icono: x => ICONOS_EQUIPO[x.nombre] || 'circle' });
             barras('est-perfil-ciudades', (d.ciudades || []).slice(0, 5), { total: r.visitas, vacio: 'Sin datos de ubicación.' });
@@ -2398,12 +2530,12 @@
             const masVista = conocidas.filter(s => s.nombre !== 'inicio').sort((a, b) => b.visitas - a.visitas)[0];
             const masTiempo = conocidas.filter(s => s.segundos).sort((a, b) => b.segundos - a.segundos)[0];
             tarjetas('est-kpis-secciones', [
-                ['Secciones por visita', r.secciones != null ? String(r.secciones).replace('.', ',') : '—', 'De las 16 que tiene la página', ''],
+                ['Secciones por visita', r.secciones != null ? String(r.secciones).replace('.', ',') : '—', 'De las ' + (Object.keys(SECCIONES).length - SECCIONES_ANTERIORES.length) + ' que tiene la página', ''],
                 ['Tiempo en la página', duracionTxt(r.duracion), 'Promedio por visita', ''],
                 ['La más vista', masVista ? SECCIONES[masVista.nombre] : '—', masVista ? pct(masVista.visitas, r.visitas) + ' % de las visitas, sin contar la portada' : 'Sin datos', ''],
                 ['Donde más se quedan', masTiempo ? SECCIONES[masTiempo.nombre] : '—', masTiempo ? duracionTxt(masTiempo.segundos) + ' en pantalla, en promedio' : 'Se mide desde esta versión de la página', '']
             ], true);
-            document.getElementById('est-secciones').innerHTML = Object.keys(SECCIONES).map((k, i) => {
+            document.getElementById('est-secciones').innerHTML = seccionesVisibles(d).map((k, i) => {
                 const s = porId[k];
                 const vistas = s ? s.visitas : 0;
                 return '<button type="button" class="est-seccion' + (vistas ? '' : ' is-vacia') + '" data-seccion="' + k + '">' +
@@ -2415,7 +2547,7 @@
                     '<span class="flex items-end justify-between gap-3 mt-3">' +
                         '<span><span class="block est-kpi-chico">' + pct(vistas, r.visitas) + ' %</span>' +
                         '<span class="block text-[0.66rem] text-graphite/50 mt-1">' + (vistas ? num(vistas) + ' visitas' + (s.segundos ? ' · ' + duracionTxt(s.segundos) : '') : 'Nadie la vio') + '</span></span>' +
-                        '<span class="shrink-0 opacity-90">' + (s ? sparkline(s.serie, { ancho: 84, alto: 28 }) : '') + '</span>' +
+                        '<span class="shrink-0 opacity-90 hidden sm:block">' + (s ? sparkline(s.serie, { ancho: 84, alto: 28 }) : '') + '</span>' +
                     '</span>' +
                     (vistas ? '<span class="block text-[0.66rem] text-graphite/50 mt-2 pt-2 border-t border-line">' + num(s.whatsapp) + ' escribieron · ' + plural(s.reservas || 0, 'reservó', 'reservaron') + ' · ' + num(pagadasDe(s)) + ' pagaron</span>' : '') +
                 '</button>';
@@ -2443,8 +2575,8 @@
         function abrirSeccion(k) {
             const d = datosEstadisticas;
             if (!d || !SECCIONES[k]) return;
-            const orden = Object.keys(SECCIONES);
-            const i = orden.indexOf(k);
+            const orden = seccionesVisibles(d);
+            const i = Math.max(0, orden.indexOf(k));
             const ant = orden[(i - 1 + orden.length) % orden.length];
             const sig = orden[(i + 1) % orden.length];
             const r = d.resumen || {};
@@ -2486,6 +2618,142 @@
                 tip: p => '<strong>' + num(p.v) + '</strong> visitas vieron ' + SECCIONES[k] + '<br>' + fechaLarga(p.dia)
             });
             barras('est-modal-fuentes', s.fuentes || [], { total: s.visitas, vacio: 'Nadie la vio en este período.' });
+            lucide.createIcons();
+        }
+
+        /* =================== BLOG =================== */
+        function renderBlogEst(d) {
+            const r = d.resumen || {};
+            const a = d.anterior || {};
+            const b = d.blog || {};
+            const lista = b.articulos || [];
+            const aviso = document.getElementById('est-blog-aviso');
+            const textoAviso = !CONECTADO ? 'Datos de ejemplo. Al conectar el panel aquí aparecen los artículos que leen de verdad.'
+                : !d.blog ? 'Para ver el blog falta un paso: en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.'
+                : servidorBlog === false ? 'Para medir el blog falta publicar la versión nueva del servidor: en Cloudflare abre Workers > pagos-cabaleon > Edit code, pega servidor-pagos-bold.js y toca Deploy. Mientras tanto solo se cuentan las visitas a los artículos.'
+                : !b.lectores ? 'Aún no hay lecturas del blog en este período. Se llenan solas cuando alguien abre un artículo de la página publicada.' : '';
+            aviso.textContent = textoAviso;
+            aviso.classList.toggle('hidden', !textoAviso);
+            const av = b.avance || {};
+            tarjetas('est-kpis-blog', [
+                ['Lectores', num(b.lectores), pct(b.lectores, r.visitas) + ' % de las visitas leyó al menos un artículo', cambio(b.lectores, a.lectores)],
+                ['Artículos leídos', num(b.lecturas), (b.articulos_por_lector ? String(b.articulos_por_lector).replace('.', ',') : '0') + (b.articulos_por_lector == 1 ? ' artículo' : ' artículos') + ' por lector', ''],
+                ['Tiempo de lectura', duracionTxt(b.segundos), 'Promedio por artículo, con la página a la vista', ''],
+                ['Leyeron hasta el final', av.medidos ? pct(av.p100, av.medidos) + ' %' : '—', av.medidos ? num(av.p100) + ' de ' + plural(av.medidos, 'lectura medida', 'lecturas medidas') : 'Se mide con el servidor actualizado', ''],
+                ['Llegaron por el blog', num(b.entradas), 'Visitas que empezaron en un artículo o en la lista, sin pasar por la portada', ''],
+                ['Desde la portada', num(b.desde_portada), 'Veces que tocaron una tarjeta del blog' + (b.portada_todos ? ' · ' + num(b.portada_todos) + ' en "Ver todos"' : ''), ''],
+                ['Escribieron por WhatsApp', num(b.whatsapp), pct(b.whatsapp, b.lectores) + ' % de los lectores · ' + pct(r.whatsapp, r.visitas) + ' % en todas las visitas', ''],
+                ['Reservaron', pctDecimal(b.reservas, b.lectores), plural(b.reservas || 0, 'reserva', 'reservas') + ' · ' + plural(b.pagadas || 0, 'pagada', 'pagadas') + ' · en todas las visitas: ' + pctDecimal(r.reservas, r.visitas), '']
+            ]);
+            /* Tabla de artículos (los que aún no tienen lectores también aparecen) */
+            const porId = {};
+            lista.forEach(x => { porId[x.nombre] = x; });
+            const filas = lista.concat(Object.keys(ARTICULOS).filter(k => !porId[k]).map(k => ({ nombre: k, lectores: 0 })));
+            const tablaBlog = document.getElementById('est-tabla-blog');
+            tablaBlog.innerHTML = '<table class="est-pro"><thead><tr><th>Artículo</th><th class="!text-left">Tendencia</th><th>Lectores</th><th>Tiempo</th>' +
+                '<th>Leyeron la mitad</th><th>Hasta el final</th><th>Entraron por aquí</th><th>Desde la portada</th><th>Fueron a reservar</th><th>WhatsApp</th><th>Reservas</th><th>Conversión</th></tr></thead><tbody>' +
+                filas.map(x => {
+                    const reservar = ((x.clics || []).find(c => c.nombre === 'reservar') || {}).total || 0;
+                    return '<tr tabindex="0" data-articulo="' + esc(x.nombre) + '" title="Ver el panel de este artículo">' +
+                        '<td><span class="block font-medium">' + esc(nombreArticulo(x.nombre)) + '</span><span class="block text-[0.66rem] est-tenue">' + (x.vistas ? plural(x.vistas, 'vez abierto', 'veces abierto') : 'Sin lectores en el período') + '</span></td>' +
+                        '<td class="!text-left">' + sparkline(x.serie) + '</td>' +
+                        '<td>' + num(x.lectores) + '</td><td>' + (x.segundos ? duracionTxt(x.segundos) : '<span class="est-tenue">—</span>') + '</td>' +
+                        '<td>' + (x.medidos ? pct(x.mitad, x.medidos) + ' %' : '<span class="est-tenue">—</span>') + '</td>' +
+                        '<td>' + (x.medidos ? pct(x.final, x.medidos) + ' %' : '<span class="est-tenue">—</span>') + '</td>' +
+                        '<td>' + num(x.entradas) + '</td><td>' + num(x.desde_portada) + '</td><td>' + num(reservar) + '</td><td>' + num(x.whatsapp) + '</td>' +
+                        '<td>' + num(x.reservas) + (x.pagadas ? '<span class="est-tenue text-[0.7rem]"> · ' + num(x.pagadas) + ' pag.</span>' : '') + '</td>' +
+                        '<td>' + (x.lectores ? pctDecimal(x.reservas, x.lectores) : '<span class="est-tenue">—</span>') + '</td></tr>';
+                }).join('') + '</tbody></table>';
+            /* Lectores por día */
+            const serie = b.serie || [];
+            const dias = (d.por_dia || []).map((p, i) => ({ dia: p.dia, v: serie[i] != null ? serie[i] : (p.lectores || 0), d: p }));
+            document.getElementById('est-blog-dias-tabla').innerHTML = tabla(['Día', 'Lectores', 'Visitas del día'], dias.map(p => [fechaLarga(p.dia), num(p.v), num(p.d.visitas)]));
+            graficoLinea('est-blog-dias', dias, {
+                alto: 220, etiqueta: 'Lectores del blog por día',
+                tip: p => '<strong>' + num(p.v) + '</strong> ' + (p.v === 1 ? 'lector' : 'lectores') + ' · ' + fechaLarga(p.dia) + '<br>' + num(p.d.visitas) + ' visitas en total'
+            });
+            /* Hasta dónde leen */
+            const pasos = [['Empezaron a leer', av.medidos], ['Leyeron una cuarta parte', av.p25], ['Leyeron la mitad', av.p50], ['Leyeron tres cuartas partes', av.p75], ['Llegaron al final', av.p100]];
+            barras('est-blog-avance', pasos.map(([nombre, v], i) => ({ nombre, visitas: v || 0, i })), {
+                total: av.medidos, color: x => RAMPA_EMBUDO[Math.min(RAMPA_EMBUDO.length - 1, x.i + 1)],
+                vacio: 'Se mide cuando el servidor actualizado recibe las lecturas.'
+            });
+            /* Cómo llegan */
+            barras('est-blog-llegada', [
+                { nombre: 'Tarjetas del blog en la portada', visitas: b.desde_portada || 0, icono: 'house' },
+                { nombre: 'Entraron directo a un artículo', visitas: Math.max(0, (b.entradas || 0) - (((d.entradas || []).find(e => e.nombre === 'blog') || {}).visitas || 0)), icono: 'search' },
+                { nombre: 'Abrieron la lista del blog', visitas: b.listado || 0, icono: 'newspaper' },
+                { nombre: '"Ver todos los artículos" en la portada', visitas: b.portada_todos || 0, icono: 'list' }
+            ], { icono: x => x.icono, vacio: 'Nadie llegó al blog en este período.' });
+            barras('est-blog-fuentes', b.fuentes || [], {
+                total: b.lectores, nota: f => f.reservas ? plural(f.reservas, 'reserva', 'reservas') : '',
+                dato: f => 'data-origen="' + esc(f.nombre) + '"', vacio: 'Sin lectores en este período.'
+            });
+            barras('est-blog-destinos', (b.destinos || []).reduce((acc, x) => {
+                const k = String(x.nombre).startsWith('articulo:') ? 'articulo' : x.nombre;
+                const f = acc.find(y => y.k === k);
+                if (f) { f.total += x.total; f.visitas += x.visitas || 0; } else acc.push({ k, nombre: x.nombre, total: x.total, visitas: x.visitas || 0 });
+                return acc;
+            }, []).sort((x, y) => y.total - x.total), {
+                valor: x => x.total, nombre: x => destinoBlog(x.nombre)[1], icono: x => destinoBlog(x.nombre)[0],
+                nota: x => 'en ' + plural(x.visitas, 'visita', 'visitas'), vacio: 'Nadie tocó enlaces dentro de los artículos en este período.'
+            });
+        }
+
+        /* Panel de un artículo: sus cifras, sus lectores por día, de dónde llegan y qué hacen después */
+        function abrirArticulo(id) {
+            const d = datosEstadisticas;
+            if (!d) return;
+            const b = d.blog || {};
+            const r = d.resumen || {};
+            const lista = Object.keys(ARTICULOS);
+            (b.articulos || []).forEach(x => { if (!lista.includes(x.nombre)) lista.push(x.nombre); });
+            const i = Math.max(0, lista.indexOf(id));
+            const ant = lista[(i - 1 + lista.length) % lista.length];
+            const sig = lista[(i + 1) % lista.length];
+            const x = (b.articulos || []).find(y => y.nombre === id) || { nombre: id, lectores: 0, serie: [], fuentes: [], clics: [], contactos: [] };
+            const { desde, hasta } = periodoEstadisticas();
+            const cifra = (t, v, nota) => '<div class="bg-white p-4"><span class="micro text-graphite/40">' + t + '</span><span class="block est-kpi-chico mt-2">' + v + '</span>' +
+                (nota ? '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + nota + '</span>' : '') + '</div>';
+            const reservar = ((x.clics || []).find(c => c.nombre === 'reservar') || {}).total || 0;
+            const enlace = ARTICULOS[id] ? '<a href="' + ARTICULOS[id][1] + '" target="_blank" rel="noopener" class="btn btn-outline btn-sm"><i data-lucide="external-link" class="w-3.5 h-3.5"></i> Abrir el artículo</a>' : '';
+            abrirModal('<div class="p-6 sm:p-8">' +
+                '<div class="flex items-center gap-3 pr-10">' +
+                    '<span class="w-10 h-10 rounded-full bg-brass/15 text-brass-deep flex items-center justify-center shrink-0"><i data-lucide="newspaper" class="w-5 h-5"></i></span>' +
+                    '<span class="min-w-0"><span class="micro text-graphite/40 block">Artículo del blog</span>' +
+                    '<span class="block font-display text-3xl text-ink leading-tight">' + esc(nombreArticulo(id)) + '</span></span>' +
+                '</div>' +
+                '<p class="text-[0.75rem] text-graphite/50 mt-2">' + fechaCorta(desde) + ' – ' + fechaCorta(hasta) + (origenEstadisticas ? ' · solo visitas de ' + esc(origenEstadisticas) : ' · todas las fuentes') + '</p>' +
+                '<div class="grid grid-cols-2 sm:grid-cols-3 gap-px bg-line border border-line mt-6">' +
+                    cifra('Lectores', num(x.lectores), x.vistas ? plural(x.vistas, 'vez abierto', 'veces abierto') : 'En el período') +
+                    cifra('Tiempo de lectura', x.segundos ? duracionTxt(x.segundos) : '—', 'Promedio por lector') +
+                    cifra('Hasta el final', x.medidos ? pct(x.final, x.medidos) + ' %' : '—', x.medidos ? pct(x.mitad, x.medidos) + ' % leyó la mitad' : 'Sin lecturas medidas') +
+                    cifra('Entraron por aquí', num(x.entradas), 'Llegaron directo a este artículo') +
+                    cifra('Desde la portada', num(x.desde_portada), 'Tocaron su tarjeta') +
+                    cifra('Reservaron', pctDecimal(x.reservas, x.lectores), plural(x.reservas || 0, 'reserva', 'reservas') + ' · ' + plural(x.pagadas || 0, 'pagada', 'pagadas') + (x.valor ? ' · ' + copCorto(x.valor) : '')) +
+                '</div>' +
+                '<div class="mt-7"><span class="micro text-graphite/40 block mb-2">Lectores por día</span>' +
+                '<div id="est-modal-dias" class="relative" tabindex="0" aria-label="Lectores por día de este artículo"></div></div>' +
+                '<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6 pt-5 border-t border-line">' +
+                    '<div><span class="micro text-graphite/40 block mb-2">De dónde llegan</span><div id="est-modal-fuentes"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Qué hacen después</span><div id="est-modal-clics"></div>' +
+                    (reservar ? '<p class="text-[0.72rem] text-graphite/55 mt-3">' + plural(reservar, 'vez tocaron', 'veces tocaron') + ' "Reservar ahora" en este artículo.</p>' : '') + '</div>' +
+                '</div>' +
+                '<div class="flex flex-wrap items-center justify-between gap-3 mt-7 pt-5 border-t border-line">' +
+                    '<button type="button" class="btn btn-outline btn-sm" onclick="abrirArticulo(\'' + esc(ant) + '\')"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">' + esc(nombreArticulo(ant)) + '</span><span class="sm:hidden">Anterior</span></button>' +
+                    enlace +
+                    '<button type="button" class="btn btn-outline btn-sm" onclick="abrirArticulo(\'' + esc(sig) + '\')"><span class="hidden sm:inline">' + esc(nombreArticulo(sig)) + '</span><span class="sm:hidden">Siguiente</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>' +
+                '</div></div>');
+            graficoLinea('est-modal-dias', (d.por_dia || []).map((p, j) => ({ dia: p.dia, v: (x.serie || [])[j] || 0 })), {
+                alto: 190, etiqueta: 'Lectores por día de ' + nombreArticulo(id),
+                tip: p => '<strong>' + num(p.v) + '</strong> ' + (p.v === 1 ? 'lector' : 'lectores') + '<br>' + fechaLarga(p.dia)
+            });
+            barras('est-modal-fuentes', x.fuentes || [], { total: x.lectores, vacio: 'Nadie lo leyó en este período.' });
+            const destinos = (x.clics || []).map(c => ({ nombre: c.nombre, total: c.total })).concat((x.contactos || [])
+                .filter(c => c.tipo !== 'whatsapp' || !(x.clics || []).some(k => k.nombre === 'whatsapp'))
+                .map(c => ({ nombre: c.tipo === 'como_llegar' ? 'mapa' : c.tipo, total: c.total })));
+            barras('est-modal-clics', destinos, { valor: c => c.total, nombre: c => destinoBlog(c.nombre)[1], icono: c => destinoBlog(c.nombre)[0],
+                vacio: 'Nadie tocó enlaces en este artículo en el período.' });
             lucide.createIcons();
         }
 
@@ -2570,6 +2838,8 @@
                 ['Pagadas o confirmadas', num(pagadasDe(r)), COP(valorPagadoDe(r)) + ' · cobrado: ' + COP(r.pagado)],
                 ['Sin pagar', num(pendientesDe(r)), 'Dejaron la reserva y aún no pagan: conviene escribirles'],
                 ['Escribieron por WhatsApp', num(r.whatsapp), 'Posibles reservas para responder']];
+            const blogR = d.blog || {};
+            if (blogR.lectores) web.push(['Reservas de lectores del blog', num(blogR.reservas), num(blogR.pagadas) + ' pagadas · leyeron al menos un artículo antes de reservar']);
             document.getElementById('est-web').innerHTML = '<div class="divide-y divide-line">' + web.map(([t, v, n]) =>
                 '<div class="flex items-baseline justify-between gap-4 py-3"><span><span class="block text-[0.8rem] text-ink">' + t + '</span><span class="block text-[0.68rem] text-graphite/45 mt-0.5">' + n + '</span></span>' +
                 '<span class="est-kpi-chico !text-[1.5rem] whitespace-nowrap">' + v + '</span></div>').join('') + '</div>' +
@@ -2793,7 +3063,9 @@
             const x = i => izq + (n === 1 ? ancho / 2 : i * ancho / (n - 1));
             const y = v => arr + alto * (1 - Math.min(v, tope) / tope);
             const linea = puntos.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join('');
-            const cada = Math.max(1, Math.ceil(n / (W < 480 ? 4 : 6)));
+            const angosto = W < 480;
+            const cada = Math.max(1, Math.ceil(n / (angosto ? 3 : 6)));
+            const fechaEje = dia => angosto ? fechaCorta(dia).replace(' de ', ' ') : fechaCorta(dia);
             const iMax = puntos.findIndex(p => p.v === maximo);
             let svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(op.etiqueta || 'Gráfica por día') + '" style="display:block">';
             [0, tope / 2, tope].forEach(v => {
@@ -2807,9 +3079,9 @@
                                '" font-size="11" font-weight="600" fill="#0A212E" font-family="Inter, system-ui, sans-serif">' + formato(maximo) + '</text>';
             puntos.forEach((p, i) => {
                 if (i % cada && i !== n - 1) return;
-                if (i !== n - 1 && n - 1 - i < cada * 0.6) return;   // evita que choque con la última fecha
+                if (i !== n - 1 && (n - 1 - i < cada * 0.6 || x(n - 1) - x(i) < (angosto ? 64 : 76))) return;   // evita que choque con la última fecha
                 svg += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="' + (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle') +
-                       '" font-size="10.5" fill="rgba(32,41,46,.5)" font-family="Inter, system-ui, sans-serif">' + fechaCorta(p.dia) + '</text>';
+                       '" font-size="10.5" fill="rgba(32,41,46,.5)" font-family="Inter, system-ui, sans-serif">' + fechaEje(p.dia) + '</text>';
             });
             svg += '<line class="est-cruz" x1="0" x2="0" y1="' + arr + '" y2="' + (H - aba) + '" stroke="' + AZUL + '" stroke-opacity=".4" stroke-width="1" visibility="hidden"/>' +
                    '<circle class="est-punto" r="4.5" fill="' + AZUL + '" stroke="#fff" stroke-width="2" visibility="hidden"/>' +
@@ -2936,12 +3208,14 @@
                 if (origen) return elegirOrigen(origen.dataset.origen);
                 const seccion = e.target.closest('[data-seccion]');
                 if (seccion) return abrirSeccion(seccion.dataset.seccion);
+                const art = e.target.closest('[data-articulo]');
+                if (art) return abrirArticulo(art.dataset.articulo);
                 const tab = e.target.closest('[data-est-tab], [data-ir-tab]');
                 if (tab) return mostrarPestana(tab.dataset.estTab || tab.dataset.irTab);
             });
             vista.addEventListener('keydown', e => {
                 if (e.key !== 'Enter' && e.key !== ' ') return;
-                const fila = e.target.closest('tr[data-origen], .est-fila[data-origen], .est-fila[data-seccion]');
+                const fila = e.target.closest('tr[data-origen], tr[data-articulo], .est-fila[data-origen], .est-fila[data-seccion], .est-fila[data-articulo]');
                 if (!fila) return;
                 e.preventDefault();
                 fila.click();
@@ -2963,6 +3237,10 @@
                 metricaDias = btn.dataset.metrica;
                 document.querySelectorAll('#est-metricas .chip').forEach(c => c.classList.toggle('is-active', c === btn));
                 if (datosEstadisticas) graficoDias(datosEstadisticas.por_dia || []);
+            });
+            document.getElementById('modal').addEventListener('click', e => {
+                const art = e.target.closest('.est-fila[data-articulo]');
+                if (art) abrirArticulo(art.dataset.articulo);
             });
 
             /* Cada gráfico tiene su versión en tabla */
@@ -3039,7 +3317,7 @@
                 return { dia: b.dia, visitas, visitantes: Math.round(visitas * 0.86), nuevos: Math.round(visitas * 0.62), interes: Math.round(visitas * 0.58),
                     whatsapp: Math.round(visitas * (0.06 + azar() * 0.05)), reservas: Math.round(visitas * (0.012 + azar() * 0.02)), valor: 0 };
             });
-            por_dia.forEach(p => { p.valor = p.reservas * 540000; p.pagadas = Math.round(p.reservas * 0.55); p.pendientes = p.reservas - p.pagadas; });
+            por_dia.forEach(p => { p.valor = p.reservas * 540000; p.pagadas = Math.round(p.reservas * 0.55); p.pendientes = p.reservas - p.pagadas; p.lectores = Math.round(p.visitas * 0.2); });
             const suma = k => por_dia.reduce((s, d) => s + d[k], 0);
             const visitas = suma('visitas');
             const parte = p => Math.max(0, Math.round(visitas * p));
@@ -3053,8 +3331,8 @@
                     reservas: Math.round(v * r), pagos: Math.round(v * r * 0.55), pagadas: Math.round(v * r * 0.55), pendientes: Math.round(v * r) - Math.round(v * r * 0.55),
                     valor: Math.round(v * r) * 540000, valor_pagadas: Math.round(v * r * 0.55) * 540000, serie: serieDe(p) };
             });
-            const vistasPorSeccion = { inicio: 1, destacados: 0.9, hotel: 0.78, habitaciones: 0.66, servicios: 0.52, eventos: 0.41, planes: 0.38, restaurante: 0.33,
-                bar: 0.29, galeria: 0.27, resenas: 0.24, informacion: 0.21, reservar: 0.46, faq: 0.14, catalogo: 0.11, contacto: 0.12 };
+            const vistasPorSeccion = { inicio: 1, destacados: 0.9, hotel: 0.78, habitaciones: 0.66, servicios: 0.52, eventos: 0.41, planes: 0.38, beneficios: 0.35,
+                restaurante: 0.33, bar: 0.29, galeria: 0.27, resenas: 0.24, informacion: 0.21, reservar: 0.46, faq: 0.14, blog: 0.13, contacto: 0.12 };
             const tiempos = { habitaciones: 48, reservar: 71, galeria: 39, planes: 33, restaurante: 36, hotel: 24 };
             const secciones = Object.keys(vistasPorSeccion).map(k => {
                 const v = parte(vistasPorSeccion[k]);
@@ -3088,7 +3366,7 @@
                 ciudades: [['Bogotá', 0.55], ['Girardot', 0.06], ['Fusagasugá', 0.05], ['Medellín', 0.04], ['Soacha', 0.03]]
                     .map(([nombre, p]) => ({ nombre, pais: 'CO', visitas: parte(p), reservas: Math.round(parte(p) * 0.02) })),
                 idiomas: lista([['es', 0.94], ['en', 0.04], ['fr', 0.01]]),
-                entradas: lista([['inicio', 0.81], ['habitaciones', 0.08], ['reservar', 0.06], ['planes', 0.05]]),
+                entradas: lista([['inicio', 0.74], ['habitaciones', 0.08], ['blog/pasadia', 0.06], ['reservar', 0.05], ['blog/como-llegar', 0.04], ['planes', 0.03]]),
                 secciones,
                 profundidad: [['1 sección o menos', 0.14], ['2 a 3 secciones', 0.27], ['4 a 6 secciones', 0.31], ['7 a 10 secciones', 0.19], ['Más de 10', 0.09]]
                     .map(([nombre, p]) => ({ nombre, visitas: parte(p) })),
@@ -3117,7 +3395,42 @@
                 dias_semana: pesoDia.map(v => Math.round(v * visitas / 92)),
                 embudo: [['visita', 1], ['reservar', 0.46], ['fechas', 0.21], ['habitacion', 0.14], ['datos', 0.06], ['confirmo', reservasEj / (visitas || 1)],
                          ['pago', suma('pagadas') / (visitas || 1)]]
-                    .map(([paso, p]) => ({ paso, visitas: parte(p) }))
+                    .map(([paso, p]) => ({ paso, visitas: parte(p) })),
+                blog: blogDeEjemplo(base, parte, azar, factor)
+            };
+        }
+
+        /* Blog de ejemplo: lectores, tiempo, hasta dónde leen y qué hacen después */
+        function blogDeEjemplo(base, parte, azar, factor) {
+            const ART = [['pasadia', 0.09, 0.32, 0.034], ['como-llegar', 0.07, 0.6, 0.012], ['plan-fin-de-semana', 0.05, 0.22, 0.02], ['que-llevar', 0.035, 0.4, 0.008]];
+            const articulos = ART.map(([nombre, p, entra, conv]) => {
+                const lectores = parte(p);
+                const medidos = Math.round(lectores * 0.92);
+                return { nombre, lectores, vistas: Math.round(lectores * 1.12), segundos: Math.round(70 + azar() * 110), medidos,
+                    mitad: Math.round(medidos * (0.55 + azar() * 0.15)), final: Math.round(medidos * (0.28 + azar() * 0.14)),
+                    entradas: Math.round(lectores * entra), desde_portada: Math.round(lectores * (1 - entra) * 0.7),
+                    whatsapp: Math.round(lectores * 0.07), reservas: Math.round(lectores * conv), pagadas: Math.round(lectores * conv * 0.6),
+                    valor: Math.round(lectores * conv) * 540000,
+                    clics: [['reservar', 0.12], ['whatsapp', 0.06], ['articulo:que-llevar', 0.04], ['habitaciones', 0.03], ['mapa', nombre === 'como-llegar' ? 0.09 : 0.01]]
+                        .map(([n, q]) => ({ nombre: n, total: Math.round(lectores * q) })).filter(c => c.total),
+                    contactos: [{ tipo: 'whatsapp', total: Math.round(lectores * 0.07) }],
+                    serie: base.map(b => Math.round(b.peso * factor * p * (0.6 + azar() * 0.8))),
+                    fuentes: [['Google', 0.55], ['Instagram', 0.2], ['Directo', 0.15], ['WhatsApp', 0.1]].map(([n, q]) => ({ nombre: n, visitas: Math.round(lectores * q) })) };
+            });
+            const suma = k => articulos.reduce((s, x) => s + (x[k] || 0), 0);
+            const lectores = Math.round(suma('lectores') * 0.88);
+            const medidos = suma('medidos');
+            return {
+                lectores, lecturas: suma('vistas'), articulos_por_lector: 1.2, segundos: 118,
+                avance: { medidos, p25: Math.round(medidos * 0.86), p50: suma('mitad'), p75: Math.round(medidos * 0.47), p100: suma('final') },
+                entradas: suma('entradas'), listado: Math.round(lectores * 0.12), desde_portada: suma('desde_portada'), portada_todos: Math.round(lectores * 0.06),
+                whatsapp: suma('whatsapp'), reservas: suma('reservas'), pagadas: suma('pagadas'), valor: suma('valor'),
+                serie: base.map((b, i) => articulos.reduce((s, x) => s + x.serie[i], 0)),
+                fuentes: [['Google', 0.52], ['Instagram', 0.2], ['Directo', 0.14], ['WhatsApp', 0.09], ['Facebook', 0.05]]
+                    .map(([nombre, q]) => ({ nombre, visitas: Math.round(lectores * q), reservas: Math.round(lectores * q * 0.025) })),
+                destinos: [['reservar', 0.12], ['whatsapp', 0.06], ['articulo:que-llevar', 0.05], ['habitaciones', 0.04], ['mapa', 0.03], ['planes', 0.02], ['inicio', 0.02]]
+                    .map(([nombre, q]) => ({ nombre, total: Math.round(lectores * q), visitas: Math.round(lectores * q * 0.9) })),
+                articulos: articulos.sort((x, y) => y.lectores - x.lectores)
             };
         }
 

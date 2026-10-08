@@ -11,14 +11,14 @@ La version anterior de este archivo decia que las fotos originales, los afiches 
 restaurante, los logos y las piezas graficas NO los usaba la pagina. No es asi: la
 pagina SI los usa y tienen que estar en el hosting. Si faltan, esas imagenes no cargan.
 
-  - Fotos originales "lugar-NN 1.jpg" a "lugar-NN 78.jpg"
+  - Fotos originales lugar-01.jpg a lugar-78.jpg
       Galeria (al tocar "Ver todas") y enlaces "Ver foto original" de la galeria
       y de cada habitacion.
-  - Afiches "restaurante 1.jpg" a "restaurante 10.jpg"
+  - Afiches restaurante-01.jpg a restaurante-10.jpg
       Carta de favoritos de Mangole ("Ver afiche").
   - Piezas graficas
-      bienvenido.jpg, cabalante menu.jpg, experiencias.jpg, flyer1.jpg,
-      reglas piscina.jpg, sauna y turcos.jpg   (seccion "Antes de tu llegada")
+      bienvenido.jpg, cabalante-menu.jpg, experiencias.jpg, flyer1.jpg,
+      reglas-piscina.jpg, sauna-y-turcos.jpg   (seccion "Antes de tu llegada")
   - Logos
       isotipo-transparente.png (seccion "Hotel Cabaleon"), logo.jpg, logo2.jpg,
       logo3.jpg, logo4.jpg
@@ -27,6 +27,28 @@ Tambien se usan: todas las foto-*.jpg y foto-*-sm.jpg, plato-*, clip-*, portada-
 logo-*.png, panorama.jpg, guia-bienvenida.jpg, reglamento-piscina.jpg, los 3 PDF,
 favicon.png, apple-touch-icon.png, lucide.min.js, tailwindcss.js, index.html y
 admin.html (panel del hotel).
+
+BLOG Y BUSCADORES (agregado el 8 de octubre de 2026)
+----------------------------------------------------
+Tambien hay que subir:
+  - blog.html y los 4 articulos:
+      blog-como-llegar-a-tena-desde-bogota.html
+      blog-que-llevar-a-clima-calido.html
+      blog-plan-fin-de-semana-cerca-de-bogota.html
+      blog-pasadia-cerca-de-bogota.html
+  - blog.css (estilos del blog)
+  - blog.js (mide las lecturas del blog para las Estadisticas del panel; la
+    direccion SERVIDOR que tiene adentro debe ser la misma de BOLD.servidor
+    en index.html)
+  - Fotos del blog: blog-como-llegar.jpg, blog-que-llevar.jpg,
+    blog-plan-fin-de-semana.jpg, blog-pasadia.jpg y sus versiones -sm.jpg
+  - sitemap.xml y robots.txt (para Google; van en la raiz, junto a index.html)
+Los articulos y el sitemap usan la direccion https://hotelcabaleon.com. Si la
+pagina se publica en otra direccion, hay que cambiarla en esos archivos.
+Despues de publicar: en Google Search Console, agregar la propiedad
+hotelcabaleon.com y enviar https://hotelcabaleon.com/sitemap.xml.
+Para que el panel muestre las estadisticas del blog hay que hacer, una sola vez,
+los dos pasos de "ESTADISTICAS DEL BLOG" en LEEME-RESERVAS-SUPABASE.txt.
 
 SUBIR POR LA WEB DE GITHUB
 --------------------------
@@ -49,3 +71,5 @@ Documentos de trabajo (no publicar):
   - servidor-pagos-bold.js     (se publica en Cloudflare; si queda en GitHub no es un riesgo)
   - Brief_Landing_TALA_1550_Andrea.docx
   - WhatsApp Audio 2026-09-27 at 11.28.17 AM.ogg
+  - 8e7c2427-a4c4-467e-9241-38af245cc1ec.png y c1e13031-302f-4fdf-a7b0-d88dc6b43574.jpg
+    (imagenes de trabajo; la pagina no las usa)

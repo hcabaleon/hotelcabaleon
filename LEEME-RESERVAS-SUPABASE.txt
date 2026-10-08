@@ -170,3 +170,18 @@ ESTADISTICAS DE VISITAS (seccion "Estadisticas" del panel)
 - Se guardan los ultimos 400 dias; lo mas viejo se borra solo.
 - Los bloqueadores de anuncios pueden ocultar algunas visitas: los numeros son
   una muy buena guia, no un conteo exacto.
+
+ESTADISTICAS DEL BLOG (pestana "Blog" de Estadisticas, 8 de octubre de 2026)
+----------------------------------------------------------------------------
+Una sola vez, despues de subir la pagina con el blog:
+1. Cloudflare > Workers & Pages > pagos-cabaleon > Edit code: borrar todo, pegar
+   el servidor-pagos-bold.js nuevo > Deploy. (Las llaves y variables se
+   conservan.) Al abrir la direccion del Worker debe decir "version":"2026-10-08".
+   Sin este paso el servidor descarta las lecturas del blog.
+2. Supabase > SQL Editor > New query > pegar todo supabase-reservas.sql > Run.
+   No borra datos.
+Que muestra: lectores, articulos leidos, tiempo de lectura, hasta donde leen
+(25/50/75/100 %), como llegan (portada, lista o directo desde Google), de donde
+vienen, que tocan despues de leer (reservar, WhatsApp, mapa...) y cuantas
+reservas hicieron los lectores. Tocar un articulo abre su panel con el detalle.
+Si falta alguno de los dos pasos, el panel lo avisa arriba de la pestana.

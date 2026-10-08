@@ -71,6 +71,9 @@ c. Settings > Variables and Secrets > Add, y crear estas tres:
    Guardar (Deploy).
 d. Abrir la direccion del Worker (ej.: https://pagos-cabaleon.TU-CUENTA.workers.dev).
    Debe mostrar: {"ok":true, ... "configurado":true}
+   Cada vez que cambie servidor-pagos-bold.js (la ultima: 8 de octubre de 2026,
+   para medir el blog) hay que repetir el paso b. La version publicada aparece
+   en "version".
 
 PASO 2 - CONECTAR LA PAGINA
 ---------------------------
