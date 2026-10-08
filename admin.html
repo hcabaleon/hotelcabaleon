@@ -210,6 +210,55 @@
         .est-tabla th { text-align: left; font-size: 0.54rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: rgba(10,33,46,.45); padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--line); }
         .est-tabla td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
 
+        /* Pestañas de Estadísticas: una por apartado, con desplazamiento lateral en celular */
+        .est-tabs { display: flex; gap: 0.15rem; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+        .est-tabs::-webkit-scrollbar { display: none; }
+        .est-tab {
+            display: inline-flex; align-items: center; gap: 0.5rem; flex-shrink: 0;
+            padding: 0.85rem 0.95rem; margin-bottom: -1px; white-space: nowrap;
+            font-size: 0.74rem; font-weight: 500; color: rgba(10,33,46,.5);
+            border-bottom: 2px solid transparent; transition: color .3s, border-color .3s;
+        }
+        .est-tab:hover { color: var(--ink); }
+        .est-tab.is-active { color: var(--ink); border-bottom-color: var(--brass); }
+        .est-tab svg { width: 15px; height: 15px; }
+        .est-panel { display: none; }
+        .est-panel.is-active { display: block; animation: fade .35s ease both; }
+        .est-titulo { display: block; font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.3rem; line-height: 1.2; color: var(--ink); }
+        .est-sub { display: block; font-size: 0.72rem; color: rgba(32,41,46,.5); margin-top: 0.15rem; }
+        .est-kpi-chico { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.85rem; line-height: 1; color: var(--ink); }
+
+        /* Tabla de fuentes: se ordena tocando el título y cada fila abre su detalle */
+        .est-pro { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .est-pro th { text-align: right; font-size: 0.54rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: rgba(10,33,46,.45); padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); white-space: nowrap; }
+        .est-pro th:first-child, .est-pro td:first-child { text-align: left; padding-left: 1.25rem; }
+        .est-pro th:last-child, .est-pro td:last-child { padding-right: 1.25rem; }
+        .est-pro th button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; display: inline-flex; align-items: center; gap: 0.25rem; }
+        .est-pro th button:hover, .est-pro th.is-orden button { color: var(--ink); }
+        .est-pro td { text-align: right; padding: 0.7rem 0.75rem; border-bottom: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--ink); }
+        .est-pro tbody tr { cursor: pointer; transition: background-color .2s; }
+        .est-pro tbody tr:hover, .est-pro tbody tr:focus-visible { background: var(--bone); outline: none; }
+        .est-pro tbody tr.is-elegida { background: rgba(201,160,99,.13); }
+        .est-pro tbody tr:last-child td { border-bottom: none; }
+        .est-pro .est-tenue { color: rgba(32,41,46,.45); }
+
+        /* Tarjeta de cada sección de la página */
+        .est-seccion {
+            display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 3px;
+            padding: 1rem 1.05rem 0.9rem; transition: border-color .3s, box-shadow .3s, transform .3s;
+        }
+        .est-seccion:hover, .est-seccion:focus-visible { border-color: var(--ink); outline: none; box-shadow: 0 14px 28px -22px rgba(10,33,46,.55); transform: translateY(-1px); }
+        .est-seccion.is-vacia { background: var(--bone); }
+
+        /* Mapa de calor día × hora: un solo tono, de claro a oscuro */
+        .est-calor { display: grid; grid-template-columns: 1.6rem repeat(24, minmax(0, 1fr)); gap: 2px; align-items: center; }
+        .est-celda { aspect-ratio: 1 / 1; min-height: 9px; border-radius: 2px; outline: none; }
+        .est-celda:hover, .est-celda:focus-visible { box-shadow: inset 0 0 0 1.5px var(--ink); }
+
+        .est-clave { display: flex; gap: 0.75rem; align-items: flex-start; font-size: 0.8rem; line-height: 1.55; color: rgba(32,41,46,.75); }
+        .est-clave svg { width: 16px; height: 16px; color: var(--brass); flex-shrink: 0; margin-top: 0.15rem; }
+        .est-clave strong { color: var(--ink); font-weight: 500; }
+
         #toast {
             position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(6rem);
             background: var(--ink); color: #fff; padding: 0.9rem 1.4rem;
@@ -515,142 +564,302 @@
 
                 <!-- ---------- ESTADÍSTICAS ---------- -->
                 <section class="view" data-view="estadisticas">
-                    <!-- Un solo filtro arriba: todo lo de abajo usa el mismo período -->
-                    <div class="flex flex-col lg:flex-row lg:items-center gap-3 mb-6">
-                        <div class="flex flex-wrap gap-2" id="est-periodos" role="group" aria-label="Período">
-                            <button class="chip" data-dias="1">Hoy</button>
-                            <button class="chip" data-dias="7">7 días</button>
-                            <button class="chip is-active" data-dias="30">30 días</button>
-                            <button class="chip" data-dias="90">90 días</button>
-                            <button class="chip" data-dias="365">12 meses</button>
+                    <!-- Filtros: el período y la fuente valen para todas las pestañas -->
+                    <div class="card p-4 sm:p-5 mb-5">
+                        <div class="flex flex-col xl:flex-row xl:items-center gap-3">
+                            <div class="flex flex-wrap gap-2" id="est-periodos" role="group" aria-label="Período">
+                                <button class="chip" data-dias="1">Hoy</button>
+                                <button class="chip" data-dias="7">7 días</button>
+                                <button class="chip is-active" data-dias="30">30 días</button>
+                                <button class="chip" data-dias="90">90 días</button>
+                                <button class="chip" data-dias="365">12 meses</button>
+                            </div>
+                            <span id="est-rango" class="text-[0.72rem] text-graphite/45"></span>
+                            <div class="xl:ml-auto flex flex-col sm:flex-row sm:items-center gap-3">
+                                <label class="flex items-center gap-2.5">
+                                    <span class="micro text-graphite/40 shrink-0">Fuente</span>
+                                    <select id="est-origen" class="field-input py-2 text-[0.8rem] sm:w-52"><option value="">Todas las fuentes</option></select>
+                                </label>
+                                <label class="flex items-center gap-2 text-[0.75rem] text-graphite/60 cursor-pointer">
+                                    <input type="checkbox" id="est-no-medir" class="accent-ink w-3.5 h-3.5"> No contar mis visitas
+                                </label>
+                            </div>
                         </div>
-                        <span id="est-rango" class="text-[0.72rem] text-graphite/45"></span>
-                        <label class="lg:ml-auto flex items-center gap-2 text-[0.75rem] text-graphite/60 cursor-pointer">
-                            <input type="checkbox" id="est-no-medir" class="accent-ink w-3.5 h-3.5"> No contar mis visitas en este navegador
-                        </label>
+                        <div id="est-filtro-activo" class="hidden mt-4 pt-4 border-t border-line flex flex-wrap items-center gap-3 text-[0.78rem] text-graphite/65"></div>
                     </div>
-                    <p id="est-aviso" class="hidden mb-6 p-4 bg-white border border-line text-[0.8rem] text-graphite/65 leading-relaxed"></p>
+                    <p id="est-aviso" class="hidden mb-5 p-4 bg-white border border-line text-[0.8rem] text-graphite/65 leading-relaxed"></p>
+
+                    <div class="est-tabs mb-6" id="est-tabs" role="tablist" aria-label="Apartados de estadísticas">
+                        <button class="est-tab is-active" role="tab" aria-selected="true" data-est-tab="resumen"><i data-lucide="layout-grid"></i> Resumen</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="origen"><i data-lucide="compass"></i> De dónde llegan</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="secciones"><i data-lucide="panels-top-left"></i> Secciones de la página</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="reservas"><i data-lucide="calendar-check"></i> Reservas y ventas</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="habitaciones"><i data-lucide="bed-double"></i> Habitaciones y servicios</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="audiencia"><i data-lucide="users"></i> Audiencia</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="asistente"><i data-lucide="message-square"></i> Asistente</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="enlaces"><i data-lucide="link"></i> Enlaces</button>
+                    </div>
 
                     <div id="est-contenido" class="transition-opacity duration-300">
-                        <div id="est-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6"></div>
 
-                        <figure class="card p-5 sm:p-6 mb-6">
-                            <figcaption class="flex items-start justify-between gap-4 mb-4">
-                                <span>
-                                    <span class="block font-display text-xl text-ink">Visitas por día</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Pasa el cursor o el dedo sobre la línea para ver cada día</span>
-                                </span>
-                                <button type="button" class="chip shrink-0" data-ver-tabla="est-dias">Ver tabla</button>
-                            </figcaption>
-                            <div id="est-dias" class="relative" tabindex="0" aria-label="Visitas por día. Usa las flechas para recorrer los días."></div>
-                            <div id="est-dias-tabla" class="hidden overflow-x-auto max-h-80"></div>
-                        </figure>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4">
-                                    <span class="block font-display text-xl text-ink">De dónde llegan</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Visitas por fuente, con las que escribieron y reservaron</span>
+                        <!-- RESUMEN -->
+                        <div class="est-panel is-active" data-est-panel="resumen" role="tabpanel">
+                            <div id="est-kpis" class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6"></div>
+                            <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="flex flex-col xl:flex-row xl:items-start justify-between gap-3 mb-4">
+                                    <span>
+                                        <span class="est-titulo">Evolución día a día</span>
+                                        <span class="est-sub">Elige qué ver. Pasa el cursor o el dedo sobre la línea para ver cada día.</span>
+                                    </span>
+                                    <span class="flex flex-wrap gap-1.5">
+                                        <span class="flex flex-wrap gap-1.5" id="est-metricas" role="group" aria-label="Qué ver en la gráfica">
+                                            <button class="chip is-active" data-metrica="visitas">Visitas</button>
+                                            <button class="chip" data-metrica="visitantes">Visitantes</button>
+                                            <button class="chip" data-metrica="interes">Con interés</button>
+                                            <button class="chip" data-metrica="whatsapp">WhatsApp</button>
+                                            <button class="chip" data-metrica="reservas">Reservas</button>
+                                        </span>
+                                        <button type="button" class="chip" data-ver-tabla="est-dias">Ver tabla</button>
+                                    </span>
                                 </figcaption>
-                                <div id="est-fuentes"></div>
+                                <div id="est-dias" class="relative" tabindex="0" aria-label="Evolución por día. Usa las flechas para recorrer los días."></div>
+                                <div id="est-dias-tabla" class="hidden overflow-x-auto max-h-80"></div>
                             </figure>
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4">
-                                    <span class="block font-display text-xl text-ink">Camino a la reserva</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Cuántas visitas llegan a cada paso</span>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                <figure class="card p-5 sm:p-6 md:col-span-2 xl:col-span-1">
+                                    <figcaption class="mb-5"><span class="est-titulo">Lo más importante</span><span class="est-sub">Conclusiones del período, calculadas solas</span></figcaption>
+                                    <ul id="est-claves" class="space-y-3.5"></ul>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="flex items-start justify-between gap-3 mb-4">
+                                        <span><span class="est-titulo">Fuentes principales</span><span class="est-sub">Toca una para ver solo sus visitas</span></span>
+                                        <button type="button" class="chip shrink-0" data-ir-tab="origen">Ver todas</button>
+                                    </figcaption>
+                                    <div id="est-fuentes-top"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Camino a la reserva</span><span class="est-sub">Cuántas visitas llegan a cada paso</span></figcaption>
+                                    <div id="est-embudo"></div>
+                                </figure>
+                            </div>
+                        </div>
+
+                        <!-- DE DÓNDE LLEGAN -->
+                        <div class="est-panel" data-est-panel="origen" role="tabpanel">
+                            <div id="est-perfil-fuente" class="hidden mb-6"></div>
+                            <figure class="card mb-6">
+                                <figcaption class="p-5 sm:p-6 pb-3 sm:pb-3">
+                                    <span class="est-titulo">Todas las fuentes</span>
+                                    <span class="est-sub">Toca una fila para ver el panel de esa fuente. Toca un título para ordenar.</span>
                                 </figcaption>
-                                <div id="est-embudo"></div>
+                                <div class="overflow-x-auto"><table class="est-pro" id="est-tabla-fuentes"></table></div>
+                            </figure>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Tipo de tráfico</span><span class="est-sub">Buscadores, redes, directo, impresos…</span></figcaption>
+                                    <div id="est-medios"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Sitios que enlazan la página</span><span class="est-sub">Otras páginas desde las que llegaron</span></figcaption>
+                                    <div id="est-referentes"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Por dónde entran</span><span class="est-sub">La primera sección que vieron</span></figcaption>
+                                    <div id="est-entradas"></div>
+                                </figure>
+                            </div>
+                            <figure class="card">
+                                <figcaption class="p-5 sm:p-6 pb-3 sm:pb-3">
+                                    <span class="est-titulo">Campañas y enlaces con seguimiento</span>
+                                    <span class="est-sub">Resultados de cada enlace creado en la pestaña Enlaces</span>
+                                </figcaption>
+                                <div class="overflow-x-auto" id="est-campanas"></div>
                             </figure>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4"><span class="block font-display text-xl text-ink">Dispositivos</span></figcaption>
-                                <div id="est-dispositivos"></div>
-                                <div id="est-equipos" class="mt-5 pt-4 border-t border-line grid grid-cols-2 gap-4"></div>
-                            </figure>
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4"><span class="block font-display text-xl text-ink">Desde dónde visitan</span></figcaption>
-                                <div id="est-ubicacion"></div>
-                            </figure>
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="flex items-start justify-between gap-4 mb-4">
-                                    <span class="block font-display text-xl text-ink">Horas de visita</span>
-                                    <button type="button" class="chip shrink-0" data-ver-tabla="est-horas">Ver tabla</button>
+                        <!-- SECCIONES DE LA PÁGINA -->
+                        <div class="est-panel" data-est-panel="secciones" role="tabpanel">
+                            <div id="est-kpis-secciones" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                            <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="mb-5">
+                                    <span class="est-titulo">Cada sección de la página</span>
+                                    <span class="est-sub">En el mismo orden de la página. Toca una para abrir su panel con estadísticas y gráficas.</span>
                                 </figcaption>
-                                <div id="est-horas"></div>
-                                <div id="est-horas-tabla" class="hidden overflow-x-auto max-h-72"></div>
-                                <p id="est-horas-nota" class="text-[0.74rem] text-graphite/60 mt-4"></p>
+                                <div id="est-secciones" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"></div>
                             </figure>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Qué tanto recorren</span><span class="est-sub">Secciones vistas en cada visita</span></figcaption>
+                                    <div id="est-profundidad"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Qué tocan en la página</span><span class="est-sub">Cada vez que alguien usó estos botones</span></figcaption>
+                                    <div id="est-interacciones"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Desde dónde los contactan</span><span class="est-sub">WhatsApp, llamadas, correo y cómo llegar, según dónde estaba el botón</span></figcaption>
+                                    <div id="est-contactos"></div>
+                                </figure>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4">
-                                    <span class="block font-display text-xl text-ink">Lo que más miran</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Porcentaje de visitas que llegaron a cada sección</span>
+                        <!-- RESERVAS Y VENTAS -->
+                        <div class="est-panel" data-est-panel="reservas" role="tabpanel">
+                            <div id="est-kpis-reservas" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                            <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="flex items-start justify-between gap-3 mb-4">
+                                    <span><span class="est-titulo">Reservas recibidas por día</span><span id="est-reservas-dia-sub" class="est-sub">Todas las reservas creadas en el período: de la página y del panel</span></span>
+                                    <button type="button" class="chip shrink-0" data-ver-tabla="est-reservas-dia">Ver tabla</button>
                                 </figcaption>
-                                <div id="est-secciones"></div>
+                                <div id="est-reservas-dia"></div>
+                                <div id="est-reservas-dia-tabla" class="hidden overflow-x-auto max-h-80"></div>
                             </figure>
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4">
-                                    <span class="block font-display text-xl text-ink">Qué hacen en la página</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Cada vez que alguien tocó estos botones</span>
-                                </figcaption>
-                                <div id="est-interacciones"></div>
-                            </figure>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Por canal</span><span class="est-sub">Dónde se hizo cada reserva</span></figcaption>
+                                    <div id="est-canales"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Estado de las reservas</span><span class="est-sub">Cómo van las reservas del período</span></figcaption>
+                                    <div id="est-estados"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Con cuánta anticipación reservan</span><span class="est-sub">Días entre la reserva y la llegada</span></figcaption>
+                                    <div id="est-anticipacion"></div>
+                                </figure>
+                            </div>
+                            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                                <figure class="card p-5 sm:p-6 lg:col-span-2">
+                                    <figcaption class="mb-4"><span class="est-titulo">Lo que generó la página</span><span class="est-sub">Reservas enviadas desde la web por los visitantes</span></figcaption>
+                                    <div id="est-web"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6 lg:col-span-3">
+                                    <figcaption class="flex items-start justify-between gap-3 mb-4">
+                                        <span><span class="est-titulo">Ocupación de los próximos 60 días</span><span class="est-sub">Habitaciones pagadas o confirmadas sobre el total del hotel</span></span>
+                                        <button type="button" class="chip shrink-0" data-ver-tabla="est-ocupacion">Ver tabla</button>
+                                    </figcaption>
+                                    <div id="est-ocupacion" class="relative" tabindex="0" aria-label="Ocupación por día. Usa las flechas para recorrer los días."></div>
+                                    <div id="est-ocupacion-tabla" class="hidden overflow-x-auto max-h-72"></div>
+                                </figure>
+                            </div>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4">
-                                    <span class="block font-display text-xl text-ink">Habitaciones de interés</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Fichas abiertas y veces que se agregaron a una reserva</span>
+                        <!-- HABITACIONES Y SERVICIOS -->
+                        <div class="est-panel" data-est-panel="habitaciones" role="tabpanel">
+                            <figure class="card mb-6">
+                                <figcaption class="p-5 sm:p-6 pb-3 sm:pb-3">
+                                    <span class="est-titulo">Interés por habitación</span>
+                                    <span class="est-sub">Desde que abren la ficha hasta que reservan</span>
                                 </figcaption>
-                                <div id="est-habitaciones"></div>
+                                <div class="overflow-x-auto" id="est-tabla-habitaciones"></div>
                             </figure>
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4">
-                                    <span class="block font-display text-xl text-ink">Sitios y campañas</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Quién enlaza la página y qué enlaces con seguimiento funcionan</span>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Planes que piden</span><span class="est-sub">Veces que tocaron "Cotizar" en cada plan</span></figcaption>
+                                    <div id="est-planes"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Restaurante Mangolé</span><span class="est-sub">Pedidos enviados desde la carta de la página</span></figcaption>
+                                    <div id="est-pedidos"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Fotos más vistas</span><span class="est-sub">Categorías de la galería que abren</span></figcaption>
+                                    <div id="est-galeria"></div>
+                                </figure>
+                            </div>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Documentos abiertos</span><span class="est-sub">Contrato, acuerdo Pet Friendly y política de datos</span></figcaption>
+                                    <div id="est-documentos"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Redes sociales</span><span class="est-sub">Visitas que siguieron a las redes del hotel</span></figcaption>
+                                    <div id="est-redes"></div>
+                                </figure>
+                            </div>
+                        </div>
+
+                        <!-- AUDIENCIA -->
+                        <div class="est-panel" data-est-panel="audiencia" role="tabpanel">
+                            <div id="est-kpis-audiencia" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                            <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="flex items-start justify-between gap-3 mb-5">
+                                    <span><span class="est-titulo">Cuándo visitan</span><span class="est-sub">Visitas por día de la semana y hora. Más oscuro, más visitas.</span></span>
+                                    <button type="button" class="chip shrink-0" data-ver-tabla="est-calor">Ver tabla</button>
                                 </figcaption>
-                                <div id="est-campanas"></div>
+                                <div id="est-calor"></div>
+                                <div id="est-calor-tabla" class="hidden overflow-x-auto max-h-80"></div>
+                                <p id="est-calor-nota" class="text-[0.76rem] text-graphite/65 mt-4"></p>
                             </figure>
-                            <figure class="card p-5 sm:p-6">
-                                <figcaption class="mb-4">
-                                    <span class="block font-display text-xl text-ink">Preguntas al asistente</span>
-                                    <span class="block text-[0.72rem] text-graphite/45 mt-0.5">Temas más consultados en el chat de la página</span>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Dispositivos</span><span class="est-sub">Equipo, sistema y navegador</span></figcaption>
+                                    <div id="est-dispositivos"></div>
+                                    <div id="est-equipos" class="mt-5 pt-4 border-t border-line grid grid-cols-2 gap-4"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Desde dónde visitan</span><span class="est-sub">Países y ciudades</span></figcaption>
+                                    <div id="est-ubicacion"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Quiénes vuelven</span><span class="est-sub">Visitas de cada persona en el período, e idioma</span></figcaption>
+                                    <div id="est-recurrencia"></div>
+                                    <span class="micro text-graphite/40 block mt-5 pt-4 border-t border-line mb-1">Idioma del navegador</span>
+                                    <div id="est-idiomas"></div>
+                                </figure>
+                            </div>
+                        </div>
+
+                        <!-- ASISTENTE -->
+                        <div class="est-panel" data-est-panel="asistente" role="tabpanel">
+                            <div id="est-kpis-asistente" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                                <figure class="card p-5 sm:p-6 lg:col-span-3">
+                                    <figcaption class="mb-4"><span class="est-titulo">Temas más consultados</span><span class="est-sub">Lo que preguntan en el chat de la página</span></figcaption>
+                                    <div id="est-temas"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6 lg:col-span-2">
+                                    <figcaption class="mb-4"><span class="est-titulo">Qué hacen después</span><span class="est-sub">De las visitas que usaron el asistente, comparadas con el resto</span></figcaption>
+                                    <div id="est-asistente-efecto"></div>
+                                </figure>
+                            </div>
+                        </div>
+
+                        <!-- ENLACES -->
+                        <div class="est-panel" data-est-panel="enlaces" role="tabpanel">
+                            <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="mb-5">
+                                    <span class="est-titulo">Crea un enlace con seguimiento</span>
+                                    <span class="block text-[0.76rem] text-graphite/55 mt-1 max-w-3xl leading-relaxed">
+                                        Usa un enlace distinto en cada lugar donde compartas la página: la biografía de Instagram, los estados de WhatsApp,
+                                        el perfil de Google o un volante con código QR. Así, en "De dónde llegan" verás cuántas visitas y reservas trae cada uno.
+                                    </span>
                                 </figcaption>
-                                <div id="est-temas"></div>
+                                <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                                    <div>
+                                        <label class="field-label" for="enl-lugar">Dónde lo vas a publicar</label>
+                                        <select id="enl-lugar" class="field-input"></select>
+                                    </div>
+                                    <div>
+                                        <label class="field-label" for="enl-campana">Nombre de la campaña (opcional)</label>
+                                        <input id="enl-campana" class="field-input" placeholder="Ej.: temporada de diciembre" maxlength="40" autocomplete="off">
+                                    </div>
+                                    <button type="button" class="btn btn-ink" onclick="copiarEnlace()"><i data-lucide="copy" class="w-4 h-4"></i> Copiar enlace</button>
+                                </div>
+                                <div class="mt-3 flex items-start gap-3 bg-bone border border-line px-4 py-3">
+                                    <i data-lucide="link" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
+                                    <code id="enl-url" class="text-[0.78rem] text-ink break-all"></code>
+                                </div>
+                            </figure>
+                            <figure class="card">
+                                <figcaption class="p-5 sm:p-6 pb-3 sm:pb-3">
+                                    <span class="est-titulo">Resultados de tus enlaces</span>
+                                    <span class="est-sub">Visitas, mensajes y reservas que trajo cada enlace en el período</span>
+                                </figcaption>
+                                <div class="overflow-x-auto" id="est-campanas-enlaces"></div>
                             </figure>
                         </div>
                     </div>
-
-                    <!-- Enlaces con seguimiento -->
-                    <figure class="card p-5 sm:p-6">
-                        <figcaption class="mb-5">
-                            <span class="block font-display text-xl text-ink">Enlaces con seguimiento</span>
-                            <span class="block text-[0.76rem] text-graphite/55 mt-1 max-w-3xl leading-relaxed">
-                                Usa un enlace distinto en cada lugar donde compartas la página: la biografía de Instagram, los estados de WhatsApp,
-                                el perfil de Google o un volante con código QR. Así, en "De dónde llegan" verás cuántas visitas y reservas trae cada uno.
-                            </span>
-                        </figcaption>
-                        <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3 items-end">
-                            <div>
-                                <label class="field-label" for="enl-lugar">Dónde lo vas a publicar</label>
-                                <select id="enl-lugar" class="field-input"></select>
-                            </div>
-                            <div>
-                                <label class="field-label" for="enl-campana">Nombre de la campaña (opcional)</label>
-                                <input id="enl-campana" class="field-input" placeholder="Ej.: temporada de diciembre" maxlength="40" autocomplete="off">
-                            </div>
-                            <button type="button" class="btn btn-ink" onclick="copiarEnlace()"><i data-lucide="copy" class="w-4 h-4"></i> Copiar enlace</button>
-                        </div>
-                        <div class="mt-3 flex items-start gap-3 bg-bone border border-line px-4 py-3">
-                            <i data-lucide="link" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
-                            <code id="enl-url" class="text-[0.78rem] text-ink break-all"></code>
-                        </div>
-                    </figure>
                 </section>
 
                 <!-- ---------- HABITACIONES ---------- -->
@@ -1749,17 +1958,26 @@
            Estadísticas de la página
            index.html mide las visitas y lo que hacen, sin datos
            personales, y el servidor de reservas lo guarda en Supabase
-           (tabla eventos). Aquí se pide el resumen del período a la
-           función estadisticas y se dibuja. Sin conexión, datos de ejemplo.
+           (tabla eventos). Aquí se pide el resumen del período (y de una
+           sola fuente, si se elige) a la función estadisticas y se dibuja
+           por pestañas. Reservas, ventas y ocupación salen de la tabla de
+           reservas. Sin conexión, datos de ejemplo.
            ========================================================= */
         const AZUL = '#1C4A62';
+        const AZUL_CLARO = '#9DB7C6';
         const DORADO = '#A8834A';
         const RAMPA_EMBUDO = ['#9DB7C6', '#6E93A8', '#45708A', '#2A5570', '#163B52', '#0A212E'];
+        const RAMPA_CALOR = ['#EEF3F6', '#C9D9E2', '#9DB7C6', '#6E93A8', '#45708A', '#1C4A62'];
         const SECCIONES = {
             inicio: 'Portada', destacados: 'Destacados', hotel: 'El hotel', habitaciones: 'Habitaciones', servicios: 'Servicios',
             eventos: 'Eventos', planes: 'Planes', restaurante: 'Restaurante Mangolé', bar: 'Cabalante Bar', galeria: 'Galería',
             resenas: 'Reseñas', informacion: 'Antes de tu llegada', reservar: 'Reservar', faq: 'Preguntas frecuentes',
             catalogo: 'Catálogo de ofertas', contacto: 'Contacto'
+        };
+        const ICONOS_SECCION = {
+            inicio: 'house', destacados: 'star', hotel: 'building-2', habitaciones: 'bed-double', servicios: 'waves', eventos: 'party-popper',
+            planes: 'sparkles', restaurante: 'utensils', bar: 'wine', galeria: 'images', resenas: 'message-square-quote', informacion: 'info',
+            reservar: 'calendar-check', faq: 'circle-help', catalogo: 'tag', contacto: 'map-pin'
         };
         const INTERACCIONES = {
             whatsapp: ['message-circle', 'Escribieron por WhatsApp'], llamada: ['phone', 'Llamaron'], correo: ['mail', 'Enviaron un correo'],
@@ -1794,7 +2012,18 @@
         };
         const CONVERSACION = ['saludo', 'ayuda', 'gracias', 'ok', 'despedida'];
         const DIAS_SEMANA = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados', 'domingos'];
+        const DIAS_CORTOS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
         const ICONOS_EQUIPO = { Celular: 'smartphone', Computador: 'monitor', Tablet: 'tablet' };
+        const NOMBRES_PLANES = { romantica: 'Escapada romántica', familia: 'Fin de semana en familia', pasadia: 'Pasadía Premium', alimentacion: 'Alojamiento y alimentación' };
+        const NOMBRES_DOCUMENTOS = { 'contrato-hospedaje': 'Contrato de hospedaje', 'acuerdo-pet-friendly': 'Acuerdo Pet Friendly', 'politica-tratamiento-datos': 'Política de tratamiento de datos' };
+        const CATEGORIAS_GALERIA = { hotel: 'Hotel', habitaciones: 'Habitaciones', piscina: 'Piscina', gastronomia: 'Gastronomía', naturaleza: 'Naturaleza', actividades: 'Actividades', eventos: 'Eventos' };
+        const CONTACTOS = { whatsapp: ['message-circle', 'WhatsApp'], llamada: ['phone', 'Llamada'], correo: ['mail', 'Correo'], como_llegar: ['navigation', 'Cómo llegar'] };
+        const LUGARES_CLIC = {
+            'botón flotante': 'Botón flotante', 'barra del celular': 'Barra del celular', asistente: 'Asistente', pedido: 'Pedido a Mangolé',
+            carrito: 'Su reserva', 'ficha de habitación': 'Ficha de habitación', 'resultado del pago': 'Resultado del pago', 'galería': 'Fotos de la galería',
+            'menú': 'Menú', 'pie de página': 'Pie de página', otro: 'Otro lugar'
+        };
+        const METRICAS = { visitas: 'visitas', visitantes: 'visitantes', interes: 'visitas con interés', whatsapp: 'escribieron por WhatsApp', reservas: 'reservas enviadas' };
         /* [id, texto, utm_source, utm_medium, campaña por defecto]. Los nombres coinciden con los de index.html */
         const LUGARES_ENLACE = [
             ['instagram-bio', 'Instagram · biografía', 'instagram', 'social', 'biografia'],
@@ -1810,31 +2039,47 @@
 
         const num = n => Math.round(Number(n) || 0).toLocaleString('es-CO');
         const pct = (a, b) => (b ? Math.round(100 * (a || 0) / b) : 0);
-        const pctDecimal = (a, b) => (b ? (100 * (a || 0) / b).toFixed(1).replace('.', ',') : '0') + ' %';
+        const pctDecimal = (a, b) => (b ? (100 * (a || 0) / b).toFixed(1).replace('.', ',') : '0') + ' %';
         const duracionTxt = s => { s = Math.round(s || 0); return s < 60 ? s + ' s' : Math.floor(s / 60) + ' min ' + String(s % 60).padStart(2, '0') + ' s'; };
         const horaTxt = h => (h === 0 ? '12 a. m.' : h < 12 ? h + ' a. m.' : h === 12 ? '12 m.' : (h - 12) + ' p. m.');
         const legible = id => { const t = String(id || '').replace(/[_-]+/g, ' ').trim(); return t ? t.charAt(0).toUpperCase() + t.slice(1) : 'Otro'; };
         const nombrePais = c => { try { return new Intl.DisplayNames(['es'], { type: 'region' }).of(c) || c; } catch (e) { return c; } };
+        const nombreIdioma = c => { try { return capitalize(new Intl.DisplayNames(['es'], { type: 'language' }).of(c) || c); } catch (e) { return c; } };
+        const nombreLugar = l => SECCIONES[l] || LUGARES_CLIC[l] || legible(l);
+        const copCorto = n => { n = Math.round(Number(n) || 0); return n >= 1e6 ? '$' + (n / 1e6).toFixed(n >= 1e8 ? 0 : 1).replace('.', ',').replace(',0', '') + ' M' : COP(n); };
         const vacioEst = texto => '<p class="text-[0.78rem] text-graphite/45 py-2">' + (texto || 'Sin datos en este período.') + '</p>';
+        const sumar = (lista, f) => lista.reduce((s, x) => s + (Number(f(x)) || 0), 0);
+        const tabla = (titulos, filas) => '<table class="est-tabla"><thead><tr>' + titulos.map(t => '<th>' + t + '</th>').join('') + '</tr></thead><tbody>' +
+            filas.map(f => '<tr>' + f.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
 
         let diasEstadisticas = 30;
+        let origenEstadisticas = '';
+        let metricaDias = 'visitas';
+        let ordenFuentes = { clave: 'visitas', desc: true };
         let datosEstadisticas = null;
         let consultaEstadisticas = 0;
 
-        async function cargarEstadisticas() {
+        function periodoEstadisticas() {
             const hasta = hoyISO();
-            const desde = sumarDias(hasta, -(diasEstadisticas - 1));
+            return { desde: sumarDias(hasta, -(diasEstadisticas - 1)), hasta };
+        }
+
+        async function cargarEstadisticas() {
+            const { desde, hasta } = periodoEstadisticas();
             document.getElementById('est-rango').textContent = desde === hasta ? fechaLarga(hasta) : fechaCorta(desde) + ' – ' + fechaCorta(hasta);
             const id = ++consultaEstadisticas;
             const cont = document.getElementById('est-contenido');
             cont.classList.add('is-cargando');   // se mantiene lo anterior, atenuado, mientras llega lo nuevo
             try {
-                const d = CONECTADO ? await api('POST', 'rpc/estadisticas', { desde, hasta }) : estadisticasDeEjemplo(desde, hasta);
+                const cuerpo = { desde, hasta };
+                if (origenEstadisticas) cuerpo.origen = origenEstadisticas;
+                const d = CONECTADO ? await api('POST', 'rpc/estadisticas', cuerpo) : estadisticasDeEjemplo(desde, hasta, origenEstadisticas);
                 if (id !== consultaEstadisticas) return;
                 datosEstadisticas = d;
                 renderEstadisticas(d);
             } catch (e) {
-                if (id === consultaEstadisticas) avisoEstadisticas('No se pudieron cargar las estadísticas: ' + e.message);
+                if (id === consultaEstadisticas) avisoEstadisticas('No se pudieron cargar las estadísticas: ' + e.message +
+                    (origenEstadisticas ? ' Si acabas de actualizar la página, vuelve a ejecutar supabase-reservas.sql en Supabase.' : ''));
             } finally {
                 if (id === consultaEstadisticas) cont.classList.remove('is-cargando');
             }
@@ -1848,94 +2093,165 @@
 
         function renderEstadisticas(d) {
             const r = d.resumen || {};
-            avisoEstadisticas(!CONECTADO
-                ? 'Datos de ejemplo. Al conectar el panel con Supabase aquí aparecen las visitas reales de la página.'
-                : !r.visitas ? 'Aún no hay visitas registradas en este período. Se llenan solas cuando la página está publicada y conectada al servidor de reservas.' : '');
-            renderKpis(r, d.anterior || {});
-            graficoDias(d.por_dia || []);
-            barras('est-fuentes', d.fuentes || [], {
-                total: r.visitas,
-                nota: f => num(f.whatsapp) + ' escribieron por WhatsApp · ' + num(f.reservas) + (f.reservas === 1 ? ' reserva' : ' reservas')
-            });
-            embudo(d.embudo || []);
-            barras('est-dispositivos', d.dispositivos || [], { total: r.visitas, icono: f => ICONOS_EQUIPO[f.nombre] || 'circle' });
-            document.getElementById('est-equipos').innerHTML = [['Navegador', d.navegadores], ['Sistema', d.sistemas]].map(([titulo, filas]) =>
-                '<div class="min-w-0"><span class="micro text-graphite/40 block mb-2">' + titulo + '</span>' +
-                ((filas || []).slice(0, 4).map(f => '<span class="flex justify-between gap-2 text-[0.74rem] py-0.5"><span class="truncate text-graphite/70">' + esc(f.nombre) +
-                    '</span><span class="text-ink">' + pct(f.visitas, r.visitas) + ' %</span></span>').join('') || vacioEst()) + '</div>').join('');
-            ubicacion(d.paises || [], d.ciudades || [], r.visitas);
-            graficoHoras(d.horas || [], d.dias_semana || []);
-            const vistas = {};
-            (d.secciones || []).forEach(s => { vistas[s.nombre] = s.visitas; });
-            barras('est-secciones', Object.keys(SECCIONES).filter(k => vistas[k]).map(k => ({ nombre: SECCIONES[k], visitas: vistas[k] })),
-                { total: r.visitas, vacio: 'Aún no hay secciones vistas en este período.' });
-            barras('est-interacciones', (d.interacciones || []).filter(i => INTERACCIONES[i.tipo]), {
-                valor: i => i.total, icono: i => INTERACCIONES[i.tipo][0], nombre: i => INTERACCIONES[i.tipo][1],
-                nota: i => 'en ' + num(i.visitas) + (i.visitas === 1 ? ' visita' : ' visitas') +
-                    (i.tipo === 'whatsapp' && (d.whatsapp_desde || []).length
-                        ? ' · más desde: ' + d.whatsapp_desde.slice(0, 3).map(w => SECCIONES[w.nombre] || w.nombre).join(', ') : '')
-            });
-            barras('est-habitaciones', d.habitaciones || [], {
-                valor: h => h.fichas, nombre: h => NOMBRES[h.nombre] || legible(h.nombre),
-                nota: h => num(h.agregadas) + (h.agregadas === 1 ? ' vez agregada' : ' veces agregada') + ' a una reserva',
-                vacio: 'Nadie ha abierto todavía la ficha de una habitación.'
-            });
-            campanas(d.referentes || [], d.campanas || []);
-            barras('est-temas', (d.temas || []).filter(t => !CONVERSACION.includes(t.nombre)), {
-                valor: t => t.total, nombre: t => TEMAS[t.nombre] || legible(t.nombre), vacio: 'Nadie ha usado el asistente en este período.'
-            });
+            avisoEstadisticas(CONECTADO && !d.mapa_calor
+                ? 'Falta un paso para ver todas las estadísticas nuevas: en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.'
+                : !CONECTADO ? 'Datos de ejemplo. Al conectar el panel con Supabase aquí aparecen las visitas reales de la página.'
+                : !r.visitas ? (origenEstadisticas ? 'No hay visitas de ' + origenEstadisticas + ' en este período.'
+                    : 'Aún no hay visitas registradas en este período. Se llenan solas cuando la página está publicada y conectada al servidor de reservas.') : '');
+            poblarOrigenes(d.fuentes || []);
+            pintarFiltroActivo(d);
+            renderResumenEst(d);
+            renderOrigenEst(d);
+            renderSeccionesEst(d);
+            renderReservasEst(d);
+            renderHabitacionesEst(d);
+            renderAudienciaEst(d);
+            renderAsistenteEst(d);
+            tablaCampanas('est-campanas-enlaces', d.campanas || []);
             lucide.createIcons();
         }
 
-        function renderKpis(r, a) {
-            const cambio = (actual, antes) => {
-                if (!antes) return '';
-                const v = Math.round(100 * ((actual || 0) - antes) / antes);
-                const sube = v >= 0;
-                return '<span class="flex items-center gap-1.5 mt-2 text-[0.7rem] ' + (sube ? 'text-moss' : 'text-[#8a3d3d]') + '">' +
-                    '<i data-lucide="' + (sube ? 'trending-up' : 'trending-down') + '" class="w-3.5 h-3.5"></i>' +
-                    (sube ? '+' : '−') + Math.abs(v) + ' %<span class="text-graphite/40">vs. período anterior</span></span>';
-            };
-            const tarjetas = [
-                ['Visitas', num(r.visitas), num(r.paginas) + ' páginas abiertas', cambio(r.visitas, a.visitas)],
-                ['Visitantes', num(r.visitantes), num(r.nuevos) + ' llegaron por primera vez', cambio(r.visitantes, a.visitantes)],
-                ['Tiempo promedio', duracionTxt(r.duracion), 'Con la página a la vista, por visita', ''],
-                ['Interactuaron', pct(r.interactuaron, r.visitas) + ' %', num(r.interactuaron) + ' visitas tocaron algún botón', ''],
-                ['Escribieron por WhatsApp', num(r.whatsapp), pct(r.whatsapp, r.visitas) + ' % de las visitas', cambio(r.whatsapp, a.whatsapp)],
-                ['Reservas enviadas', num(r.reservas), 'Por WhatsApp o pagando con Bold', cambio(r.reservas, a.reservas)],
-                ['Pagos aprobados', num(r.pagos), 'Con Bold, desde la página', ''],
-                ['Conversión', pctDecimal(r.reservas, r.visitas), 'De las visitas terminan en reserva', '']
-            ];
-            document.getElementById('est-kpis').innerHTML = tarjetas.map(([etiqueta, valor, nota, delta]) =>
-                '<div class="card p-5"><span class="micro text-graphite/40">' + etiqueta + '</span>' +
-                '<span class="block est-kpi-valor mt-3">' + valor + '</span>' + delta +
-                '<span class="block text-[0.68rem] text-graphite/45 mt-1.5">' + nota + '</span></div>').join('');
+        /* ---------- Filtro por fuente ---------- */
+        function poblarOrigenes(fuentes) {
+            const sel = document.getElementById('est-origen');
+            const nombres = fuentes.map(f => f.nombre);
+            if (origenEstadisticas && !nombres.includes(origenEstadisticas)) nombres.unshift(origenEstadisticas);
+            sel.innerHTML = '<option value="">Todas las fuentes</option>' + nombres.map(n => {
+                const f = fuentes.find(x => x.nombre === n);
+                return '<option value="' + esc(n) + '">' + esc(n) + (f ? ' · ' + num(f.visitas) : '') + '</option>';
+            }).join('');
+            sel.value = origenEstadisticas;
         }
 
-        /* Barras horizontales de una serie (un solo color); el valor va al final de la barra */
-        function barras(id, filas, op = {}) {
-            const cont = document.getElementById(id);
-            const valor = op.valor || (f => f.visitas);
-            const nombre = op.nombre || (f => f.nombre);
-            if (!filas.length) { cont.innerHTML = vacioEst(op.vacio); return; }
-            const max = Math.max(1, ...filas.map(f => valor(f) || 0));
-            cont.innerHTML = filas.map(f => {
-                const v = valor(f) || 0;
-                const p = op.total ? pct(v, op.total) : null;
-                const etiqueta = String(nombre(f) || 'Otro');
-                const nota = op.nota ? op.nota(f) : '';
-                return '<div class="est-fila" tabindex="0" data-tip="' + esc(etiqueta) + '" data-tip-valor="' + num(v) +
-                        (p !== null ? ' · ' + p + ' %' : '') + '" data-tip-nota="' + esc(nota) + '">' +
-                    '<span class="flex items-center gap-2 min-w-0 text-[0.8rem] text-graphite/80">' +
-                        (op.icono ? '<i data-lucide="' + op.icono(f) + '" class="w-3.5 h-3.5 text-brass shrink-0"></i>' : '') +
-                        '<span class="truncate">' + esc(etiqueta) + '</span></span>' +
-                    '<span class="text-[0.8rem] text-ink text-right whitespace-nowrap">' + num(v) +
-                        (p !== null ? '<span class="text-graphite/40"> · ' + p + ' %</span>' : '') + '</span>' +
-                    '<span class="est-pista"><span class="est-barra" style="width:' + Math.max(1.5, 100 * v / max).toFixed(1) + '%' +
-                        (op.color ? ';background:' + op.color(f) : '') + '"></span></span>' +
-                    (nota ? '<span class="est-nota">' + esc(nota) + '</span>' : '') +
-                '</div>';
-            }).join('');
+        function pintarFiltroActivo(d) {
+            const caja = document.getElementById('est-filtro-activo');
+            caja.classList.toggle('hidden', !origenEstadisticas);
+            if (!origenEstadisticas) { caja.innerHTML = ''; return; }
+            const total = sumar(d.fuentes || [], f => f.visitas);
+            const v = (d.resumen || {}).visitas || 0;
+            caja.innerHTML = '<i data-lucide="filter" class="w-4 h-4 text-brass shrink-0"></i><span class="min-w-0">Viendo solo las visitas que llegaron de <strong class="font-medium text-ink">' +
+                esc(origenEstadisticas) + '</strong>: ' + num(v) + ' de ' + num(total) + ' (' + pct(v, total) + ' %). Todas las pestañas muestran solo esta fuente.</span>' +
+                '<button type="button" class="chip sm:ml-auto" data-origen="">Quitar filtro</button>';
+        }
+
+        /* Desde la lista se queda en la pestaña actual; desde una fila o una barra abre el panel de la fuente */
+        function elegirOrigen(nombre, irAlPanel = true) {
+            origenEstadisticas = nombre || '';
+            document.getElementById('est-origen').value = origenEstadisticas;
+            if (origenEstadisticas && irAlPanel) mostrarPestana('origen');
+            cargarEstadisticas();
+            const filtros = document.querySelector('.view[data-view="estadisticas"]');
+            if (filtros.getBoundingClientRect().top < 0) window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* ---------- Pestañas ---------- */
+        function mostrarPestana(nombre) {
+            document.querySelectorAll('.est-tab').forEach(t => {
+                const si = t.dataset.estTab === nombre;
+                t.classList.toggle('is-active', si);
+                t.setAttribute('aria-selected', String(si));
+                if (si) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            });
+            document.querySelectorAll('.est-panel').forEach(p => p.classList.toggle('is-active', p.dataset.estPanel === nombre));
+            ocultarTip();
+            try { sessionStorage.setItem('cabaleon-est-pestana', nombre); } catch (e) { /* sin almacenamiento */ }
+        }
+
+        /* ---------- Tarjetas de cifras ---------- */
+        function cambio(actual, antes) {
+            if (!antes) return '';
+            const v = Math.round(100 * ((actual || 0) - antes) / antes);
+            const sube = v >= 0;
+            return '<span class="flex flex-wrap items-center gap-x-1.5 mt-2 text-[0.7rem] ' + (sube ? 'text-moss' : 'text-[#8a3d3d]') + '">' +
+                '<i data-lucide="' + (sube ? 'trending-up' : 'trending-down') + '" class="w-3.5 h-3.5"></i>' +
+                '<span class="whitespace-nowrap">' + (sube ? '+' : '−') + Math.abs(v) + ' %</span><span class="text-graphite/40 whitespace-nowrap">vs. período anterior</span></span>';
+        }
+        function tarjetas(id, lista, chicas) {
+            document.getElementById(id).innerHTML = lista.map(([etiqueta, valor, nota, delta]) =>
+                '<div class="card p-5"><span class="micro text-graphite/40">' + etiqueta + '</span>' +
+                '<span class="block ' + (chicas ? 'est-kpi-chico' : 'est-kpi-valor') + ' mt-3">' + valor + '</span>' + (delta || '') +
+                (nota ? '<span class="block text-[0.68rem] text-graphite/45 mt-1.5 leading-snug">' + nota + '</span>' : '') + '</div>').join('');
+        }
+
+        /* =================== RESUMEN =================== */
+        function renderResumenEst(d) {
+            const r = d.resumen || {};
+            const a = d.anterior || {};
+            const interes = r.interes != null ? r.interes : r.interactuaron;
+            tarjetas('est-kpis', [
+                ['Visitas', num(r.visitas), num(r.paginas) + ' veces abrieron la página', cambio(r.visitas, a.visitas)],
+                ['Visitantes', num(r.visitantes), num(r.nuevos) + ' nuevos' + (r.regresaron != null ? ' · ' + num(r.regresaron) + ' volvieron' : ''), cambio(r.visitantes, a.visitantes)],
+                ['Tiempo promedio', duracionTxt(r.duracion), 'Con la página a la vista, por visita', cambio(r.duracion, a.duracion)],
+                ['Visitas con interés', pct(interes, r.visitas) + ' %', num(interes) + ' se quedaron 10 s o más o tocaron un botón', cambio(interes, a.interes)],
+                ['Escribieron por WhatsApp', num(r.whatsapp), pct(r.whatsapp, r.visitas) + ' % de las visitas', cambio(r.whatsapp, a.whatsapp)],
+                ['Reservas enviadas', num(r.reservas), 'Por WhatsApp o pagando con Bold', cambio(r.reservas, a.reservas)],
+                ['Valor reservado', copCorto(r.valor), 'Estadías enviadas desde la página' + (r.pagado ? ' · pagado con Bold: ' + COP(r.pagado) : ''), cambio(r.valor, a.valor)],
+                ['Conversión', pctDecimal(r.reservas, r.visitas), 'De las visitas terminan en reserva', '']
+            ]);
+            graficoDias(d.por_dia || []);
+            claves(d);
+            const total = r.visitas || 0;
+            barras('est-fuentes-top', (d.fuentes || []).slice(0, 6), {
+                total: origenEstadisticas ? sumar(d.fuentes || [], f => f.visitas) : total,
+                nota: f => num(f.whatsapp) + ' WhatsApp · ' + plural(f.reservas || 0, 'reserva', 'reservas') + (f.valor ? ' · ' + copCorto(f.valor) : ''),
+                dato: f => 'data-origen="' + esc(f.nombre) + '"', vacio: 'Aún no hay visitas en este período.'
+            });
+            embudo(d.embudo || []);
+        }
+
+        function graficoDias(dias) {
+            document.getElementById('est-dias-tabla').innerHTML = tabla(['Día', 'Visitas', 'Visitantes', 'Con interés', 'WhatsApp', 'Reservas', 'Valor'],
+                dias.map(d => [fechaLarga(d.dia), num(d.visitas), num(d.visitantes), num(d.interes != null ? d.interes : 0), num(d.whatsapp), num(d.reservas), COP(d.valor || 0)]));
+            graficoLinea('est-dias', dias.map(d => ({ dia: d.dia, v: Number(d[metricaDias]) || 0, d })), {
+                etiqueta: 'Evolución por día',
+                tip: p => '<strong>' + num(p.v) + '</strong> ' + METRICAS[metricaDias] + ' · ' + fechaLarga(p.dia) +
+                    '<br>' + num(p.d.visitas) + ' visitas · ' + num(p.d.whatsapp) + ' WhatsApp · ' + num(p.d.reservas) + ' reservas'
+            });
+        }
+
+        /* Conclusiones automáticas del período */
+        function claves(d) {
+            const r = d.resumen || {};
+            const a = d.anterior || {};
+            const lista = [];
+            if (r.visitas) {
+                const fuentes = (d.fuentes || []).filter(f => f.visitas);
+                const totalFuentes = sumar(fuentes, f => f.visitas);
+                if (a.visitas) {
+                    const v = Math.round(100 * (r.visitas - a.visitas) / a.visitas);
+                    lista.push([v >= 0 ? 'trending-up' : 'trending-down', 'Las visitas ' + (v >= 0 ? 'subieron' : 'bajaron') + ' <strong>' + Math.abs(v) + ' %</strong> frente al período anterior.']);
+                }
+                if (!origenEstadisticas && fuentes[0]) lista.push(['compass', '<strong>' + esc(fuentes[0].nombre) + '</strong> es la fuente que más visitas trae: ' + pct(fuentes[0].visitas, totalFuentes) + ' % del total.']);
+                const mejor = fuentes.filter(f => f.visitas >= 5 && f.reservas).sort((x, y) => y.reservas / y.visitas - x.reservas / x.visitas)[0];
+                if (!origenEstadisticas && mejor) lista.push(['target', 'La fuente que mejor convierte es <strong>' + esc(mejor.nombre) + '</strong>: ' + pctDecimal(mejor.reservas, mejor.visitas) + ' de sus visitas envían una reserva.']);
+                const secciones = (d.secciones || []).filter(s => SECCIONES[s.nombre] && s.nombre !== 'inicio');
+                const masVista = secciones.slice().sort((x, y) => y.visitas - x.visitas)[0];
+                if (masVista) lista.push(['eye', 'Después de la portada, lo más visto es <strong>' + SECCIONES[masVista.nombre] + '</strong> (' + pct(masVista.visitas, r.visitas) + ' % de las visitas).']);
+                const masTiempo = secciones.filter(s => s.segundos).sort((x, y) => y.segundos - x.segundos)[0];
+                if (masTiempo) lista.push(['timer', 'Donde más se quedan: <strong>' + SECCIONES[masTiempo.nombre] + '</strong>, ' + duracionTxt(masTiempo.segundos) + ' en promedio.']);
+                const momento = mejorMomento(d.mapa_calor);
+                if (momento) lista.push(['clock', 'El mejor momento para publicar: los <strong>' + momento + '</strong>.']);
+                const pasos = d.embudo || [];
+                let caida = null;
+                for (let i = 1; i < pasos.length; i++) {
+                    if (!pasos[i - 1].visitas) continue;
+                    const sigue = pasos[i].visitas / pasos[i - 1].visitas;
+                    if (!caida || sigue < caida.sigue) caida = { sigue, de: pasos[i - 1].paso, a: pasos[i].paso };
+                }
+                if (caida && pasos[0].visitas >= 10) lista.push(['route', 'Donde más visitas se pierden: de "' + PASOS_EMBUDO[caida.de] + '" a "' + PASOS_EMBUDO[caida.a] + '" (sigue el <strong>' + Math.round(caida.sigue * 100) + ' %</strong>).']);
+                const celular = (d.dispositivos || []).find(x => x.nombre === 'Celular');
+                if (celular) lista.push(['smartphone', '<strong>' + pct(celular.visitas, r.visitas) + ' %</strong> de las visitas son desde el celular.']);
+            }
+            document.getElementById('est-claves').innerHTML = lista.length
+                ? lista.slice(0, 7).map(([icono, texto]) => '<li class="est-clave"><i data-lucide="' + icono + '"></i><span>' + texto + '</span></li>').join('')
+                : '<li>' + vacioEst('Las conclusiones aparecen cuando haya visitas en el período.') + '</li>';
+        }
+
+        function mejorMomento(matriz) {
+            if (!Array.isArray(matriz) || matriz.length !== 7) return '';
+            let max = 0, dia = -1, hora = -1;
+            matriz.forEach((fila, d) => (fila || []).forEach((v, h) => { if (v > max) { max = v; dia = d; hora = h; } }));
+            return max ? DIAS_SEMANA[dia] + ' entre ' + horaTxt(hora) + ' y ' + horaTxt((hora + 1) % 24) : '';
         }
 
         /* Camino a la reserva: un solo tono, de claro a oscuro según el paso */
@@ -1950,7 +2266,363 @@
             });
             const ultimo = pasos[pasos.length - 1];
             cont.insertAdjacentHTML('beforeend', '<p class="text-[0.76rem] text-graphite/65 mt-4 pt-4 border-t border-line">De cada 100 visitas, <strong class="font-medium text-ink">' +
-                pctDecimal(ultimo.visitas, base).replace(' %', '') + '</strong> envían una reserva.</p>');
+                pctDecimal(ultimo.visitas, base).replace(' %', '') + '</strong> envían una reserva.</p>');
+        }
+
+        /* =================== DE DÓNDE LLEGAN =================== */
+        function renderOrigenEst(d) {
+            perfilFuente(d);
+            tablaFuentes(d.fuentes || []);
+            const r = d.resumen || {};
+            const totalTodas = sumar(d.fuentes || [], f => f.visitas);
+            barras('est-medios', d.medios || [], {
+                total: totalTodas, nota: m => plural(m.reservas || 0, 'reserva', 'reservas') + (m.valor ? ' · ' + copCorto(m.valor) : ''),
+                vacio: 'Aún no hay visitas en este período.'
+            });
+            barras('est-referentes', (d.referentes || []).slice(0, 8), {
+                total: r.visitas, nota: x => x.reservas ? plural(x.reservas, 'reserva', 'reservas') : '',
+                vacio: 'Nadie llegó desde otro sitio en este período.'
+            });
+            barras('est-entradas', d.entradas || [], { total: r.visitas, nombre: e => nombreLugar(e.nombre) });
+            tablaCampanas('est-campanas', d.campanas || []);
+        }
+
+        function perfilFuente(d) {
+            const caja = document.getElementById('est-perfil-fuente');
+            caja.classList.toggle('hidden', !origenEstadisticas);
+            if (!origenEstadisticas) { caja.innerHTML = ''; return; }
+            const r = d.resumen || {};
+            const f = (d.fuentes || []).find(x => x.nombre === origenEstadisticas) || {};
+            const totalTodas = sumar(d.fuentes || [], x => x.visitas);
+            const interes = r.interes != null ? r.interes : r.interactuaron;
+            caja.innerHTML = '<div class="card p-5 sm:p-7">' +
+                '<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">' +
+                    '<div><span class="eyebrow">Panel de la fuente</span>' +
+                    '<h3 class="font-display text-3xl sm:text-4xl text-ink mt-3 leading-none">' + esc(origenEstadisticas) + '</h3>' +
+                    '<p class="text-[0.78rem] text-graphite/55 mt-2">' + (f.medio ? esc(f.medio) + ' · ' : '') + pct(r.visitas, totalTodas) + ' % de todas las visitas del período</p></div>' +
+                    '<button type="button" class="btn btn-outline btn-sm shrink-0" data-origen=""><i data-lucide="x" class="w-3.5 h-3.5"></i> Ver todas las fuentes</button>' +
+                '</div>' +
+                '<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-px bg-line border border-line mb-6">' +
+                    [['Visitas', num(r.visitas)], ['Visitantes', num(r.visitantes)], ['Tiempo promedio', duracionTxt(r.duracion)],
+                     ['Con interés', pct(interes, r.visitas) + ' %'], ['WhatsApp', num(r.whatsapp)], ['Reservas', num(r.reservas) + '<span class="text-[0.8rem] text-graphite/45"> · ' + pctDecimal(r.reservas, r.visitas) + '</span>']]
+                    .map(([t, v]) => '<div class="bg-white p-4"><span class="micro text-graphite/40">' + t + '</span><span class="block est-kpi-chico mt-2">' + v + '</span></div>').join('') +
+                '</div>' +
+                '<span class="micro text-graphite/40 block mb-2">Visitas por día</span>' +
+                '<div id="est-perfil-dias" class="relative mb-6" tabindex="0" aria-label="Visitas por día de esta fuente"></div>' +
+                '<div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-5 border-t border-line">' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Secciones que más ven</span><div id="est-perfil-secciones"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Dispositivos</span><div id="est-perfil-equipos"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Ciudades</span><div id="est-perfil-ciudades"></div></div>' +
+                '</div></div>';
+            graficoLinea('est-perfil-dias', (d.por_dia || []).map(p => ({ dia: p.dia, v: p.visitas, d: p })), {
+                alto: 200, etiqueta: 'Visitas por día de ' + origenEstadisticas,
+                tip: p => '<strong>' + num(p.v) + '</strong> visitas desde ' + esc(origenEstadisticas) + ' · ' + fechaLarga(p.dia) +
+                    '<br>' + num(p.d.whatsapp) + ' WhatsApp · ' + num(p.d.reservas) + ' reservas'
+            });
+            barras('est-perfil-secciones', (d.secciones || []).filter(s => SECCIONES[s.nombre]).slice(0, 5), {
+                total: r.visitas, nombre: s => SECCIONES[s.nombre], dato: s => 'data-seccion="' + s.nombre + '"'
+            });
+            barras('est-perfil-equipos', d.dispositivos || [], { total: r.visitas, icono: x => ICONOS_EQUIPO[x.nombre] || 'circle' });
+            barras('est-perfil-ciudades', (d.ciudades || []).slice(0, 5), { total: r.visitas, vacio: 'Sin datos de ubicación.' });
+        }
+
+        const COLUMNAS_FUENTES = [
+            ['nombre', 'Fuente'], ['serie', 'Tendencia'], ['visitas', 'Visitas'], ['parte', '% del total'], ['visitantes', 'Visitantes'],
+            ['nuevos', 'Nuevos'], ['duracion', 'Tiempo'], ['interes', 'Con interés'], ['whatsapp', 'WhatsApp'],
+            ['reservas', 'Reservas'], ['conversion', 'Conversión'], ['valor', 'Valor']
+        ];
+        function tablaFuentes(fuentes) {
+            const t = document.getElementById('est-tabla-fuentes');
+            const total = sumar(fuentes, f => f.visitas);
+            if (!fuentes.length) { t.innerHTML = '<tbody><tr><td class="!text-left !pl-6">' + vacioEst('Aún no hay visitas en este período.') + '</td></tr></tbody>'; return; }
+            const valor = (f, c) => c === 'parte' ? f.visitas / (total || 1) : c === 'conversion' ? (f.reservas || 0) / (f.visitas || 1)
+                : c === 'interes' ? (f.interes || 0) / (f.visitas || 1) : c === 'nuevos' ? (f.nuevos || 0) / (f.visitantes || 1) : Number(f[c]) || 0;
+            const filas = fuentes.slice().sort((a, b) => {
+                if (ordenFuentes.clave === 'nombre') return (ordenFuentes.desc ? -1 : 1) * a.nombre.localeCompare(b.nombre, 'es');
+                const x = valor(a, ordenFuentes.clave), y = valor(b, ordenFuentes.clave);
+                return (ordenFuentes.desc ? y - x : x - y) || b.visitas - a.visitas;
+            });
+            const flecha = c => ordenFuentes.clave === c ? '<i data-lucide="' + (ordenFuentes.desc ? 'arrow-down' : 'arrow-up') + '" class="w-3 h-3"></i>' : '';
+            t.innerHTML = '<thead><tr>' + COLUMNAS_FUENTES.map(([c, titulo]) => c === 'serie' ? '<th class="!text-left">' + titulo + '</th>'
+                    : '<th class="' + (ordenFuentes.clave === c ? 'is-orden' : '') + '"><button type="button" data-orden="' + c + '">' + titulo + flecha(c) + '</button></th>').join('') + '</tr></thead><tbody>' +
+                filas.map(f => '<tr tabindex="0" data-origen="' + esc(f.nombre) + '" class="' + (f.nombre === origenEstadisticas ? 'is-elegida' : '') + '" title="Ver el panel de ' + esc(f.nombre) + '">' +
+                    '<td><span class="block font-medium">' + esc(f.nombre) + '</span><span class="block text-[0.66rem] est-tenue">' + esc(f.medio || '') + '</span></td>' +
+                    '<td class="!text-left">' + sparkline(f.serie) + '</td>' +
+                    '<td>' + num(f.visitas) + '</td><td class="est-tenue">' + pct(f.visitas, total) + ' %</td><td>' + num(f.visitantes) + '</td>' +
+                    '<td class="est-tenue">' + pct(f.nuevos, f.visitantes) + ' %</td><td>' + duracionTxt(f.duracion) + '</td>' +
+                    '<td>' + pct(f.interes, f.visitas) + ' %</td><td>' + num(f.whatsapp) + '</td><td>' + num(f.reservas) + '</td>' +
+                    '<td>' + pctDecimal(f.reservas, f.visitas) + '</td><td>' + (f.valor ? COP(f.valor) : '<span class="est-tenue">—</span>') + '</td></tr>').join('') +
+                '</tbody><tfoot><tr><td class="!text-left font-medium">Total</td><td></td><td class="font-medium">' + num(total) + '</td><td class="est-tenue">100 %</td>' +
+                '<td>' + num(sumar(fuentes, f => f.visitantes)) + '</td><td></td><td></td><td></td><td>' + num(sumar(fuentes, f => f.whatsapp)) + '</td>' +
+                '<td>' + num(sumar(fuentes, f => f.reservas)) + '</td><td>' + pctDecimal(sumar(fuentes, f => f.reservas), total) + '</td><td>' + COP(sumar(fuentes, f => f.valor)) + '</td></tr></tfoot>';
+            lucide.createIcons();
+        }
+
+        function tablaCampanas(id, lista) {
+            const cont = document.getElementById(id);
+            if (!lista.length) {
+                cont.innerHTML = '<div class="px-5 sm:px-6 pb-5">' + vacioEst('Todavía no hay visitas desde enlaces con seguimiento. Créalos en la pestaña Enlaces y compártelos.') + '</div>';
+                return;
+            }
+            cont.innerHTML = '<table class="est-pro"><thead><tr><th>Campaña</th><th class="!text-left">Fuente</th><th>Visitas</th><th>WhatsApp</th><th>Reservas</th><th>Conversión</th><th>Valor</th></tr></thead><tbody>' +
+                lista.map(c => '<tr tabindex="0" data-origen="' + esc(c.fuente || '') + '" title="Ver el panel de ' + esc(c.fuente || '') + '">' +
+                    '<td class="font-medium">' + esc(legible(c.nombre)) + '</td><td class="!text-left">' + esc(c.fuente || '') + '<span class="est-tenue">' + (c.medio ? ' · ' + esc(c.medio) : '') + '</span></td>' +
+                    '<td>' + num(c.visitas) + '</td><td>' + num(c.whatsapp) + '</td><td>' + num(c.reservas) + '</td><td>' + pctDecimal(c.reservas, c.visitas) + '</td>' +
+                    '<td>' + (c.valor ? COP(c.valor) : '<span class="est-tenue">—</span>') + '</td></tr>').join('') + '</tbody></table>';
+        }
+
+        /* =================== SECCIONES DE LA PÁGINA =================== */
+        function renderSeccionesEst(d) {
+            const r = d.resumen || {};
+            const lista = d.secciones || [];
+            const porId = {};
+            lista.forEach(s => { porId[s.nombre] = s; });
+            const conocidas = lista.filter(s => SECCIONES[s.nombre]);
+            const masVista = conocidas.filter(s => s.nombre !== 'inicio').sort((a, b) => b.visitas - a.visitas)[0];
+            const masTiempo = conocidas.filter(s => s.segundos).sort((a, b) => b.segundos - a.segundos)[0];
+            tarjetas('est-kpis-secciones', [
+                ['Secciones por visita', r.secciones != null ? String(r.secciones).replace('.', ',') : '—', 'De las 16 que tiene la página', ''],
+                ['Tiempo en la página', duracionTxt(r.duracion), 'Promedio por visita', ''],
+                ['La más vista', masVista ? SECCIONES[masVista.nombre] : '—', masVista ? pct(masVista.visitas, r.visitas) + ' % de las visitas, sin contar la portada' : 'Sin datos', ''],
+                ['Donde más se quedan', masTiempo ? SECCIONES[masTiempo.nombre] : '—', masTiempo ? duracionTxt(masTiempo.segundos) + ' en pantalla, en promedio' : 'Se mide desde esta versión de la página', '']
+            ], true);
+            document.getElementById('est-secciones').innerHTML = Object.keys(SECCIONES).map((k, i) => {
+                const s = porId[k];
+                const vistas = s ? s.visitas : 0;
+                return '<button type="button" class="est-seccion' + (vistas ? '' : ' is-vacia') + '" data-seccion="' + k + '">' +
+                    '<span class="flex items-center justify-between gap-2">' +
+                        '<span class="flex items-center gap-2 min-w-0"><i data-lucide="' + ICONOS_SECCION[k] + '" class="w-4 h-4 text-brass shrink-0"></i>' +
+                        '<span class="text-[0.82rem] text-ink truncate">' + SECCIONES[k] + '</span></span>' +
+                        '<span class="text-[0.62rem] text-graphite/35 shrink-0">' + String(i + 1).padStart(2, '0') + '</span>' +
+                    '</span>' +
+                    '<span class="flex items-end justify-between gap-3 mt-3">' +
+                        '<span><span class="block est-kpi-chico">' + pct(vistas, r.visitas) + ' %</span>' +
+                        '<span class="block text-[0.66rem] text-graphite/50 mt-1">' + (vistas ? num(vistas) + ' visitas' + (s.segundos ? ' · ' + duracionTxt(s.segundos) : '') : 'Nadie la vio') + '</span></span>' +
+                        '<span class="shrink-0 opacity-90">' + (s ? sparkline(s.serie, { ancho: 84, alto: 28 }) : '') + '</span>' +
+                    '</span>' +
+                    (vistas ? '<span class="block text-[0.66rem] text-graphite/50 mt-2 pt-2 border-t border-line">' + num(s.whatsapp) + ' escribieron · ' + plural(s.reservas || 0, 'reservó', 'reservaron') + '</span>' : '') +
+                '</button>';
+            }).join('');
+            barras('est-profundidad', d.profundidad || [], { total: r.visitas, vacio: 'Se mide desde esta versión de la página.' });
+            barras('est-interacciones', (d.interacciones || []).filter(i => INTERACCIONES[i.tipo]), {
+                valor: i => i.total, icono: i => INTERACCIONES[i.tipo][0], nombre: i => INTERACCIONES[i.tipo][1],
+                nota: i => 'en ' + plural(i.visitas, 'visita', 'visitas'), vacio: 'Nadie ha tocado botones en este período.'
+            });
+            const lugares = {};
+            (d.contactos || []).forEach(c => {
+                const l = lugares[c.lugar] = lugares[c.lugar] || { nombre: c.lugar, total: 0, tipos: {} };
+                l.total += c.total;
+                l.tipos[c.tipo] = (l.tipos[c.tipo] || 0) + c.total;
+            });
+            barras('est-contactos', Object.values(lugares).sort((a, b) => b.total - a.total).slice(0, 8), {
+                valor: l => l.total, nombre: l => nombreLugar(l.nombre),
+                nota: l => Object.keys(CONTACTOS).filter(t => l.tipos[t]).map(t => CONTACTOS[t][1] + ': ' + l.tipos[t]).join(' · '),
+                dato: l => SECCIONES[l.nombre] ? 'data-seccion="' + l.nombre + '"' : '',
+                vacio: 'Nadie ha usado los botones de contacto en este período.'
+            });
+        }
+
+        /* Panel de una sección: sus cifras, su gráfica por día y de dónde venían quienes la vieron */
+        function abrirSeccion(k) {
+            const d = datosEstadisticas;
+            if (!d || !SECCIONES[k]) return;
+            const orden = Object.keys(SECCIONES);
+            const i = orden.indexOf(k);
+            const ant = orden[(i - 1 + orden.length) % orden.length];
+            const sig = orden[(i + 1) % orden.length];
+            const r = d.resumen || {};
+            const s = (d.secciones || []).find(x => x.nombre === k) || { visitas: 0, segundos: null, whatsapp: 0, reservas: 0, entradas: 0, clics: 0, serie: [], fuentes: [] };
+            const { desde, hasta } = periodoEstadisticas();
+            const contactos = (d.contactos || []).filter(c => c.lugar === k);
+            const comparar = (parte, total, promedioParte, promedioTotal) => {
+                const aqui = total ? 100 * parte / total : 0;
+                const prom = promedioTotal ? 100 * promedioParte / promedioTotal : 0;
+                if (!total || !promedioTotal) return '';
+                const mejor = aqui >= prom;
+                return '<span class="block text-[0.66rem] mt-1 ' + (mejor ? 'text-moss' : 'text-graphite/45') + '">' + (mejor ? 'Más' : 'Menos') + ' que el promedio (' + pctDecimal(promedioParte, promedioTotal) + ')</span>';
+            };
+            const cifra = (t, v, nota) => '<div class="bg-white p-4"><span class="micro text-graphite/40">' + t + '</span><span class="block est-kpi-chico mt-2">' + v + '</span>' + (nota || '') + '</div>';
+            abrirModal('<div class="p-6 sm:p-8">' +
+                '<div class="flex items-center gap-3 pr-10">' +
+                    '<span class="w-10 h-10 rounded-full bg-brass/15 text-brass-deep flex items-center justify-center shrink-0"><i data-lucide="' + ICONOS_SECCION[k] + '" class="w-5 h-5"></i></span>' +
+                    '<span class="min-w-0"><span class="micro text-graphite/40 block">Sección ' + (i + 1) + ' de ' + orden.length + ' de la página</span>' +
+                    '<span class="block font-display text-3xl text-ink leading-tight">' + SECCIONES[k] + '</span></span>' +
+                '</div>' +
+                '<p class="text-[0.75rem] text-graphite/50 mt-2">' + fechaCorta(desde) + ' – ' + fechaCorta(hasta) + (origenEstadisticas ? ' · solo visitas de ' + esc(origenEstadisticas) : ' · todas las fuentes') + '</p>' +
+                '<div class="grid grid-cols-2 sm:grid-cols-3 gap-px bg-line border border-line mt-6">' +
+                    cifra('La vieron', num(s.visitas), '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + pct(s.visitas, r.visitas) + ' % de las visitas</span>') +
+                    cifra('Tiempo en pantalla', s.segundos ? duracionTxt(s.segundos) : '—', '<span class="block text-[0.66rem] text-graphite/45 mt-1">Promedio de quienes la vieron</span>') +
+                    cifra('Entraron por aquí', num(s.entradas), '<span class="block text-[0.66rem] text-graphite/45 mt-1">Primera sección de su visita</span>') +
+                    cifra('Contactos desde aquí', num(s.clics), '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + (contactos.map(c => (CONTACTOS[c.tipo] ? CONTACTOS[c.tipo][1] : c.tipo) + ': ' + c.total).join(' · ') || 'WhatsApp, llamadas y cómo llegar') + '</span>') +
+                    cifra('Escribieron', pctDecimal(s.whatsapp, s.visitas), comparar(s.whatsapp, s.visitas, r.whatsapp, r.visitas)) +
+                    cifra('Reservaron', pctDecimal(s.reservas, s.visitas), comparar(s.reservas, s.visitas, r.reservas, r.visitas)) +
+                '</div>' +
+                '<div class="mt-7"><span class="micro text-graphite/40 block mb-2">Visitas que la vieron, por día</span>' +
+                '<div id="est-modal-dias" class="relative" tabindex="0" aria-label="Visitas por día a esta sección"></div></div>' +
+                '<div class="mt-6 pt-5 border-t border-line"><span class="micro text-graphite/40 block mb-2">De dónde venían quienes la vieron</span><div id="est-modal-fuentes"></div></div>' +
+                '<div class="flex items-center justify-between gap-3 mt-7 pt-5 border-t border-line">' +
+                    '<button type="button" class="btn btn-outline btn-sm" onclick="abrirSeccion(\'' + ant + '\')"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">' + SECCIONES[ant] + '</span><span class="sm:hidden">Anterior</span></button>' +
+                    '<button type="button" class="btn btn-outline btn-sm" onclick="abrirSeccion(\'' + sig + '\')"><span class="hidden sm:inline">' + SECCIONES[sig] + '</span><span class="sm:hidden">Siguiente</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>' +
+                '</div></div>');
+            graficoLinea('est-modal-dias', (d.por_dia || []).map((p, j) => ({ dia: p.dia, v: (s.serie || [])[j] || 0 })), {
+                alto: 190, etiqueta: 'Visitas por día a ' + SECCIONES[k],
+                tip: p => '<strong>' + num(p.v) + '</strong> visitas vieron ' + SECCIONES[k] + '<br>' + fechaLarga(p.dia)
+            });
+            barras('est-modal-fuentes', s.fuentes || [], { total: s.visitas, vacio: 'Nadie la vio en este período.' });
+            lucide.createIcons();
+        }
+
+        /* =================== RESERVAS Y VENTAS =================== */
+        function analisisReservas(desde, hasta) {
+            const creadaEl = r => iso(new Date(r.creada));
+            const enPeriodo = reservas.filter(r => { const c = creadaEl(r); return c >= desde && c <= hasta; });
+            const vigentes = enPeriodo.filter(r => OCUPAN.includes(r.estado));
+            const caidas = enPeriodo.filter(r => ['cancelada', 'rechazada', 'anulada'].includes(r.estado));
+            const validas = enPeriodo.filter(r => !['cancelada', 'rechazada', 'anulada'].includes(r.estado));
+            const anticipacion = validas.map(r => Math.max(0, nochesEntre(creadaEl(r), r.llegada)));
+            const porDia = {};
+            enPeriodo.forEach(r => { const c = creadaEl(r); const x = porDia[c] = porDia[c] || { n: 0, ventas: 0 }; x.n++; if (OCUPAN.includes(r.estado)) x.ventas += Number(r.total) || 0; });
+            const dias = [];
+            for (let dia = desde; dia <= hasta; dia = sumarDias(dia, 1)) dias.push({ dia, n: (porDia[dia] || {}).n || 0, ventas: (porDia[dia] || {}).ventas || 0 });
+            const contar = (lista, clave) => { const m = {}; lista.forEach(r => { const k = clave(r); const x = m[k] = m[k] || { nombre: k, visitas: 0, valor: 0 }; x.visitas++; x.valor += Number(r.total) || 0; }); return Object.values(m).sort((a, b) => b.visitas - a.visitas); };
+            const nochesPorTipo = {};
+            validas.forEach(r => Object.keys(r.habitaciones || {}).forEach(k => { nochesPorTipo[k] = (nochesPorTipo[k] || 0) + (Number(r.habitaciones[k]) || 0) * (Number(r.noches) || 0); }));
+            const rangos = [['El mismo día o al siguiente', 0, 1], ['2 a 7 días antes', 2, 7], ['8 a 30 días antes', 8, 30], ['1 a 3 meses antes', 31, 90], ['Más de 3 meses antes', 91, 100000]];
+            const totalUnidades = Object.values(UNIDADES).reduce((s, v) => s + v, 0) || 1;
+            const ocupacion = [];
+            for (let i = 0; i < 60; i++) {
+                const dia = sumarDias(hoyISO(), i);
+                const occ = ocupadasLaNoche(dia);
+                const usadas = Object.values(occ).reduce((s, v) => s + v, 0);
+                ocupacion.push({ dia, usadas, total: totalUnidades, v: Math.round(100 * usadas / totalUnidades), detalle: occ });
+            }
+            return {
+                total: enPeriodo.length, vigentes: vigentes.length, caidas: caidas.length,
+                ventas: sumar(vigentes, r => r.total), cobrado: sumar(enPeriodo, r => r.pagado),
+                ticket: vigentes.length ? sumar(vigentes, r => r.total) / vigentes.length : 0,
+                noches: validas.length ? sumar(validas, r => r.noches) / validas.length : 0,
+                huespedes: validas.length ? sumar(validas, r => r.huespedes) / validas.length : 0,
+                anticipacion: anticipacion.length ? anticipacion.reduce((s, v) => s + v, 0) / anticipacion.length : 0,
+                mascotas: validas.filter(r => Number(r.mascotas) > 0).length, validas: validas.length,
+                dias, canales: contar(enPeriodo, r => r.canal), estados: contar(enPeriodo, r => r.estado),
+                anticipaciones: rangos.map(([nombre, a, b]) => ({ nombre, visitas: anticipacion.filter(v => v >= a && v <= b).length })),
+                nochesPorTipo, ocupacion
+            };
+        }
+
+        function renderReservasEst(d) {
+            const { desde, hasta } = periodoEstadisticas();
+            const a = analisisReservas(desde, hasta);
+            const r = d.resumen || {};
+            tarjetas('est-kpis-reservas', [
+                ['Reservas recibidas', num(a.total), num(a.vigentes) + ' pagadas o confirmadas', ''],
+                ['Ventas confirmadas', copCorto(a.ventas), COP(a.ventas) + ' · reservas pagadas o confirmadas', ''],
+                ['Cobrado', copCorto(a.cobrado), 'Pagos registrados en el período', ''],
+                ['Valor promedio', copCorto(a.ticket), 'Por reserva confirmada', ''],
+                ['Noches promedio', a.noches ? a.noches.toFixed(1).replace('.', ',') : '0', (a.huespedes ? a.huespedes.toFixed(1).replace('.', ',') : '0') + ' huéspedes por reserva', ''],
+                ['Anticipación', Math.round(a.anticipacion) + (Math.round(a.anticipacion) === 1 ? ' día' : ' días'), 'Promedio entre la reserva y la llegada', ''],
+                ['Cancelaciones', pct(a.caidas, a.total) + ' %', plural(a.caidas, 'reserva cancelada, rechazada o anulada', 'reservas canceladas, rechazadas o anuladas'), ''],
+                ['Con mascotas', pct(a.mascotas, a.validas) + ' %', 'Reservas Pet Friendly', '']
+            ]);
+            if (origenEstadisticas) {
+                document.getElementById('est-kpis-reservas').insertAdjacentHTML('afterbegin', '<p class="col-span-full text-[0.76rem] text-graphite/60 bg-white border border-line p-3 flex gap-2.5">' +
+                    '<i data-lucide="info" class="w-4 h-4 text-brass shrink-0"></i><span>Las reservas del hotel no se separan por fuente: estas cifras son de todas. "Lo que generó la página" sí muestra solo ' + esc(origenEstadisticas) + '.</span></p>');
+            }
+            const dias = a.dias.length > 62 ? porSemanas(a.dias) : a.dias;
+            columnas('est-reservas-dia', dias.map(x => x.n), {
+                etiqueta: i => dias[i].hasta ? fechaCorta(dias[i].dia) + ' – ' + fechaCorta(dias[i].hasta) : fechaLarga(dias[i].dia),
+                valorTip: i => plural(dias[i].n, 'reserva', 'reservas') + (dias[i].ventas ? ' · ' + COP(dias[i].ventas) + ' confirmadas' : ''),
+                ejes: [[0, fechaCorta(dias[0].dia)], [dias.length - 1, fechaCorta(dias[dias.length - 1].dia)]],
+                vacio: 'No llegaron reservas en este período.'
+            });
+            document.getElementById('est-reservas-dia-sub').textContent = 'Todas las reservas creadas en el período, de la página y del panel' + (dias !== a.dias ? ' · por semana' : '');
+            document.getElementById('est-reservas-dia-tabla').innerHTML = tabla(['Día', 'Reservas', 'Ventas confirmadas'], a.dias.filter(x => x.n).map(x => [fechaLarga(x.dia), num(x.n), COP(x.ventas)]));
+            barras('est-canales', a.canales, { total: a.total, nombre: c => CANALES[c.nombre] || legible(c.nombre), nota: c => COP(c.valor) + ' en reservas', vacio: 'Sin reservas en este período.' });
+            barras('est-estados', a.estados, { total: a.total, nombre: e => ESTADOS[e.nombre] ? ESTADOS[e.nombre].txt : legible(e.nombre), vacio: 'Sin reservas en este período.' });
+            barras('est-anticipacion', a.anticipaciones.filter(x => x.visitas), { total: a.validas, vacio: 'Sin reservas en este período.' });
+            const web = [['Reservas enviadas', num(r.reservas), pctDecimal(r.reservas, r.visitas) + ' de las visitas'],
+                ['Valor de esas estadías', COP(r.valor), 'Suma del total de cada reserva enviada'],
+                ['Pagos aprobados con Bold', num(r.pagos), r.pagado ? COP(r.pagado) + ' pagados' : 'Desde la página'],
+                ['Escribieron por WhatsApp', num(r.whatsapp), 'Posibles reservas para responder']];
+            document.getElementById('est-web').innerHTML = '<div class="divide-y divide-line">' + web.map(([t, v, n]) =>
+                '<div class="flex items-baseline justify-between gap-4 py-3"><span><span class="block text-[0.8rem] text-ink">' + t + '</span><span class="block text-[0.68rem] text-graphite/45 mt-0.5">' + n + '</span></span>' +
+                '<span class="est-kpi-chico !text-[1.5rem] whitespace-nowrap">' + v + '</span></div>').join('') + '</div>' +
+                (origenEstadisticas ? '<p class="text-[0.7rem] text-graphite/45 mt-3">Solo visitas de ' + esc(origenEstadisticas) + '.</p>' : '');
+            document.getElementById('est-ocupacion-tabla').innerHTML = tabla(['Noche', 'Ocupadas', 'Ocupación'], a.ocupacion.map(o => [fechaLarga(o.dia), o.usadas + ' de ' + o.total, o.v + ' %']));
+            graficoLinea('est-ocupacion', a.ocupacion, {
+                alto: 220, tope: 100, formato: v => v + ' %', etiqueta: 'Ocupación de los próximos 60 días',
+                tip: o => '<strong>' + o.v + ' %</strong> · ' + fechaLarga(o.dia) + '<br>' + o.usadas + ' de ' + o.total + ' habitaciones' +
+                    (o.usadas ? ' · ' + textoHabitaciones(o.detalle) : '')
+            });
+        }
+
+        function porSemanas(dias) {
+            const semanas = [];
+            for (let i = 0; i < dias.length; i += 7) {
+                const grupo = dias.slice(i, i + 7);
+                semanas.push({ dia: grupo[0].dia, hasta: grupo[grupo.length - 1].dia, n: sumar(grupo, x => x.n), ventas: sumar(grupo, x => x.ventas) });
+            }
+            return semanas;
+        }
+
+        /* =================== HABITACIONES Y SERVICIOS =================== */
+        function renderHabitacionesEst(d) {
+            const r = d.resumen || {};
+            const { desde, hasta } = periodoEstadisticas();
+            const a = analisisReservas(desde, hasta);
+            const porId = {};
+            (d.habitaciones || []).forEach(h => { porId[h.nombre] = h; });
+            const filas = Object.keys(NOMBRES).map(k => ({ k, ...(porId[k] || {}), noches: a.nochesPorTipo[k] || 0 }));
+            document.getElementById('est-tabla-habitaciones').innerHTML = '<table class="est-pro"><thead><tr><th>Habitación</th><th>Abrieron la ficha</th><th>La agregaron</th>' +
+                '<th>Reservas desde la página</th><th>De ficha a reserva</th><th>Noches reservadas</th></tr></thead><tbody>' +
+                filas.map(h => '<tr class="!cursor-default"><td><span class="block font-medium">' + NOMBRES[h.k] + '</span><span class="block text-[0.66rem] est-tenue">' + (UNIDADES[h.k] || 0) + ' en el hotel</span></td>' +
+                    '<td>' + num(h.fichas) + '</td><td>' + num(h.agregadas) + '</td><td>' + num(h.reservadas) + '</td>' +
+                    '<td>' + (h.fichas ? pctDecimal(h.reservadas, h.fichas) : '<span class="est-tenue">—</span>') + '</td>' +
+                    '<td>' + num(h.noches) + '<span class="est-tenue text-[0.7rem]"> noches</span></td></tr>').join('') +
+                '</tbody></table><p class="text-[0.7rem] text-graphite/45 px-5 sm:px-6 py-4 border-t border-line">"Noches reservadas" sale de las reservas del hotel en el período (sin canceladas) y no depende del filtro de fuente.</p>';
+            barras('est-planes', d.planes || [], { valor: p => p.total, nombre: p => NOMBRES_PLANES[p.nombre] || legible(p.nombre),
+                nota: p => p.visitas != null ? 'en ' + plural(p.visitas, 'visita', 'visitas') : '', vacio: 'Nadie ha pedido un plan en este período.' });
+            const ped = d.pedidos || {};
+            document.getElementById('est-pedidos').innerHTML = ped.pedidos ? '<div class="grid grid-cols-3 gap-px bg-line border border-line">' +
+                [['Pedidos', num(ped.pedidos)], ['Platos', num(ped.platos)], ['Valor', copCorto(ped.valor)]].map(([t, v]) =>
+                    '<div class="bg-white p-3.5"><span class="micro text-graphite/40">' + t + '</span><span class="block est-kpi-chico !text-[1.45rem] mt-2">' + v + '</span></div>').join('') + '</div>' +
+                '<p class="text-[0.74rem] text-graphite/60 mt-4">' + plural(ped.visitas || 0, 'visita envió', 'visitas enviaron') + ' un pedido por WhatsApp desde la carta' +
+                (ped.pedidos ? ', con un valor promedio de <strong class="font-medium text-ink">' + COP(ped.valor / ped.pedidos) + '</strong>' : '') + '.</p>'
+                : vacioEst('Nadie ha enviado pedidos a Mangolé desde la página en este período.');
+            barras('est-galeria', d.galeria || [], { valor: g => g.total, nombre: g => CATEGORIAS_GALERIA[g.nombre] || legible(g.nombre),
+                nota: g => g.visitas != null ? 'en ' + plural(g.visitas, 'visita', 'visitas') : '', vacio: 'Nadie ha abierto fotos de la galería en este período.' });
+            barras('est-documentos', d.documentos || [], { valor: x => x.total, nombre: x => NOMBRES_DOCUMENTOS[x.nombre] || legible(x.nombre),
+                icono: () => 'file-text', vacio: 'Nadie abrió documentos en este período.' });
+            barras('est-redes', d.redes || [], { valor: x => x.total, nombre: x => legible(x.nombre), icono: () => 'share-2',
+                nota: x => x.visitas != null ? pct(x.visitas, r.visitas) + ' % de las visitas' : '', vacio: 'Nadie fue a las redes desde la página en este período.' });
+        }
+
+        /* =================== AUDIENCIA =================== */
+        function renderAudienciaEst(d) {
+            const r = d.resumen || {};
+            const celular = (d.dispositivos || []).find(x => x.nombre === 'Celular');
+            const conPais = sumar(d.paises || [], p => p.visitas);
+            const colombia = ((d.paises || []).find(p => p.nombre === 'CO') || {}).visitas || 0;
+            const recurrencia = d.recurrencia || [];
+            const volvieron = sumar(recurrencia.slice(1), x => x.visitantes);
+            tarjetas('est-kpis-audiencia', [
+                ['Visitantes nuevos', pct(r.nuevos, r.visitantes) + ' %', num(r.nuevos) + ' llegaron por primera vez', ''],
+                ['Volvieron', num(r.regresaron != null ? r.regresaron : volvieron), 'Personas que ya conocían la página', ''],
+                ['Desde el celular', pct(celular ? celular.visitas : 0, r.visitas) + ' %', celular ? num(celular.visitas) + ' visitas' : 'Sin datos', ''],
+                ['Fuera de Colombia', pct(conPais - colombia, conPais) + ' %', num(conPais - colombia) + ' visitas de otros países', '']
+            ]);
+            mapaCalor(d.mapa_calor || []);
+            barras('est-dispositivos', d.dispositivos || [], {
+                total: r.visitas, icono: f => ICONOS_EQUIPO[f.nombre] || 'circle',
+                nota: f => f.duracion != null ? duracionTxt(f.duracion) + ' en promedio · ' + plural(f.reservas || 0, 'reserva', 'reservas') : ''
+            });
+            document.getElementById('est-equipos').innerHTML = [['Navegador', d.navegadores], ['Sistema', d.sistemas]].map(([titulo, filas]) =>
+                '<div class="min-w-0"><span class="micro text-graphite/40 block mb-2">' + titulo + '</span>' +
+                ((filas || []).slice(0, 5).map(f => '<span class="flex justify-between gap-2 text-[0.74rem] py-0.5"><span class="truncate text-graphite/70">' + esc(f.nombre) +
+                    '</span><span class="text-ink">' + pct(f.visitas, r.visitas) + ' %</span></span>').join('') || vacioEst()) + '</div>').join('');
+            ubicacion(d.paises || [], d.ciudades || [], r.visitas);
+            barras('est-recurrencia', recurrencia, { valor: x => x.visitantes, total: r.visitantes, vacio: 'Se mide desde esta versión de la página.' });
+            barras('est-idiomas', d.idiomas || [], { total: r.visitas, nombre: x => nombreIdioma(x.nombre), vacio: 'Sin datos de idioma.' });
         }
 
         function ubicacion(paises, ciudades, total) {
@@ -1959,56 +2631,157 @@
             cont.innerHTML = '<span class="micro text-graphite/40 block mb-1">Países</span><div id="est-paises"></div>' +
                 '<span class="micro text-graphite/40 block mt-4 mb-1">Ciudades</span><div id="est-ciudades"></div>';
             barras('est-paises', paises.slice(0, 5), { total, nombre: p => nombrePais(p.nombre) });
-            barras('est-ciudades', ciudades.slice(0, 6), { total, nombre: c => c.nombre });
+            barras('est-ciudades', ciudades.slice(0, 7), { total, nombre: c => c.nombre, nota: c => c.reservas ? plural(c.reservas, 'reserva', 'reservas') : '' });
         }
 
-        function campanas(referentes, lista) {
-            const cont = document.getElementById('est-campanas');
-            if (!referentes.length && !lista.length) {
-                cont.innerHTML = vacioEst('Todavía no hay sitios ni campañas. Crea abajo un enlace con seguimiento para cada lugar donde compartas la página.');
-                return;
-            }
-            cont.innerHTML = '<span class="micro text-graphite/40 block mb-1">Sitios que enlazan la página</span><div id="est-referentes"></div>' +
-                '<span class="micro text-graphite/40 block mt-4 mb-1">Enlaces con seguimiento</span><div id="est-lista-campanas"></div>';
-            barras('est-referentes', referentes.slice(0, 5), { vacio: 'Ninguno en este período.' });
-            barras('est-lista-campanas', lista.slice(0, 6), {
-                nombre: c => legible(c.nombre) + ' · ' + c.fuente,
-                nota: c => (c.medio ? c.medio + ' · ' : '') + num(c.reservas) + (c.reservas === 1 ? ' reserva' : ' reservas'),
-                vacio: 'Ninguno en este período.'
-            });
+        /* Mapa de calor: filas de lunes a domingo, columnas de 12 a. m. a 11 p. m. */
+        function mapaCalor(matriz) {
+            const cont = document.getElementById('est-calor');
+            const nota = document.getElementById('est-calor-nota');
+            const filas = matriz.length === 7 ? matriz : [];
+            const max = Math.max(0, ...filas.flat());
+            document.getElementById('est-calor-tabla').innerHTML = tabla(['Día'].concat(Array.from({ length: 24 }, (_, h) => horaTxt(h))),
+                filas.map((f, d) => [capitalize(DIAS_SEMANA[d])].concat(f.map(v => num(v)))));
+            if (!max) { cont.innerHTML = vacioEst(); nota.textContent = ''; return; }
+            const nivel = v => (v ? Math.min(5, Math.max(1, Math.ceil(5 * v / max))) : 0);
+            cont.innerHTML = '<div class="est-calor">' + filas.map((f, d) =>
+                '<span class="text-[0.62rem] text-graphite/50">' + DIAS_CORTOS[d] + '</span>' +
+                f.map((v, h) => '<span class="est-celda" tabindex="0" style="background:' + RAMPA_CALOR[nivel(v)] + '" data-tip="' + capitalize(DIAS_SEMANA[d]) + ' · ' +
+                    horaTxt(h) + ' – ' + horaTxt((h + 1) % 24) + '" data-tip-valor="' + plural(v, 'visita', 'visitas') + '"></span>').join('')).join('') +
+                '<span></span>' + Array.from({ length: 24 }, (_, h) => '<span class="text-[0.58rem] text-graphite/45 whitespace-nowrap overflow-visible">' + (h % 6 ? '' : horaTxt(h).replace(' a. m.', 'a').replace(' p. m.', 'p').replace(' m.', 'm')) + '</span>').join('') +
+                '</div><div class="flex items-center justify-end gap-1.5 mt-4 text-[0.62rem] text-graphite/50">Menos' +
+                RAMPA_CALOR.map(c => '<span class="w-3 h-3 rounded-[2px] inline-block" style="background:' + c + '"></span>').join('') + 'Más</div>';
+            const dias = filas.map(f => f.reduce((s, v) => s + v, 0));
+            const horas = Array.from({ length: 24 }, (_, h) => filas.reduce((s, f) => s + (f[h] || 0), 0));
+            const mejorDia = dias.indexOf(Math.max(...dias));
+            const mejorHora = horas.indexOf(Math.max(...horas));
+            nota.innerHTML = 'Más visitas los <strong class="font-medium text-ink">' + DIAS_SEMANA[mejorDia] + '</strong> y entre <strong class="font-medium text-ink">' +
+                horaTxt(mejorHora) + ' y ' + horaTxt((mejorHora + 1) % 24) + '</strong>. El momento más fuerte: los ' + mejorMomento(filas) + '.';
         }
 
-        /* Visitas por día: área de una serie con cruz que sigue al cursor (o a las flechas del teclado) */
-        function graficoDias(dias) {
-            const cont = document.getElementById('est-dias');
-            document.getElementById('est-dias-tabla').innerHTML = '<table class="est-tabla"><thead><tr><th>Día</th><th>Visitas</th><th>Visitantes</th><th>WhatsApp</th><th>Reservas</th></tr></thead><tbody>' +
-                dias.map(d => '<tr><td>' + fechaLarga(d.dia) + '</td><td>' + num(d.visitas) + '</td><td>' + num(d.visitantes) + '</td><td>' + num(d.whatsapp) + '</td><td>' + num(d.reservas) + '</td></tr>').join('') +
-                '</tbody></table>';
-            if (!dias.length) { cont.innerHTML = vacioEst(); return; }
-            const W = Math.max(300, cont.clientWidth || 720), H = 240, izq = 42, der = 14, arr = 24, aba = 28;
-            const n = dias.length, ancho = W - izq - der, alto = H - arr - aba;
-            const maximo = Math.max(...dias.map(d => d.visitas));
-            const tope = topeEje(maximo);
+        /* =================== ASISTENTE =================== */
+        function renderAsistenteEst(d) {
+            const r = d.resumen || {};
+            const a = d.asistente || {};
+            const temas = (d.temas || []).filter(t => !CONVERSACION.includes(t.nombre));
+            const preguntas = a.preguntas != null ? a.preguntas : sumar(d.temas || [], t => t.total);
+            const sinRespuesta = a.sin_respuesta != null ? a.sin_respuesta : ((d.temas || []).find(t => t.nombre === 'sin_respuesta') || {}).total || 0;
+            tarjetas('est-kpis-asistente', [
+                ['Lo abrieron', num(a.aperturas), 'Veces que abrieron el chat', ''],
+                ['Preguntas', num(preguntas), 'Mensajes que respondió el asistente', ''],
+                ['Visitas que lo usaron', pct(a.visitas, r.visitas) + ' %', num(a.visitas) + ' visitas', ''],
+                ['Sin respuesta', pct(sinRespuesta, preguntas) + ' %', plural(sinRespuesta, 'pregunta que no entendió', 'preguntas que no entendió'), '']
+            ]);
+            barras('est-temas', temas, { valor: t => t.total, nombre: t => TEMAS[t.nombre] || legible(t.nombre), total: preguntas,
+                color: t => t.nombre === 'sin_respuesta' ? DORADO : AZUL, vacio: 'Nadie ha usado el asistente en este período.' });
+            const cont = document.getElementById('est-asistente-efecto');
+            const otras = (r.visitas || 0) - (a.visitas || 0);
+            if (!a.visitas) { cont.innerHTML = vacioEst('Aparece cuando alguien use el asistente.'); return; }
+            const filas = [
+                ['Escribieron por WhatsApp', a.whatsapp, a.visitas, (r.whatsapp || 0) - (a.whatsapp || 0), otras],
+                ['Enviaron una reserva', a.reservas, a.visitas, (r.reservas || 0) - (a.reservas || 0), otras]
+            ];
+            cont.innerHTML = '<div class="flex flex-wrap gap-4 mb-4 text-[0.7rem] text-graphite/60">' +
+                '<span class="flex items-center gap-1.5"><span class="w-3 h-2 rounded-sm" style="background:' + AZUL + '"></span> Usaron el asistente</span>' +
+                '<span class="flex items-center gap-1.5"><span class="w-3 h-2 rounded-sm" style="background:' + AZUL_CLARO + '"></span> No lo usaron</span></div>' +
+                filas.map(([titulo, x, nx, y, ny]) => {
+                    const px = nx ? 100 * x / nx : 0, py = ny ? 100 * y / ny : 0, tope = Math.max(px, py, 1);
+                    return '<div class="mb-5"><span class="block text-[0.8rem] text-ink mb-2">' + titulo + '</span>' +
+                        [[px, AZUL, 'Usaron el asistente'], [py, AZUL_CLARO, 'No lo usaron']].map(([v, color, quien]) =>
+                            '<div class="flex items-center gap-3 mb-1.5" data-tip="' + quien + '" data-tip-valor="' + v.toFixed(1).replace('.', ',') + ' %" tabindex="0">' +
+                            '<span class="flex-1 h-2"><span class="block h-2 rounded-r" style="width:' + Math.max(1.5, 100 * v / tope).toFixed(1) + '%;background:' + color + '"></span></span>' +
+                            '<span class="text-[0.76rem] text-ink w-14 text-right">' + v.toFixed(1).replace('.', ',') + ' %</span></div>').join('') + '</div>';
+                }).join('');
+        }
+
+        /* =================== GRÁFICAS =================== */
+        /* Barras horizontales de una serie (un solo color); el valor va al final de la barra */
+        function barras(id, filas, op = {}) {
+            const cont = document.getElementById(id);
+            if (!cont) return;
+            const valor = op.valor || (f => f.visitas);
+            const nombre = op.nombre || (f => f.nombre);
+            if (!filas.length || !filas.some(f => valor(f))) { cont.innerHTML = vacioEst(op.vacio); return; }
+            const max = Math.max(1, ...filas.map(f => valor(f) || 0));
+            cont.innerHTML = filas.map(f => {
+                const v = valor(f) || 0;
+                const p = op.total ? pct(v, op.total) : null;
+                const etiqueta = String(nombre(f) || 'Otro');
+                const nota = op.nota ? op.nota(f) : '';
+                const dato = op.dato ? op.dato(f) : '';
+                return '<div class="est-fila' + (dato ? ' cursor-pointer' : '') + '" tabindex="0" ' + dato + ' data-tip="' + esc(etiqueta) + '" data-tip-valor="' + num(v) +
+                        (p !== null ? ' · ' + p + ' %' : '') + '" data-tip-nota="' + esc(nota) + '">' +
+                    '<span class="flex items-center gap-2 min-w-0 text-[0.8rem] text-graphite/80">' +
+                        (op.icono ? '<i data-lucide="' + op.icono(f) + '" class="w-3.5 h-3.5 text-brass shrink-0"></i>' : '') +
+                        '<span class="truncate">' + esc(etiqueta) + '</span></span>' +
+                    '<span class="text-[0.8rem] text-ink text-right whitespace-nowrap">' + num(v) +
+                        (p !== null ? '<span class="text-graphite/40"> · ' + p + ' %</span>' : '') + '</span>' +
+                    '<span class="est-pista"><span class="est-barra" style="width:' + Math.max(1.5, 100 * v / max).toFixed(1) + '%' +
+                        (op.color ? ';background:' + op.color(f) : '') + '"></span></span>' +
+                    (nota ? '<span class="est-nota">' + esc(nota) + '</span>' : '') +
+                '</div>';
+            }).join('');
+        }
+
+        /* Línea pequeña de tendencia (sin ejes). Con muchos días, por semanas */
+        function sparkline(serie, op = {}) {
+            let s = Array.isArray(serie) ? serie : [];
+            if (s.length > 62) { const g = []; for (let i = 0; i < s.length; i += 7) g.push(s.slice(i, i + 7).reduce((a, b) => a + b, 0)); s = g; }
+            if (s.length < 2) return '';
+            const W = op.ancho || 96, H = op.alto || 26;
+            const max = Math.max(1, ...s);
+            const x = i => (2 + i * (W - 4) / (s.length - 1)).toFixed(1);
+            const y = v => (H - 2 - (H - 5) * v / max).toFixed(1);
+            const linea = s.map((v, i) => (i ? 'L' : 'M') + x(i) + ' ' + y(v)).join('');
+            return '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true" style="display:block">' +
+                '<path d="' + linea + 'L' + x(s.length - 1) + ' ' + (H - 2) + 'L' + x(0) + ' ' + (H - 2) + 'Z" fill="' + AZUL + '" fill-opacity=".1"/>' +
+                '<path d="' + linea + '" fill="none" stroke="' + AZUL + '" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+        }
+
+        /* Las gráficas de línea se vuelven a dibujar al cambiar el ancho (o al mostrarse su pestaña) */
+        const graficos = new Map();
+        const anchos = new WeakMap();
+        const vigiaAncho = new ResizeObserver(entradas => entradas.forEach(e => {
+            const ancho = Math.round(e.contentRect.width);
+            if (!ancho || anchos.get(e.target) === ancho) return;
+            anchos.set(e.target, ancho);
+            const dibujar = graficos.get(e.target.id);
+            if (dibujar) dibujar();
+        }));
+
+        /* Línea de una serie con área suave y cruz que sigue al cursor (o a las flechas del teclado) */
+        function graficoLinea(id, puntos, op = {}) {
+            const cont = document.getElementById(id);
+            if (!cont) return;
+            graficos.set(id, () => graficoLinea(id, puntos, op));
+            if (!anchos.has(cont)) { anchos.set(cont, 0); vigiaAncho.observe(cont); }
+            if (!puntos.length) { cont.innerHTML = vacioEst(); return; }
+            if (!cont.clientWidth) return;            // pestaña oculta: se dibuja al mostrarse
+            const formato = op.formato || num;
+            const W = Math.max(260, cont.clientWidth), H = op.alto || 240, izq = 44, der = 14, arr = 24, aba = 28;
+            const n = puntos.length, ancho = W - izq - der, alto = H - arr - aba;
+            const maximo = Math.max(...puntos.map(p => p.v));
+            const tope = op.tope || topeEje(maximo);
             const x = i => izq + (n === 1 ? ancho / 2 : i * ancho / (n - 1));
-            const y = v => arr + alto * (1 - v / tope);
-            const linea = dias.map((d, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(d.visitas).toFixed(1)).join('');
-            const cada = Math.max(1, Math.ceil(n / 6));
-            const iMax = dias.findIndex(d => d.visitas === maximo);
-            let svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Visitas por día" style="display:block">';
+            const y = v => arr + alto * (1 - Math.min(v, tope) / tope);
+            const linea = puntos.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1)).join('');
+            const cada = Math.max(1, Math.ceil(n / (W < 480 ? 4 : 6)));
+            const iMax = puntos.findIndex(p => p.v === maximo);
+            let svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(op.etiqueta || 'Gráfica por día') + '" style="display:block">';
             [0, tope / 2, tope].forEach(v => {
                 svg += '<line x1="' + izq + '" x2="' + (W - der) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="rgba(10,33,46,.09)" stroke-width="1"/>' +
-                       '<text x="' + (izq - 10) + '" y="' + (y(v) + 3.5) + '" text-anchor="end" font-size="10.5" fill="rgba(32,41,46,.45)">' + num(v) + '</text>';
+                       '<text x="' + (izq - 10) + '" y="' + (y(v) + 3.5) + '" text-anchor="end" font-size="10.5" fill="rgba(32,41,46,.45)" font-family="Inter, system-ui, sans-serif">' + formato(v) + '</text>';
             });
             if (n > 1) svg += '<path d="' + linea + 'L' + x(n - 1).toFixed(1) + ' ' + y(0) + 'L' + x(0).toFixed(1) + ' ' + y(0) + 'Z" fill="' + AZUL + '" fill-opacity=".1"/>' +
                                '<path d="' + linea + '" fill="none" stroke="' + AZUL + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
-            else svg += '<circle cx="' + x(0) + '" cy="' + y(dias[0].visitas) + '" r="4.5" fill="' + AZUL + '" stroke="#fff" stroke-width="2"/>';
+            else svg += '<circle cx="' + x(0) + '" cy="' + y(puntos[0].v) + '" r="4.5" fill="' + AZUL + '" stroke="#fff" stroke-width="2"/>';
             if (maximo) svg += '<text x="' + x(iMax) + '" y="' + (y(maximo) - 10) + '" text-anchor="' + (iMax === 0 ? 'start' : iMax === n - 1 ? 'end' : 'middle') +
-                               '" font-size="11" font-weight="600" fill="#0A212E">' + num(maximo) + '</text>';
-            dias.forEach((d, i) => {
+                               '" font-size="11" font-weight="600" fill="#0A212E" font-family="Inter, system-ui, sans-serif">' + formato(maximo) + '</text>';
+            puntos.forEach((p, i) => {
                 if (i % cada && i !== n - 1) return;
                 if (i !== n - 1 && n - 1 - i < cada * 0.6) return;   // evita que choque con la última fecha
                 svg += '<text x="' + x(i) + '" y="' + (H - 8) + '" text-anchor="' + (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle') +
-                       '" font-size="10.5" fill="rgba(32,41,46,.5)">' + fechaCorta(d.dia) + '</text>';
+                       '" font-size="10.5" fill="rgba(32,41,46,.5)" font-family="Inter, system-ui, sans-serif">' + fechaCorta(p.dia) + '</text>';
             });
             svg += '<line class="est-cruz" x1="0" x2="0" y1="' + arr + '" y2="' + (H - aba) + '" stroke="' + AZUL + '" stroke-opacity=".4" stroke-width="1" visibility="hidden"/>' +
                    '<circle class="est-punto" r="4.5" fill="' + AZUL + '" stroke="#fff" stroke-width="2" visibility="hidden"/>' +
@@ -2021,20 +2794,20 @@
             let actual = -1;
             const mostrar = (i, cx, cy) => {
                 actual = Math.max(0, Math.min(n - 1, i));
-                const d = dias[actual];
+                const p = puntos[actual];
                 cruz.setAttribute('x1', x(actual)); cruz.setAttribute('x2', x(actual)); cruz.setAttribute('visibility', 'visible');
-                punto.setAttribute('cx', x(actual)); punto.setAttribute('cy', y(d.visitas)); punto.setAttribute('visibility', 'visible');
+                punto.setAttribute('cx', x(actual)); punto.setAttribute('cy', y(p.v)); punto.setAttribute('visibility', 'visible');
                 const caja = svgEl.getBoundingClientRect();
-                mostrarTip('<strong>' + num(d.visitas) + '</strong> visitas · ' + fechaLarga(d.dia) +
-                    '<br>' + num(d.visitantes) + ' visitantes · ' + num(d.whatsapp) + ' WhatsApp · ' + num(d.reservas) + ' reservas',
-                    cx != null ? cx : caja.left + x(actual), cy != null ? cy : caja.top + y(d.visitas));
+                mostrarTip(op.tip ? op.tip(p) : '<strong>' + formato(p.v) + '</strong> · ' + fechaLarga(p.dia),
+                    cx != null ? cx : caja.left + x(actual), cy != null ? cy : caja.top + y(p.v));
             };
             const ocultar = () => { cruz.setAttribute('visibility', 'hidden'); punto.setAttribute('visibility', 'hidden'); ocultarTip(); };
-            cont.querySelector('.est-captura').addEventListener('pointermove', e => {
+            const captura = cont.querySelector('.est-captura');
+            captura.addEventListener('pointermove', e => {
                 const caja = svgEl.getBoundingClientRect();
                 mostrar(n === 1 ? 0 : Math.round((e.clientX - caja.left - izq) / (ancho / (n - 1))), e.clientX, e.clientY);
             });
-            cont.querySelector('.est-captura').addEventListener('pointerleave', ocultar);
+            captura.addEventListener('pointerleave', ocultar);
             cont.onkeydown = e => {
                 if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
                 e.preventDefault();
@@ -2051,26 +2824,21 @@
             return tope % 2 ? tope * 2 : tope;
         }
 
-        /* Horas de visita: columnas; la hora con más visitas, en dorado */
-        function graficoHoras(horas, dias) {
-            const cont = document.getElementById('est-horas');
-            const nota = document.getElementById('est-horas-nota');
-            const total = horas.reduce((s, v) => s + v, 0);
-            document.getElementById('est-horas-tabla').innerHTML = '<table class="est-tabla"><thead><tr><th>Hora</th><th>Visitas</th></tr></thead><tbody>' +
-                horas.map((v, h) => '<tr><td>' + horaTxt(h) + ' – ' + horaTxt((h + 1) % 24) + '</td><td>' + num(v) + '</td></tr>').join('') + '</tbody></table>';
-            if (!total) { cont.innerHTML = vacioEst(); nota.textContent = ''; return; }
-            const max = Math.max(...horas);
-            const pico = horas.indexOf(max);
-            cont.innerHTML = '<div class="flex items-end gap-[2px] h-36">' + horas.map((v, h) =>
-                '<span class="est-col' + (h === pico ? ' is-pico' : '') + '" tabindex="0" style="height:' + Math.max(1.5, 100 * v / max).toFixed(1) + '%"' +
-                ' data-tip="' + horaTxt(h) + ' – ' + horaTxt((h + 1) % 24) + '" data-tip-valor="' + num(v) + ' visitas"></span>').join('') + '</div>' +
-                '<div class="grid grid-cols-4 mt-2 text-[0.66rem] text-graphite/45"><span>12 a. m.</span><span>6 a. m.</span><span>12 m.</span><span>6 p. m.</span></div>';
-            const mejorDia = dias.length ? dias.indexOf(Math.max(...dias)) : -1;
-            nota.innerHTML = 'Más visitas ' + (mejorDia >= 0 && dias[mejorDia] ? 'los <strong class="font-medium text-ink">' + DIAS_SEMANA[mejorDia] + '</strong>, ' : '') +
-                'entre <strong class="font-medium text-ink">' + horaTxt(pico) + ' y ' + horaTxt((pico + 1) % 24) + '</strong>.';
+        /* Columnas de una serie; la más alta, en dorado */
+        function columnas(id, valores, op = {}) {
+            const cont = document.getElementById(id);
+            const total = valores.reduce((s, v) => s + v, 0);
+            if (!total) { cont.innerHTML = vacioEst(op.vacio); return; }
+            const max = Math.max(...valores);
+            const pico = valores.indexOf(max);
+            cont.innerHTML = '<div class="flex items-end gap-[2px]" style="height:9.5rem">' + valores.map((v, i) =>
+                '<span class="est-col' + (i === pico ? ' is-pico' : '') + '" tabindex="0" style="height:' + Math.max(v ? 3 : 1, 100 * v / max).toFixed(1) + '%' + (v ? '' : ';background:rgba(10,33,46,.08)') + '"' +
+                ' data-tip="' + esc(op.etiqueta ? op.etiqueta(i) : String(i)) + '" data-tip-valor="' + esc(op.valorTip ? op.valorTip(i) : num(v)) + '"></span>').join('') + '</div>' +
+                (op.ejes ? '<div class="flex justify-between mt-2 text-[0.66rem] text-graphite/45">' + op.ejes.map(([, t]) => '<span>' + t + '</span>').join('') + '</div>' : '') +
+                '<p class="text-[0.74rem] text-graphite/60 mt-3">El día con más: <strong class="font-medium text-ink">' + esc(op.etiqueta ? op.etiqueta(pico) : '') + '</strong>, ' + esc(op.valorTip ? op.valorTip(pico) : num(max)) + '.</p>';
         }
 
-        /* Aviso flotante de los gráficos: el valor primero, después la etiqueta */
+        /* Aviso flotante de las gráficas: el valor primero, después la etiqueta */
         function mostrarTip(html, cx, cy) {
             const tip = document.getElementById('est-tip');
             tip.innerHTML = html;
@@ -2088,19 +2856,48 @@
 
         function prepararEstadisticas() {
             const vista = document.querySelector('.view[data-view="estadisticas"]');
-            vista.addEventListener('pointermove', e => {
-                const el = e.target.closest('[data-tip]');
-                if (el) mostrarTip(tipDe(el), e.clientX, e.clientY);
-                else if (!e.target.closest('.est-captura')) ocultarTip();
+            /* Avisos flotantes de barras, columnas y celdas (en la vista y en el panel de cada sección) */
+            [vista, document.getElementById('modal')].forEach(zona => {
+                zona.addEventListener('pointermove', e => {
+                    const el = e.target.closest('[data-tip]');
+                    if (el) mostrarTip(tipDe(el), e.clientX, e.clientY);
+                    else if (!e.target.closest('.est-captura')) ocultarTip();
+                });
+                zona.addEventListener('pointerleave', ocultarTip);
+                zona.addEventListener('focusin', e => {
+                    const el = e.target.closest('[data-tip]');
+                    if (!el) return;
+                    const caja = el.getBoundingClientRect();
+                    mostrarTip(tipDe(el), caja.left + caja.width / 2, caja.top);
+                });
+                zona.addEventListener('focusout', ocultarTip);
             });
-            vista.addEventListener('pointerleave', ocultarTip);
-            vista.addEventListener('focusin', e => {
-                const el = e.target.closest('[data-tip]');
-                if (!el) return;
-                const caja = el.getBoundingClientRect();
-                mostrarTip(tipDe(el), caja.left + caja.width / 2, caja.top);
+
+            /* Clics: elegir una fuente, abrir una sección, ordenar la tabla, cambiar de pestaña */
+            vista.addEventListener('click', e => {
+                const orden = e.target.closest('[data-orden]');
+                if (orden) {
+                    const c = orden.dataset.orden;
+                    ordenFuentes = ordenFuentes.clave === c ? { clave: c, desc: !ordenFuentes.desc } : { clave: c, desc: c !== 'nombre' };
+                    if (datosEstadisticas) tablaFuentes(datosEstadisticas.fuentes || []);
+                    return;
+                }
+                const origen = e.target.closest('[data-origen]');
+                if (origen) return elegirOrigen(origen.dataset.origen);
+                const seccion = e.target.closest('[data-seccion]');
+                if (seccion) return abrirSeccion(seccion.dataset.seccion);
+                const tab = e.target.closest('[data-est-tab], [data-ir-tab]');
+                if (tab) return mostrarPestana(tab.dataset.estTab || tab.dataset.irTab);
             });
-            vista.addEventListener('focusout', ocultarTip);
+            vista.addEventListener('keydown', e => {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                const fila = e.target.closest('tr[data-origen], .est-fila[data-origen], .est-fila[data-seccion]');
+                if (!fila) return;
+                e.preventDefault();
+                fila.click();
+            });
+
+            document.getElementById('est-origen').addEventListener('change', e => elegirOrigen(e.target.value, false));
 
             document.getElementById('est-periodos').addEventListener('click', e => {
                 const btn = e.target.closest('.chip');
@@ -2110,12 +2907,20 @@
                 cargarEstadisticas();
             });
 
+            document.getElementById('est-metricas').addEventListener('click', e => {
+                const btn = e.target.closest('[data-metrica]');
+                if (!btn) return;
+                metricaDias = btn.dataset.metrica;
+                document.querySelectorAll('#est-metricas .chip').forEach(c => c.classList.toggle('is-active', c === btn));
+                if (datosEstadisticas) graficoDias(datosEstadisticas.por_dia || []);
+            });
+
             /* Cada gráfico tiene su versión en tabla */
             document.querySelectorAll('[data-ver-tabla]').forEach(btn => btn.addEventListener('click', () => {
                 const grafico = document.getElementById(btn.dataset.verTabla);
-                const tabla = document.getElementById(btn.dataset.verTabla + '-tabla');
-                const verTabla = tabla.classList.contains('hidden');
-                tabla.classList.toggle('hidden', !verTabla);
+                const tablaEl = document.getElementById(btn.dataset.verTabla + '-tabla');
+                const verTabla = tablaEl.classList.contains('hidden');
+                tablaEl.classList.toggle('hidden', !verTabla);
                 grafico.classList.toggle('hidden', verTabla);
                 btn.textContent = verTabla ? 'Ver gráfico' : 'Ver tabla';
             }));
@@ -2139,15 +2944,11 @@
             document.getElementById('enl-campana').addEventListener('input', pintarEnlace);
             pintarEnlace();
 
-            /* El gráfico de días se vuelve a dibujar cuando cambia el ancho disponible */
-            let anchoDias = 0;
-            new ResizeObserver(entradas => {
-                const ancho = Math.round(entradas[0].contentRect.width);
-                if (ancho && ancho !== anchoDias && datosEstadisticas) {
-                    anchoDias = ancho;
-                    graficoDias(datosEstadisticas.por_dia || []);
-                }
-            }).observe(document.getElementById('est-dias'));
+            /* Vuelve a la última pestaña abierta en esta sesión */
+            try {
+                const ultima = sessionStorage.getItem('cabaleon-est-pestana');
+                if (ultima && document.querySelector('[data-est-panel="' + ultima + '"]')) mostrarPestana(ultima);
+            } catch (e) { /* sin almacenamiento */ }
         }
 
         function enlaceConSeguimiento() {
@@ -2171,57 +2972,98 @@
         }
 
         /* Datos de ejemplo con la misma forma que la función estadisticas de Supabase */
-        function estadisticasDeEjemplo(desde, hasta) {
+        function estadisticasDeEjemplo(desde, hasta, origen) {
             let semilla = 11;
             const azar = () => { semilla = (semilla * 16807) % 2147483647; return semilla / 2147483647; };
-            const por_dia = [];
+            const FUENTES_EJ = [['Instagram', 'Redes', 0.31, 0.022, 0.11], ['Google', 'Buscador', 0.27, 0.034, 0.08], ['Directo', 'Directo', 0.18, 0.02, 0.06],
+                ['WhatsApp', 'Redes', 0.11, 0.03, 0.14], ['Facebook', 'Redes', 0.08, 0.012, 0.05], ['Código QR', 'Impreso', 0.03, 0.04, 0.1], ['Otros sitios', 'Referido', 0.02, 0.01, 0.04]];
+            const elegida = FUENTES_EJ.find(f => f[0] === origen);
+            const factor = elegida ? elegida[2] : 1;
+            const base = [];
             for (let dia = desde; dia <= hasta; dia = sumarDias(dia, 1)) {
                 const dow = fechaD(dia).getDay();
-                const visitas = Math.round((dow === 5 || dow === 6 ? 64 : dow === 0 ? 46 : 31) * (0.75 + azar() * 0.5));
-                por_dia.push({ dia, visitas, visitantes: Math.round(visitas * 0.86),
-                    whatsapp: Math.round(visitas * (0.06 + azar() * 0.05)), reservas: Math.round(visitas * (0.012 + azar() * 0.02)) });
+                base.push({ dia, peso: (dow === 5 || dow === 6 ? 64 : dow === 0 ? 46 : 31) * (0.75 + azar() * 0.5) });
             }
+            const por_dia = base.map(b => {
+                const visitas = Math.round(b.peso * factor);
+                return { dia: b.dia, visitas, visitantes: Math.round(visitas * 0.86), nuevos: Math.round(visitas * 0.62), interes: Math.round(visitas * 0.58),
+                    whatsapp: Math.round(visitas * (0.06 + azar() * 0.05)), reservas: Math.round(visitas * (0.012 + azar() * 0.02)), valor: 0 };
+            });
+            por_dia.forEach(p => { p.valor = p.reservas * 540000; });
             const suma = k => por_dia.reduce((s, d) => s + d[k], 0);
             const visitas = suma('visitas');
             const parte = p => Math.max(0, Math.round(visitas * p));
             const lista = (filas, campo = 'visitas') => filas.map(([nombre, p]) => ({ nombre, [campo]: parte(p) }));
-            const reservas = suma('reservas');
+            const reservasEj = suma('reservas');
+            const serieDe = p => base.map(b => Math.round(b.peso * p * (0.8 + azar() * 0.4)));
+            const fuentes = FUENTES_EJ.map(([nombre, medio, p, r, w]) => {
+                const v = Math.round(visitas / factor * p);
+                return { nombre, medio, visitas: v, visitantes: Math.round(v * 0.86), nuevos: Math.round(v * 0.6), duracion: Math.round(110 + azar() * 90),
+                    interes: Math.round(v * (0.45 + azar() * 0.25)), secciones: Math.round(40 + azar() * 30) / 10, whatsapp: Math.round(v * w * 0.6),
+                    reservas: Math.round(v * r), pagos: Math.round(v * r * 0.45), valor: Math.round(v * r) * 540000, serie: serieDe(p) };
+            });
+            const vistasPorSeccion = { inicio: 1, destacados: 0.9, hotel: 0.78, habitaciones: 0.66, servicios: 0.52, eventos: 0.41, planes: 0.38, restaurante: 0.33,
+                bar: 0.29, galeria: 0.27, resenas: 0.24, informacion: 0.21, reservar: 0.46, faq: 0.14, catalogo: 0.11, contacto: 0.12 };
+            const tiempos = { habitaciones: 48, reservar: 71, galeria: 39, planes: 33, restaurante: 36, hotel: 24 };
+            const secciones = Object.keys(vistasPorSeccion).map(k => {
+                const v = parte(vistasPorSeccion[k]);
+                return { nombre: k, visitas: v, segundos: tiempos[k] || Math.round(9 + azar() * 14), whatsapp: Math.round(v * 0.08), reservas: Math.round(v * 0.03),
+                    entradas: k === 'inicio' ? parte(0.81) : ['habitaciones', 'reservar', 'planes'].includes(k) ? parte(0.06) : 0,
+                    clics: Math.round(v * 0.04), serie: base.map(b => Math.round(b.peso * factor * vistasPorSeccion[k] * (0.8 + azar() * 0.4))),
+                    fuentes: FUENTES_EJ.slice(0, origen ? 1 : 4).map(([nombre, , p]) => ({ nombre: origen || nombre, visitas: Math.round(v * (origen ? 1 : p)) })) };
+            }).sort((a, b) => b.visitas - a.visitas);
+            const horas = [2, 1, 1, 0, 0, 1, 3, 6, 9, 12, 13, 14, 15, 14, 13, 13, 15, 18, 22, 26, 24, 17, 9, 4];
+            const pesoDia = [10, 9, 10, 11, 18, 20, 14];
             return {
-                desde, hasta,
-                resumen: { visitas, visitantes: suma('visitantes'), nuevos: Math.round(suma('visitantes') * 0.71), duracion: 152,
-                    interactuaron: parte(0.57), whatsapp: suma('whatsapp'), reservas, pagos: Math.round(reservas * 0.45), paginas: parte(1.21) },
-                anterior: { visitas: Math.round(visitas * 0.87), visitantes: Math.round(suma('visitantes') * 0.9),
-                    whatsapp: Math.round(suma('whatsapp') * 0.82), reservas: Math.round(reservas * 0.94) },
-                por_dia,
-                fuentes: [['Instagram', 0.31, 0.022], ['Google', 0.27, 0.034], ['Directo', 0.18, 0.02], ['WhatsApp', 0.11, 0.03],
-                          ['Facebook', 0.08, 0.012], ['Código QR', 0.03, 0.04], ['Otros sitios', 0.02, 0.01]]
-                    .map(([nombre, p, r]) => ({ nombre, visitas: parte(p), whatsapp: Math.round(parte(p) * 0.09), reservas: Math.round(parte(p) * r) })),
+                desde, hasta, origen: origen || null,
+                resumen: { visitas, visitantes: suma('visitantes'), nuevos: Math.round(suma('visitantes') * 0.71), regresaron: Math.round(suma('visitantes') * 0.29),
+                    duracion: 152, interes: suma('interes'), interactuaron: parte(0.57), secciones: 4.6, whatsapp: suma('whatsapp'), reservas: reservasEj,
+                    pagos: Math.round(reservasEj * 0.45), valor: suma('valor'), pagado: Math.round(reservasEj * 0.45) * 270000, paginas: parte(1.21) },
+                anterior: { visitas: Math.round(visitas * 0.87), visitantes: Math.round(suma('visitantes') * 0.9), duracion: 141, interes: Math.round(suma('interes') * 0.84),
+                    whatsapp: Math.round(suma('whatsapp') * 0.82), reservas: Math.round(reservasEj * 0.94), valor: Math.round(suma('valor') * 0.9) },
+                por_dia, fuentes,
+                medios: [['Redes', 0.5], ['Buscador', 0.27], ['Directo', 0.18], ['Impreso', 0.03], ['Referido', 0.02]]
+                    .map(([nombre, p]) => ({ nombre, visitas: Math.round(visitas / factor * p), reservas: Math.round(visitas / factor * p * 0.025), valor: Math.round(visitas / factor * p * 0.025) * 540000 })),
                 referentes: lista([['google.com', 0.2], ['l.instagram.com', 0.13], ['m.facebook.com', 0.05], ['tripadvisor.com.co', 0.012]]),
                 campanas: [['biografia', 'Instagram', 'Redes', 0.12], ['mensajes', 'WhatsApp', 'Redes', 0.06], ['volante', 'Código QR', 'Impreso', 0.03]]
-                    .map(([nombre, fuente, medio, p]) => ({ nombre, fuente, medio, visitas: parte(p), reservas: Math.round(parte(p) * 0.03) })),
-                dispositivos: lista([['Celular', 0.74], ['Computador', 0.22], ['Tablet', 0.04]]),
+                    .filter(c => !origen || c[1] === origen)
+                    .map(([nombre, fuente, medio, p]) => ({ nombre, fuente, medio, visitas: parte(p), whatsapp: Math.round(parte(p) * 0.09), reservas: Math.round(parte(p) * 0.03), valor: Math.round(parte(p) * 0.03) * 540000 })),
+                dispositivos: [['Celular', 0.74, 141], ['Computador', 0.22, 205], ['Tablet', 0.04, 168]]
+                    .map(([nombre, p, du]) => ({ nombre, visitas: parte(p), interes: parte(p * 0.6), reservas: Math.round(parte(p) * 0.022), duracion: du })),
                 navegadores: lista([['Chrome', 0.47], ['Safari', 0.27], ['Instagram', 0.14], ['Samsung Internet', 0.07], ['Edge', 0.03]]),
                 sistemas: lista([['Android', 0.52], ['iOS', 0.31], ['Windows', 0.13], ['macOS', 0.04]]),
                 paises: lista([['CO', 0.93], ['US', 0.03], ['ES', 0.015], ['MX', 0.01]]),
                 ciudades: [['Bogotá', 0.55], ['Girardot', 0.06], ['Fusagasugá', 0.05], ['Medellín', 0.04], ['Soacha', 0.03]]
-                    .map(([nombre, p]) => ({ nombre, pais: 'CO', visitas: parte(p) })),
+                    .map(([nombre, p]) => ({ nombre, pais: 'CO', visitas: parte(p), reservas: Math.round(parte(p) * 0.02) })),
+                idiomas: lista([['es', 0.94], ['en', 0.04], ['fr', 0.01]]),
                 entradas: lista([['inicio', 0.81], ['habitaciones', 0.08], ['reservar', 0.06], ['planes', 0.05]]),
-                secciones: lista([['inicio', 1], ['destacados', 0.9], ['hotel', 0.78], ['habitaciones', 0.66], ['servicios', 0.52], ['eventos', 0.41],
-                                  ['planes', 0.38], ['restaurante', 0.33], ['bar', 0.29], ['galeria', 0.27], ['resenas', 0.24], ['informacion', 0.21],
-                                  ['reservar', 0.46], ['faq', 0.14], ['catalogo', 0.11], ['contacto', 0.12]]),
+                secciones,
+                profundidad: [['1 sección o menos', 0.14], ['2 a 3 secciones', 0.27], ['4 a 6 secciones', 0.31], ['7 a 10 secciones', 0.19], ['Más de 10', 0.09]]
+                    .map(([nombre, p]) => ({ nombre, visitas: parte(p) })),
+                recurrencia: [['1 visita', 0.78], ['2 visitas', 0.14], ['3 a 5 visitas', 0.06], ['6 o más', 0.02]]
+                    .map(([nombre, p]) => ({ nombre, visitantes: Math.round(suma('visitantes') * p) })),
+                mapa_calor: pesoDia.map(pd => horas.map(h => Math.round(h * pd * visitas / 25000))),
                 interacciones: [['ficha_habitacion', 0.34, 0.24], ['galeria', 0.29, 0.15], ['fechas', 0.21, 0.21], ['habitacion_agregada', 0.19, 0.14],
                                 ['whatsapp', 0.12, 0.1], ['como_llegar', 0.08, 0.07], ['asistente', 0.07, 0.07], ['asistente_tema', 0.11, 0.05],
                                 ['carrito', 0.06, 0.05], ['datos_completos', 0.06, 0.06], ['documento', 0.03, 0.03], ['llamada', 0.02, 0.02],
                                 ['reserva_whatsapp', 0.012, 0.012], ['pago_iniciado', 0.014, 0.013]]
                     .map(([tipo, t, v]) => ({ tipo, total: parte(t), visitas: parte(v) })),
                 whatsapp_desde: lista([['reservar', 0.04], ['botón flotante', 0.03], ['habitaciones', 0.02]], 'total'),
-                habitaciones: [['suite', 0.14, 0.07], ['cabana', 0.1, 0.05], ['cuadruple', 0.06, 0.04], ['triple', 0.05, 0.03]]
-                    .map(([nombre, f, a]) => ({ nombre, fichas: parte(f), agregadas: parte(a) })),
+                contactos: [['whatsapp', 'reservar', 0.04], ['whatsapp', 'botón flotante', 0.03], ['whatsapp', 'habitaciones', 0.02], ['como_llegar', 'contacto', 0.05],
+                            ['como_llegar', 'informacion', 0.02], ['llamada', 'contacto', 0.01], ['whatsapp', 'planes', 0.01]]
+                    .map(([tipo, lugar, p]) => ({ tipo, lugar, total: parte(p) })),
+                habitaciones: [['suite', 0.14, 0.07, 0.012], ['cabana', 0.1, 0.05, 0.008], ['cuadruple', 0.06, 0.04, 0.006], ['triple', 0.05, 0.03, 0.005]]
+                    .map(([nombre, f, a, r]) => ({ nombre, fichas: parte(f), agregadas: parte(a), reservadas: parte(r) })),
                 temas: lista([['precios', 0.03], ['reservar', 0.02], ['mascotas', 0.015], ['pasadia', 0.012], ['ubicacion', 0.01], ['desayuno', 0.008], ['sin_respuesta', 0.006]], 'total'),
-                planes: lista([['romantica', 0.02], ['familia', 0.012], ['pasadia', 0.01]], 'total'),
-                horas: [2, 1, 1, 0, 0, 1, 3, 6, 9, 12, 13, 14, 15, 14, 13, 13, 15, 18, 22, 26, 24, 17, 9, 4].map(v => Math.round(v * visitas / 270)),
-                dias_semana: [10, 9, 10, 11, 18, 20, 14].map(v => Math.round(v * visitas / 92)),
-                embudo: [['visita', 1], ['reservar', 0.46], ['fechas', 0.21], ['habitacion', 0.14], ['datos', 0.06], ['confirmo', reservas / visitas]]
+                asistente: { aperturas: parte(0.07), preguntas: parte(0.11), sin_respuesta: parte(0.006), visitas: parte(0.07), whatsapp: parte(0.014), reservas: parte(0.004) },
+                planes: [['romantica', 0.02], ['familia', 0.012], ['pasadia', 0.01], ['alimentacion', 0.006]].map(([nombre, p]) => ({ nombre, total: parte(p), visitas: parte(p * 0.9) })),
+                documentos: [['acuerdo-pet-friendly', 0.015], ['contrato-hospedaje', 0.01], ['politica-tratamiento-datos', 0.004]].map(([nombre, p]) => ({ nombre, total: parte(p), visitas: parte(p) })),
+                redes: [['instagram', 0.03], ['facebook', 0.01], ['tripadvisor', 0.004]].map(([nombre, p]) => ({ nombre, total: parte(p), visitas: parte(p) })),
+                galeria: [['piscina', 0.09], ['habitaciones', 0.07], ['hotel', 0.06], ['gastronomia', 0.04], ['naturaleza', 0.03]].map(([nombre, p]) => ({ nombre, total: parte(p), visitas: parte(p * 0.6) })),
+                pedidos: { pedidos: parte(0.012), visitas: parte(0.011), platos: parte(0.03), valor: parte(0.012) * 68000 },
+                horas: horas.map(v => Math.round(v * visitas / 270)),
+                dias_semana: pesoDia.map(v => Math.round(v * visitas / 92)),
+                embudo: [['visita', 1], ['reservar', 0.46], ['fechas', 0.21], ['habitacion', 0.14], ['datos', 0.06], ['confirmo', reservasEj / (visitas || 1)]]
                     .map(([paso, p]) => ({ paso, visitas: parte(p) }))
             };
         }

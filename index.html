@@ -93,7 +93,15 @@
         .section { padding-block: clamp(4.5rem, 9vw, 8.5rem); }
         .section-tight { padding-block: clamp(3.5rem, 6vw, 6rem); }
 
-        section[id] { scroll-margin-top: 92px; }
+        /* ---------- Cada sección se acomoda a la pantalla ----------
+           Al dejar de desplazarse cerca del comienzo de una sección, la página la ubica
+           completa justo debajo de la barra del menú, en computador y en celular.
+           Las secciones más altas que la pantalla se recorren libremente. */
+        :root { --alto-nav: 77px; }                     /* barra del menú ya desplazada, en celular */
+        @media (min-width: 640px) { :root { --alto-nav: 86px; } }
+        html { scroll-snap-type: y proximity; }
+        header#inicio, section[id] { scroll-snap-align: start; }
+        section[id] { scroll-margin-top: var(--alto-nav); }
 
         /* ---------- Tipografía ---------- */
         .display-xl { font-size: clamp(2.9rem, 7.2vw, 5.6rem); line-height: 1.02; }
@@ -4649,6 +4657,9 @@
         let ultimoClic = null;
         let segundosActivos = 0;
         let activoDesde = null;
+        let seccionEnPantalla = null;     // la sección que cruza el centro de la pantalla
+        let seccionDesde = 0;
+        const segundosPorSeccion = {};
 
         const idAlAzar = () => [...crypto.getRandomValues(new Uint8Array(12))].map(b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
 
@@ -4768,8 +4779,22 @@
             return seccion ? (seccion.id || 'pie de página') : 'otro';
         }
 
+        /* Tiempo de la sección en pantalla: solo suma mientras la página está a la vista */
+        function sumarTiempoSeccion() {
+            if (seccionEnPantalla && seccionDesde) {
+                segundosPorSeccion[seccionEnPantalla] = (segundosPorSeccion[seccionEnPantalla] || 0) + (Date.now() - seccionDesde) / 1000;
+            }
+            seccionDesde = seccionEnPantalla && document.visibilityState === 'visible' ? Date.now() : 0;
+        }
+
         function registrarTiempo() {
             if (activoDesde) { segundosActivos += (Date.now() - activoDesde) / 1000; activoDesde = null; }
+            sumarTiempoSeccion();
+            Object.keys(segundosPorSeccion).forEach(id => {
+                const s = Math.round(segundosPorSeccion[id]);
+                if (s >= 1) registrar('seccion', id, Math.min(s, 3600));
+                delete segundosPorSeccion[id];
+            });
             if (segundosActivos >= 1) registrar('salida', null, segundosActivos);
             enviarEventos();
         }
@@ -4790,9 +4815,21 @@
                 : { visitante, sesion: idAlAzar(), atributos: atributosDeLlegada(nuevo), vistos: new Set() };
             registrar('visita', (location.hash || '#inicio').slice(1, 60));
 
-            /* Secciones vistas: cuentan cuando cruzan el centro de la pantalla */
+            /* Secciones vistas (cuentan cuando cruzan el centro de la pantalla) y cuánto tiempo estuvo cada una ahí */
             const observador = new IntersectionObserver(entradas => entradas.forEach(e => {
-                if (e.isIntersecting) { registrarUnaVez('seccion', e.target.id); observador.unobserve(e.target); }
+                const id = e.target.id;
+                if (e.isIntersecting) {
+                    registrarUnaVez('seccion', id);
+                    if (id !== seccionEnPantalla) {
+                        sumarTiempoSeccion();
+                        seccionEnPantalla = id;
+                        seccionDesde = document.visibilityState === 'visible' ? Date.now() : 0;
+                    }
+                } else if (id === seccionEnPantalla) {
+                    sumarTiempoSeccion();
+                    seccionEnPantalla = null;
+                    seccionDesde = 0;
+                }
             }), { rootMargin: '-45% 0px -45% 0px' });
             document.querySelectorAll('header[id], section[id]').forEach(s => observador.observe(s));
 
@@ -4818,7 +4855,7 @@
             activoDesde = document.visibilityState === 'visible' ? Date.now() : null;
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'hidden') registrarTiempo();
-                else activoDesde = Date.now();
+                else { activoDesde = Date.now(); if (seccionEnPantalla) seccionDesde = Date.now(); }
             });
             window.addEventListener('pagehide', registrarTiempo);
             setInterval(enviarEventos, 8000);
@@ -5069,7 +5106,7 @@
                 };
                 const retorno = urlRetornoBold();
                 if (retorno) opciones.redirectionUrl = retorno;
-                registrar('pago_iniciado', Object.keys(habs).join('+'), p.monto);
+                registrar('pago_iniciado', Object.keys(habs).join('+'), p.total);
                 enviarEventos();
                 new BoldCheckout(opciones).open();
             } catch (e) {
