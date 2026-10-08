@@ -400,7 +400,6 @@
                 <a class="nav-item" data-view="disponibilidad"><i data-lucide="calendar-days" class="w-4 h-4"></i> Disponibilidad</a>
                 <a class="nav-item" data-view="estadisticas"><i data-lucide="chart-no-axes-combined" class="w-4 h-4"></i> Estadísticas</a>
                 <span class="block px-5 pb-2 pt-5 micro text-white/30">Hotel</span>
-                <a class="nav-item" data-view="habitaciones"><i data-lucide="bed-double" class="w-4 h-4"></i> Habitaciones y tarifas</a>
                 <a class="nav-item" data-view="mensajes" data-modo="ejemplo"><i data-lucide="message-square" class="w-4 h-4"></i> Mensajes <span class="ml-auto pill pill-amber">3</span></a>
                 <a class="nav-item" data-view="ajustes"><i data-lucide="settings" class="w-4 h-4"></i> Ajustes</a>
             </nav>
@@ -859,18 +858,6 @@
                                 <div class="overflow-x-auto" id="est-campanas-enlaces"></div>
                             </figure>
                         </div>
-                    </div>
-                </section>
-
-                <!-- ---------- HABITACIONES ---------- -->
-                <section class="view" data-view="habitaciones">
-                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="habitaciones-body"></div>
-                    <div class="mt-6 p-5 bg-white border border-line text-[0.8rem] text-graphite/65 flex gap-3">
-                        <i data-lucide="info" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
-                        <span>
-                            Las tarifas, los festivos y cuántas habitaciones hay de cada tipo se cambian en <strong class="font-medium text-ink">index.html</strong>
-                            (TARIFAS, FESTIVOS y UNIDADES). La página, el carrito, el cobro con Bold y este panel leen de ahí, así que siempre coinciden.
-                        </span>
                     </div>
                 </section>
 
@@ -1423,7 +1410,6 @@
             reservas: 'Reservas',
             disponibilidad: 'Disponibilidad',
             estadisticas: 'Estadísticas',
-            habitaciones: 'Habitaciones y tarifas',
             mensajes: 'Mensajes',
             ajustes: 'Ajustes'
         };
@@ -1899,24 +1885,6 @@
         }
 
         /* =========================================================
-           Habitaciones y tarifas (se leen de index.html)
-           ========================================================= */
-        function renderHabitaciones() {
-            document.getElementById('habitaciones-body').innerHTML = Object.keys(UNIDADES).map(k => `
-                <div class="card p-5">
-                    <h3 class="font-display text-lg text-ink leading-tight mb-1">${NOMBRES[k] || k}</h3>
-                    <p class="micro text-graphite/40 mb-5">${plural(UNIDADES[k], 'unidad', 'unidades')} · hasta ${CAPACIDAD[k] || '—'} huéspedes</p>
-                    <dl class="space-y-3 text-[0.8rem]">${!TARIFAS[k]
-                        ? '<div class="text-graphite/55">Sin tarifa en index.html</div>'
-                        : TARIFAS[k].finde === TARIFAS[k].semana
-                        ? `<div class="flex justify-between gap-3"><dt class="text-graphite/55">Por noche, cualquier día</dt><dd class="text-ink">${COP(TARIFAS[k].semana)}</dd></div>`
-                        : `<div class="flex justify-between gap-3"><dt class="text-graphite/55">Fin de semana y festivos</dt><dd class="text-ink">${COP(TARIFAS[k].finde)}</dd></div>
-                           <div class="flex justify-between gap-3"><dt class="text-graphite/55">Domingo a jueves</dt><dd class="text-ink">${COP(TARIFAS[k].semana)}</dd></div>`}
-                    </dl>
-                </div>`).join('');
-        }
-
-        /* =========================================================
            Mensajes (solo modo de ejemplo: los mensajes reales llegan al WhatsApp del hotel)
            ========================================================= */
         const mensajes = [
@@ -1949,7 +1917,6 @@
             renderResumen();
             renderReservas();
             renderCalendario();
-            renderHabitaciones();
             if (!CONECTADO) renderMensajes();
             lucide.createIcons();
         }
