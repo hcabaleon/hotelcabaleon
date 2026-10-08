@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="pantallas">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -93,15 +93,376 @@
         .section { padding-block: clamp(4.5rem, 9vw, 8.5rem); }
         .section-tight { padding-block: clamp(3.5rem, 6vw, 6rem); }
 
-        /* ---------- Cada sección se acomoda a la pantalla ----------
-           Al dejar de desplazarse cerca del comienzo de una sección, la página la ubica
-           completa justo debajo de la barra del menú, en computador y en celular.
-           Las secciones más altas que la pantalla se recorren libremente. */
+        /* ---------- Una sección por pantalla ----------
+           Cada sección (o cada parte de una sección larga, marcada con .pantalla) ocupa la
+           pantalla debajo del menú, con el contenido centrado. Al desplazarse, la página pasa
+           a la siguiente pantalla. Las listas de tarjetas se recorren de lado (.carrusel).
+           Quitar la clase "pantallas" de <html> vuelve al desplazamiento normal. */
         :root { --alto-nav: 77px; }                     /* barra del menú ya desplazada, en celular */
         @media (min-width: 640px) { :root { --alto-nav: 86px; } }
-        html { scroll-snap-type: y proximity; }
-        header#inicio, section[id] { scroll-snap-align: start; }
-        section[id] { scroll-margin-top: var(--alto-nav); }
+        section[id], .pantalla { scroll-margin-top: var(--alto-nav); }
+        html.pantallas { scroll-snap-type: y mandatory; }
+        html.pantallas header#inicio,
+        html.pantallas section[id]:not(.con-pantallas),
+        html.pantallas .pantalla { scroll-snap-align: start; scroll-snap-stop: always; }
+        html.pantallas footer { scroll-snap-align: end; }
+        html.pantallas section.section:not(.con-pantallas),
+        html.pantallas section.section-tight,
+        html.pantallas #destacados,
+        html.pantallas .pantalla {
+            min-height: calc(100vh - var(--alto-nav));
+            min-height: calc(100svh - var(--alto-nav));
+            display: flex; flex-direction: column; justify-content: center;
+            padding-block: clamp(0.75rem, 2.2vh, 2.5rem);
+        }
+        html.pantallas section.con-pantallas { padding-block: 0; }
+        /* Títulos y textos que se ajustan también a la altura de la pantalla */
+        html.pantallas .display-lg { font-size: clamp(1.8rem, min(4.4vw, 5.6vh), 3.5rem); margin-bottom: clamp(0.6rem, 2vh, 1.5rem); }
+        html.pantallas .section .eyebrow { margin-bottom: clamp(0.6rem, 2vh, 1.5rem); }
+        html.pantallas .section .lead { font-size: clamp(0.9rem, min(1.15vw, 2vh), 1.13rem); line-height: 1.65; }
+        @media (max-width: 640px) {
+            html.pantallas .recorte-celular { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+            html.pantallas .solo-amplio { display: none !important; }
+        }
+        @media (max-height: 760px) and (min-width: 641px) {
+            html.pantallas .recorte-bajo { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        }
+
+        /* Partes de una sección que son su propia pantalla solo en celular y tableta */
+        @media (max-width: 1023px) {
+            html.pantallas section[id].con-pantallas-movil { padding-block: 0; scroll-snap-align: none; display: block; min-height: 0; }
+            html.pantallas .pantalla-movil {
+                scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--alto-nav);
+                min-height: calc(100vh - var(--alto-nav)); min-height: calc(100svh - var(--alto-nav));
+                display: flex; flex-direction: column; justify-content: center; padding-block: clamp(1rem, 3vh, 2.5rem);
+            }
+        }
+        /* El cierre (logos y pie de página) */
+        html.pantallas section[aria-label="Marcas de Hotel Cabaleón"] { scroll-snap-align: start; }
+
+        /* ---------- Carrusel: tarjetas que se recorren de lado ---------- */
+        .carrusel {
+            display: grid !important; grid-template-columns: none !important; grid-auto-flow: column !important;
+            grid-auto-columns: var(--carrusel-ancho, 84%); gap: 1rem !important;
+            overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+        }
+        .carrusel::-webkit-scrollbar { display: none; }
+        .carrusel > * { scroll-snap-align: start; min-width: 0; }
+        /* Carrusel solo en celular: en pantallas grandes la lista se ve completa */
+        @media (max-width: 767px) {
+            .carrusel-movil {
+                display: grid !important; grid-template-columns: none !important; grid-auto-flow: column !important;
+                grid-auto-columns: var(--carrusel-ancho, 84%); gap: 0.75rem !important;
+                overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+            }
+            .carrusel-movil::-webkit-scrollbar { display: none; }
+            .carrusel-movil > * { scroll-snap-align: start; min-width: 0; }
+            .carrusel[data-movil="2"], .carrusel-movil[data-movil="2"] { --carrusel-ancho: calc((100% - 0.75rem) / 2); }
+        }
+        @media (min-width: 768px) { .carrusel { --carrusel-ancho: calc((100% - 1rem) / 2); } }
+        @media (min-width: 768px) and (max-width: 1099px) { .carrusel[data-tableta="3"] { --carrusel-ancho: calc((100% - 2rem) / 3); } }
+        @media (min-width: 1100px) {
+            .carrusel[data-por-vista="3"] { --carrusel-ancho: calc((100% - 2rem) / 3); }
+            .carrusel[data-por-vista="4"] { --carrusel-ancho: calc((100% - 3rem) / 4); }
+            .carrusel[data-por-vista="5"] { --carrusel-ancho: calc((100% - 4rem) / 5); }
+            .carrusel[data-por-vista="6"] { --carrusel-ancho: calc((100% - 5rem) / 6); }
+        }
+        .carrusel-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: clamp(0.5rem, 1.4vh, 1rem); }
+        .carrusel-nav.is-vacio { display: none; }
+        .carrusel-flecha {
+            width: clamp(2.1rem, 4.4vh, 2.6rem); height: clamp(2.1rem, 4.4vh, 2.6rem); border-radius: 999px; border: 1px solid currentColor; opacity: .55;
+            display: inline-flex; align-items: center; justify-content: center; transition: opacity .3s, background-color .3s, color .3s;
+        }
+        .carrusel-flecha:hover:not(:disabled) { opacity: 1; }
+        .carrusel-flecha:disabled { opacity: .2; cursor: default; }
+        .carrusel-cuenta { font-size: 0.6rem; letter-spacing: 0.22em; font-weight: 600; opacity: .55; }
+        .carrusel-puntos { display: flex; gap: 6px; min-width: 0; overflow: hidden; }
+        .carrusel-puntos span { width: 6px; height: 6px; border-radius: 999px; background: currentColor; opacity: .2; transition: opacity .3s, width .3s; }
+        .carrusel-puntos span.is-actual { opacity: .8; width: 18px; }
+
+        /* ---------- Portada y destacados ---------- */
+        @media (max-width: 767px) { html.pantallas #barra-reserva { display: none; } }
+        html.pantallas #destacados .feat-item { font-size: 0.82rem; }
+        html.pantallas #destacados ul { row-gap: clamp(1.25rem, 4vh, 2.75rem); }
+
+        /* ---------- El hotel: presentación y recorrido ---------- */
+        html.pantallas #hotel .pantalla > .grid.mb-14 { margin-bottom: 0; }
+        html.pantallas #hotel .pantalla > div[role="tablist"] { margin-top: clamp(1rem, 3vh, 4rem); }
+        html.pantallas #steps .aspect-\[4\/3\] { aspect-ratio: auto; height: clamp(170px, 44vh, 560px); }
+        html.pantallas #steps .step-panel .mb-8 { margin-bottom: clamp(0.75rem, 2vh, 2rem); }
+        html.pantallas #steps .hairline-t.mt-10 { margin-top: clamp(0.75rem, 2vh, 2.5rem); padding-top: clamp(0.6rem, 1.5vh, 1.5rem); }
+        @media (max-width: 1023px) {
+            html.pantallas #hotel .pantalla > div[role="tablist"] { display: none; }
+            html.pantallas #steps .step-panel ul { display: none; }
+            html.pantallas #steps { gap: 1rem; }
+        }
+
+        /* ---------- Servicios ---------- */
+        html.pantallas #servicios .lg\:sticky { position: static; }
+        html.pantallas #servicios dl.mb-8 { margin-bottom: clamp(0.75rem, 2vh, 2rem); }
+        html.pantallas #servicios dl > div { padding-block: clamp(0.35rem, 0.9vh, 0.625rem); }
+        html.pantallas #servicios ul.mb-9 { display: none; }
+        html.pantallas #servicios p.mb-7 { margin-bottom: clamp(0.75rem, 2vh, 1.75rem); }
+        html.pantallas #fotos-servicios img { aspect-ratio: auto; height: clamp(150px, 22vh, 280px); }
+        html.pantallas #lista-servicios p { font-size: 0.8rem; line-height: 1.55; }
+        html.pantallas #lista-servicios > div { padding: clamp(1rem, 2.4vh, 2rem); }
+        html.pantallas #lista-servicios .ico-lujo { margin-bottom: 0.75rem; }
+        @media (max-width: 1023px) { html.pantallas #servicios .atajos-servicios { display: none; } }
+
+        /* ---------- Eventos ---------- */
+        html.pantallas #eventos .grid.mt-10 { margin-top: clamp(1rem, 3vh, 2.5rem); }
+        html.pantallas #eventos .grid.mt-10 img { aspect-ratio: auto; height: clamp(140px, 26vh, 300px); }
+        html.pantallas #eventos .lead.mb-9 { margin-bottom: clamp(1rem, 2.6vh, 2.25rem); }
+        html.pantallas #tipos-eventos > div { padding: clamp(0.9rem, 2.4vh, 2rem); }
+        @media (max-width: 639px) {
+            html.pantallas #tipos-eventos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            html.pantallas #tipos-eventos .ico-lujo { margin-bottom: 0.5rem; }
+            html.pantallas #tipos-eventos h3 { font-size: 1.05rem; line-height: 1.25; }
+            html.pantallas #tipos-eventos p { font-size: 0.78rem; line-height: 1.5; }
+        }
+
+        /* ---------- Restaurante Mangolé ---------- */
+        html.pantallas #restaurante .pantalla > .grid.mb-16 { margin-bottom: 0; }
+        html.pantallas #restaurante img[alt="Mangolé Restaurante"] { width: clamp(8rem, 18vh, 16rem); margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
+        html.pantallas #restaurante dl.mb-9 { margin-bottom: clamp(0.75rem, 2.4vh, 2.25rem); }
+        html.pantallas #fotos-mangole img:first-child { aspect-ratio: auto; height: clamp(160px, 34vh, 420px); }
+        html.pantallas #fotos-mangole img:not(:first-child) { aspect-ratio: auto; height: clamp(110px, 21vh, 260px); }
+        html.pantallas #carta-grid img { aspect-ratio: auto !important; height: clamp(110px, 19vh, 240px); }
+        html.pantallas #restaurante .pantalla .mb-8 { margin-bottom: clamp(0.6rem, 1.8vh, 2rem); }
+        html.pantallas #restaurante .text-\[0\.72rem\].mt-6 { margin-top: clamp(0.4rem, 1vh, 1.5rem); }
+        html.pantallas #afiches .reel img { aspect-ratio: auto; height: clamp(260px, 62vh, 640px); }
+        @media (min-width: 1024px) { html.pantallas #afiches .reel { width: auto; } }
+        @media (max-width: 1023px) {
+            html.pantallas #fotos-mangole img:not(:first-child) { display: none; }
+            html.pantallas #restaurante .lead + .body-sm { display: none; }
+        }
+
+        /* ---------- Cabalante Bar ---------- */
+        html.pantallas #bar .pantalla > .grid.mb-14 { margin-bottom: 0; }
+        html.pantallas #bar img[alt^="Cabalante, bar"] { width: clamp(9rem, 20vh, 18rem); margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
+        html.pantallas #bar dl.mb-9 { margin-bottom: clamp(0.75rem, 2.4vh, 2.25rem); }
+        html.pantallas #fotos-bar { height: clamp(200px, 50vh, 560px); grid-template-rows: 1fr 1fr; }
+        html.pantallas #fotos-bar img { aspect-ratio: auto; height: 100%; min-height: 0; }
+        html.pantallas #fotos-bar figure { min-height: 0; }
+        html.pantallas #bebidas-grid { column-gap: 1.5rem !important; }
+        html.pantallas #bar .bg-white.border { padding: clamp(1rem, 2.6vh, 2.5rem); }
+        html.pantallas #bar .bg-white.border > .mb-8 { margin-bottom: clamp(0.6rem, 1.6vh, 2rem); }
+        html.pantallas #bar .bg-white.border > p.mt-8 { margin-top: clamp(0.4rem, 1vh, 2rem); }
+        @media (max-width: 1023px) {
+            html.pantallas #fotos-bar { height: clamp(160px, 26vh, 260px); }
+            html.pantallas #bar .lead + .body-sm { display: none; }
+        }
+
+        /* ---------- Galería ---------- */
+        html.pantallas #gallery-grid { grid-auto-rows: clamp(220px, 46vh, 520px) !important; }
+        html.pantallas #gallery-grid > * { grid-column: auto !important; grid-row: auto !important; }
+        html.pantallas #gallery-more-wrap, html.pantallas #gallery-note { display: none !important; }
+        html.pantallas #galeria .pantalla > .grid.mb-10 { margin-bottom: clamp(0.75rem, 2.4vh, 2rem); }
+        html.pantallas #galeria .hairline-t.hairline-b { padding-block: clamp(0.5rem, 1.4vh, 1.25rem); margin-bottom: clamp(0.75rem, 2.4vh, 2.5rem); }
+        html.pantallas #gallery-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+        html.pantallas #reels video { aspect-ratio: auto; height: clamp(260px, 62vh, 640px); }
+        @media (min-width: 1024px) { html.pantallas #reels .reel { width: auto; } }
+        @media (max-width: 1023px) { html.pantallas #galeria .pantalla > .grid.mb-10 > div:last-child { display: none; } }
+
+        /* ---------- Reseñas ---------- */
+        html.pantallas #resenas .text-center.mb-14 { margin-bottom: clamp(1rem, 3.5vh, 4rem); }
+        html.pantallas #resenas figure { padding: clamp(1.25rem, 3.4vh, 2.5rem); }
+        html.pantallas #resenas .mt-12 { margin-top: clamp(1rem, 3vh, 3rem); }
+        /* Listas con filos de 1 px entre tarjetas: el carrusel conserva el filo */
+        html.pantallas #lista-servicios, html.pantallas #tarjetas-info, html.pantallas #lista-resenas { gap: 1px !important; }
+
+        /* ---------- Antes de tu llegada ---------- */
+        html.pantallas #informacion .pantalla > div:first-child { margin-bottom: clamp(0.75rem, 2vh, 3rem); }
+        html.pantallas #informacion .pantalla > div:first-child .lead { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        html.pantallas #tarjetas-info > div { padding: clamp(1rem, 2.6vh, 2.25rem); }
+        html.pantallas #tarjetas-info .mb-6 { margin-bottom: clamp(0.5rem, 1.5vh, 1.5rem); }
+        html.pantallas #tarjetas-info ul { row-gap: 0; }
+        html.pantallas #tarjetas-info ul.space-y-3 > * + * { margin-top: clamp(0.3rem, 0.9vh, 0.75rem); }
+        html.pantallas #tarjetas-info .hairline-t.pt-5 { padding-top: clamp(0.5rem, 1.4vh, 1.25rem); }
+        html.pantallas #guias-info img { aspect-ratio: auto; height: clamp(140px, 30vh, 320px); }
+        html.pantallas #guias-info .aspect-\[3\/4\] { aspect-ratio: auto; }
+        html.pantallas #informacion .notas-info { margin-top: clamp(1rem, 3vh, 3.5rem); padding-top: clamp(0.75rem, 2.2vh, 2.5rem); }
+        @media (max-width: 1023px) {
+            html.pantallas #informacion .pantalla > div:first-child .lead { display: none; }
+            html.pantallas #tarjetas-info > div > p.body-sm.mb-6 { display: none; }
+        }
+
+        /* ---------- Preguntas frecuentes ---------- */
+        html.pantallas #faq .faq-trigger { padding-block: clamp(0.65rem, 1.9vh, 1.75rem); }
+        html.pantallas #faq .faq-q { font-size: clamp(1.05rem, 2.6vh, 1.5rem); }
+        html.pantallas #faq .faq-panel p { padding-bottom: clamp(0.65rem, 1.9vh, 1.75rem); }
+
+        /* ---------- Contacto ---------- */
+        html.pantallas #contacto dl.mb-10 { margin-bottom: clamp(0.75rem, 2.4vh, 2.5rem); }
+        html.pantallas #contacto dl > div { padding-block: clamp(0.5rem, 1.5vh, 1.25rem); }
+        html.pantallas #contacto .mb-10 { margin-bottom: clamp(0.75rem, 2.4vh, 2.5rem); }
+        html.pantallas #contacto .aspect-\[4\/3\] { aspect-ratio: auto; height: clamp(220px, 34vh, 420px); }
+        html.pantallas #contact-form { margin-top: clamp(0.75rem, 2vh, 2rem); padding: clamp(1rem, 2.6vh, 2.25rem); }
+        html.pantallas #contact-form .mb-7 { margin-bottom: clamp(0.6rem, 1.6vh, 1.75rem); }
+        html.pantallas #ct-mensaje { min-height: 0; height: clamp(4rem, 8vh, 7rem); }
+        html.pantallas #contact-form > p.body-sm { display: none; }
+        html.pantallas #contact-form .mb-4 { margin-bottom: clamp(0.5rem, 1.3vh, 1rem); }
+        html.pantallas #contact-form .mb-6 { margin-bottom: clamp(0.6rem, 1.6vh, 1.5rem); }
+        @media (max-width: 1023px) {
+            html.pantallas #contacto .aspect-\[4\/3\] { height: clamp(260px, 62vh, 560px); }
+            html.pantallas #contact-form { margin-top: 0; }
+        }
+        @media (max-width: 1023px) { html.pantallas #contacto .solo-amplio-info { display: none; } }
+        html.pantallas #contacto .redes-contacto { display: none; }
+        html.pantallas #contacto h2.mb-8 { margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
+
+        /* ---------- Habitaciones en una pantalla ---------- */
+        html.pantallas #habitaciones .shell > div:first-child { margin-bottom: clamp(0.75rem, 2.5vh, 2.5rem); }
+        html.pantallas #habitaciones .shell > div:nth-child(2) { padding-block: clamp(0.5rem, 1.4vh, 1.25rem); margin-bottom: clamp(0.9rem, 2.6vh, 3rem); }
+        html.pantallas #habitaciones .shell > div:last-child { display: none; }   /* notas de tarifa: están en la ficha y en la reserva */
+        html.pantallas .room-card .img-zoom > :first-child { aspect-ratio: auto !important; height: clamp(130px, 24vh, 270px); }
+        html.pantallas .room-card > div { padding: clamp(1rem, 2.4vh, 2rem) !important; }
+        html.pantallas .room-card .display-md { font-size: clamp(1.3rem, 3vh, 2rem); margin-bottom: clamp(0.4rem, 1.2vh, 1rem); }
+        html.pantallas .room-card p.body-sm,
+        html.pantallas .room-card ul { display: none; }
+        html.pantallas .room-card .flex.flex-wrap.micro { margin-bottom: clamp(0.5rem, 1.5vh, 1.25rem); }
+        html.pantallas .room-card .hairline-t.pt-6 { padding-top: clamp(0.6rem, 1.6vh, 1.5rem); }
+        html.pantallas .room-card .mb-6 { margin-bottom: clamp(0.6rem, 1.6vh, 1.5rem); }
+        @media (max-width: 640px) { html.pantallas #room-filter-note { display: none; } }
+        /* En computador el filtro de huéspedes va al lado del título */
+        @media (min-width: 1024px) {
+            html.pantallas #habitaciones .shell { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 2.5rem; align-items: end; }
+            html.pantallas #habitaciones .shell > * { grid-column: 1 / -1; }
+            html.pantallas #habitaciones .shell > div:first-child { grid-column: 1; }
+            html.pantallas #habitaciones .shell > div:nth-child(2) { grid-column: 2; border: 0; flex-direction: column; align-items: flex-end; gap: 0.6rem; }
+            html.pantallas #habitaciones .shell > div:first-child > a.link-arrow { display: none; }
+            html.pantallas #room-filter-note { display: none; }
+        }
+        html.pantallas #habitaciones .lead, html.pantallas #planes .lead { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        html.pantallas .room-card .img-zoom > :first-child { height: clamp(120px, 20vh, 220px); }
+        html.pantallas .room-card .flex.flex-wrap.micro > :nth-child(n+4) { display: none; }
+        html.pantallas .room-card .hairline-t.pt-6 > div:first-child { display: none; }
+
+        /* ---------- Planes en una pantalla ---------- */
+        html.pantallas #planes .shell > div:first-child { margin-bottom: clamp(0.9rem, 2.6vh, 3rem); }
+        html.pantallas #plans-grid img { aspect-ratio: auto !important; height: clamp(90px, 13.5vh, 190px); }
+        html.pantallas #plans-grid article > div { padding: clamp(1rem, 2.2vh, 2rem) !important; }
+        html.pantallas #plans-grid h3 { font-size: clamp(1.25rem, 2.8vh, 1.5rem); }
+        html.pantallas #plans-grid ul { margin-bottom: clamp(0.6rem, 1.8vh, 2rem); }
+        html.pantallas #plans-grid ul li { line-height: 1.5; }
+        html.pantallas #plans-grid ul li:nth-child(n+4) { display: none; }
+        html.pantallas #plans-grid .mb-5 { margin-bottom: clamp(0.5rem, 1.4vh, 1.25rem); }
+        html.pantallas #plans-grid .mb-6 { margin-bottom: clamp(0.5rem, 1.4vh, 1.5rem); }
+        html.pantallas #planes .shell > div:last-child { margin-top: clamp(0.9rem, 2.2vh, 2rem); padding: clamp(0.9rem, 2vh, 1.5rem) clamp(1rem, 2.5vw, 2rem); gap: 1rem; }
+        html.pantallas #planes .shell > div:last-child ul { display: none; }
+        html.pantallas #planes .shell > div:last-child .eyebrow { display: none; }
+        html.pantallas #planes .shell > div:last-child h3 { font-size: clamp(1.15rem, 2.6vh, 1.6rem); }
+        @media (min-width: 1024px) { html.pantallas #planes .shell > div:last-child > div:first-child { grid-column: span 9 / span 9; } html.pantallas #planes .shell > div:last-child > div:last-child { grid-column: span 3 / span 3; } }
+        html.pantallas #plans-grid article > div > div:first-child { display: none; }
+        html.pantallas #plans-grid ul li:nth-child(n+3) { display: none; }
+        html.pantallas #plans-grid .font-display.text-3xl { font-size: clamp(1.4rem, 3vh, 1.875rem); }
+        html.pantallas #plans-grid .mt-auto.hairline-t { padding-top: clamp(0.6rem, 1.5vh, 1.25rem); }
+
+        /* ---------- Celular: cada pantalla con lo esencial ---------- */
+        @media (max-width: 1023px) {
+            html.pantallas #habitaciones .shell > div:nth-child(2) > span.micro { display: none; }
+            html.pantallas #habitaciones .shell > div:nth-child(2) { padding-block: 0.5rem; margin-bottom: 0.75rem; }
+            html.pantallas #habitaciones .shell > div:first-child { margin-bottom: 0.5rem; gap: 0.5rem; }
+            html.pantallas #habitaciones .shell > div:first-child > a.link-arrow { display: none; }
+            html.pantallas .room-card .img-zoom > :first-child { height: clamp(110px, 16vh, 170px); }
+            html.pantallas .room-card .hairline-t.pt-6 p.mb-6 { display: none; }
+            html.pantallas .room-card .grid.grid-cols-2 { margin-top: 0.6rem; }
+            html.pantallas #fotos-mangole img:first-child { height: clamp(140px, 22vh, 220px); }
+            html.pantallas #restaurante .pantalla .md\:flex-row p.body-sm { display: none; }
+            html.pantallas #restaurante .pantalla .md\:flex-row { gap: 0.75rem; margin-bottom: 0.75rem; }
+            html.pantallas #carta-grid img { height: clamp(90px, 12vh, 120px); }
+            html.pantallas #carta-grid .p-4 { padding: 0.65rem 0.75rem 0.75rem; }
+            html.pantallas #carta-grid .plato-ctrl { margin-top: 0.5rem; }
+            html.pantallas .pantalla, html.pantallas .pantalla-movil, html.pantallas section.section:not(.con-pantallas) { padding-block: clamp(0.6rem, 2vh, 1.5rem); }
+            html.pantallas #carta-grid h4 { font-size: 1rem; line-height: 1.25; }
+            html.pantallas #restaurante .text-\[0\.72rem\].mt-6 { display: none; }
+            html.pantallas #restaurante .pantalla .eyebrow.mb-4 { margin-bottom: 0.5rem; }
+            html.pantallas #restaurante .pantalla h3.text-3xl { font-size: 1.6rem; margin-bottom: 0; }
+            html.pantallas #bar .bg-white.border h3 { font-size: 1.6rem; margin-bottom: 0; }
+            html.pantallas #bar .bg-white.border > .mb-8 p { display: none; }
+            html.pantallas #bar .bg-white.border > .mb-8 { gap: 0.75rem; }
+            html.pantallas #bebidas-grid .bebida-fila { font-size: 0.78rem; line-height: 1.35; }
+            html.pantallas #bar .bg-white.border > p.mt-8 { font-size: 0.6rem; line-height: 1.45; }
+            html.pantallas #guias-info img { height: clamp(120px, 20vh, 180px); }
+            html.pantallas #guias-info .p-3 { padding: 0.6rem; }
+            html.pantallas #informacion .notas-info { margin-top: 0.75rem; padding-top: 0.75rem; }
+            html.pantallas #informacion .pantalla h3.mb-8 { margin-bottom: 0.75rem; font-size: 1.4rem; }
+            html.pantallas #informacion .pantalla > div:first-child > a.link-arrow { display: none; }
+            html.pantallas #informacion .pantalla > div:first-child { gap: 0.5rem; }
+        }
+
+        /* ---------- Celulares pequeños (760 px de alto o menos) ---------- */
+        @media (max-width: 1023px) and (max-height: 760px) {
+            html.pantallas .display-lg { font-size: 1.65rem; }
+            html.pantallas .section .eyebrow { margin-bottom: 0.4rem; }
+            html.pantallas .room-card .img-zoom > :first-child { height: 96px; }
+            html.pantallas .room-card .display-md { font-size: 1.2rem; }
+            html.pantallas #plans-grid img { height: 84px; }
+            html.pantallas #plans-grid ul li { font-size: 0.8rem; }
+            html.pantallas #carta-grid img { height: 84px; }
+            html.pantallas #carta-grid h4 { font-size: 0.92rem; }
+            html.pantallas #restaurante .pantalla .md\:flex-row .eyebrow { display: none; }
+            html.pantallas #restaurante .pantalla .md\:flex-row .btn { padding: 0.7rem 1.1rem; }
+            html.pantallas #bebidas-grid .bebida-fila { font-size: 0.74rem; line-height: 1.3; }
+            html.pantallas #bebidas-grid ul.space-y-2\.5 > * + * { margin-top: 0.2rem; }
+            html.pantallas #bar .bg-white.border > .mb-8 .eyebrow { display: none; }
+            html.pantallas #resenas blockquote { font-size: 1.05rem; line-height: 1.55; margin-bottom: 1rem; }
+            html.pantallas #resenas .text-center.mb-14 { margin-bottom: 0.75rem; }
+            html.pantallas #tarjetas-info ul li { font-size: 0.78rem; line-height: 1.45; }
+            html.pantallas #tarjetas-info .mb-6 { margin-bottom: 0.4rem; }
+            html.pantallas #tarjetas-info h3 { font-size: 1.3rem; }
+        }
+
+        /* ---------- Tabletas (768 a 1023 px de ancho) ---------- */
+        @media (max-width: 1023px) {
+            html.pantallas #planes .shell > div:last-child { display: none; }
+            html.pantallas #gallery-grid { grid-auto-rows: clamp(200px, 42vh, 480px) !important; }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+            html.pantallas #tarjetas-info { --carrusel-ancho: calc((100% - 1rem) / 2); }
+        }
+
+        /* ---------- Pantallas angostas y bajas (1024 a 1279 px de ancho) ---------- */
+        @media (min-width: 1024px) and (max-width: 1279px) and (max-height: 820px) {
+            html.pantallas #servicios .atajos-servicios { display: none; }
+            html.pantallas #servicios h2.display-lg { font-size: 2.1rem; }
+            html.pantallas #servicios p.mb-7 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+            html.pantallas #contacto h2.display-lg { font-size: 2.1rem; }
+            html.pantallas #contacto .lg\:col-span-5 > div.flex { gap: 0.5rem; }
+            html.pantallas #contacto .lg\:col-span-5 > div.flex .btn { padding: 0.75rem 1.1rem; }
+        }
+
+        /* ---------- Pantallas bajas (laptops de 768 px de alto o menos) ---------- */
+        html.pantallas .display-xl { font-size: clamp(2.4rem, min(7.2vw, 8.6vh), 5.6rem); }
+        html.pantallas #bebidas-grid ul.space-y-2\.5 > * + * { margin-top: clamp(0.25rem, 0.8vh, 0.625rem); }
+        html.pantallas #bebidas-grid h4 { margin-bottom: clamp(0.5rem, 1.2vh, 1rem); font-size: clamp(1.25rem, 2.8vh, 1.5rem); }
+        @media (max-height: 820px) {
+            html.pantallas #bebidas-grid .bebida-fila { font-size: 0.8rem; line-height: 1.45; }
+            html.pantallas #bar .bg-white.border > .mb-8 p { display: none; }
+            html.pantallas .room-card .img-zoom > :first-child { height: clamp(110px, 17vh, 200px); }
+            html.pantallas #plans-grid p.micro { display: none; }
+            html.pantallas #carta-grid img { height: clamp(100px, 15vh, 200px); }
+            html.pantallas #gallery-grid { grid-auto-rows: clamp(200px, 40vh, 480px) !important; }
+            html.pantallas #tarjetas-info > div > p.body-sm.mb-6 { display: none; }
+            html.pantallas #contacto .solo-amplio-info { display: none; }
+            html.pantallas #contacto .aspect-\[4\/3\] { height: clamp(200px, 30vh, 380px); }
+            html.pantallas #planes .shell > div:last-child { display: none; }
+            html.pantallas #habitaciones .lead { -webkit-line-clamp: 1; }
+            /* Portada: título, texto y espacios más compactos para que quepa con la barra de reserva */
+            html.pantallas #inicio .hero-title { font-size: clamp(2.6rem, 8.4vh, 5rem); margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
+            html.pantallas #inicio .hero-eyebrow, html.pantallas #inicio .hero-rule { margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
+            html.pantallas #inicio .hero-lead { font-size: 0.9rem; line-height: 1.6; margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
+            html.pantallas #inicio .shell.pt-28 { padding-top: calc(var(--alto-nav) + 2.5rem); }
+            html.pantallas #bebidas-grid .bebida-fila { font-size: 0.76rem; line-height: 1.35; }
+            html.pantallas #tarjetas-info ul li { font-size: 0.8rem; line-height: 1.5; }
+            html.pantallas #contacto dl > div { padding-block: 0.45rem; }
+            html.pantallas #bar .bg-white.border h3 { font-size: clamp(1.5rem, 3.6vh, 2.25rem); margin-bottom: 0; }
+            html.pantallas #bar .bg-white.border { padding: 1rem 1.5rem; }
+            html.pantallas #contact-form .field-box { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+            html.pantallas #contact-form h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+            html.pantallas #ct-mensaje { height: 3.6rem; }
+        }
+
 
         /* ---------- Tipografía ---------- */
         .display-xl { font-size: clamp(2.9rem, 7.2vw, 5.6rem); line-height: 1.02; }
@@ -711,6 +1072,31 @@
         /* clip y no hidden: con hidden la factura no se queda fija al bajar por los pasos */
         #reservar { overflow-x: hidden; overflow-x: clip; }
         .rv-paso, #factura { scroll-margin-top: 104px; }
+
+        /* ---------- Ventana de reserva: aparte de la página y paso a paso ---------- */
+        #ventana-reserva {
+            position: fixed; inset: 0; z-index: 138; display: flex; flex-direction: column;
+            background: var(--ink); color: #fff;
+            opacity: 0; visibility: hidden; transform: translateY(18px);
+            transition: opacity .35s ease, transform .5s cubic-bezier(.16,1,.3,1), visibility 0s linear .5s;
+        }
+        #ventana-reserva.is-open { opacity: 1; visibility: visible; transform: none; transition: opacity .35s ease, transform .5s cubic-bezier(.16,1,.3,1); }
+        .vr-barra { flex-shrink: 0; border-bottom: 1px solid var(--line-light); background: rgba(10, 33, 46, 0.98); }
+        .vr-cuerpo { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        #ventana-reserva .rv-paso { display: none; }
+        #ventana-reserva .rv-paso.is-actual { display: block; animation: vrPaso .45s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes vrPaso { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+        #ventana-reserva #factura { order: 10; }
+        #ventana-reserva .rv-prog { cursor: pointer; }
+        #ventana-reserva .rv-prog.is-actual .rv-prog-txt { color: var(--brass); }
+        #ventana-reserva .rv-prog.is-actual .rv-prog-linea { background: rgba(201, 160, 99, 0.45); }
+        .vr-nav { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line-light); }
+        .vr-aviso { display: flex; gap: .5rem; align-items: flex-start; font-size: .82rem; color: #EDB3A8; border: 1px solid rgba(237,179,168,.3); background: rgba(237,179,168,.06); padding: .75rem 1rem; margin-bottom: 1rem; }
+        /* En celular la factura completa aparece en el último paso; antes, un resumen arriba */
+        @media (max-width: 1023px) {
+            #ventana-reserva:not([data-paso="paso-pago"]) #factura { display: none; }
+        }
+        @media (min-width: 1024px) { #vr-resumen { display: none; } }
 
         .fa-doc { position: relative; background: #FBFAF7; color: var(--ink); box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.75); }
         .fa-doc::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, #A8834A, #E3C79A 50%, #A8834A); }
@@ -1666,6 +2052,10 @@
     <!-- ============================= SERVICIOS DESTACADOS ============================= -->
     <section id="destacados" class="bg-white hairline-b" aria-label="Servicios y comodidades">
         <div class="shell py-9 sm:py-11">
+            <div class="text-center mb-8 sm:mb-12">
+                <span class="eyebrow is-centered mb-4">Comodidades</span>
+                <h2 class="display-lg text-ink">Todo para tu <em class="italic text-moss">descanso</em></h2>
+            </div>
             <ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-6">
                 <li class="feat-item"><span class="feat-icon"><i data-lucide="accessibility"></i></span>Acceso para personas con discapacidad</li>
                 <li class="feat-item"><span class="feat-icon"><i data-lucide="party-popper"></i></span>Eventos</li>
@@ -1682,9 +2072,10 @@
     </section>
 
     <!-- ============================= HOTEL CABALEÓN · RECORRIDO ============================= -->
-    <section id="hotel" class="section">
+    <section id="hotel" class="section con-pantallas">
         <div class="shell">
 
+            <div class="pantalla">
             <!-- Encabezado -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end mb-14 sm:mb-20 reveal">
                 <div class="lg:col-span-7">
@@ -1700,13 +2091,13 @@
                         clima cálido cerca de Bogotá. Está en la vereda Escalante de Tena, Cundinamarca, rodeado de
                         montañas, jardines y paisajes que invitan a respirar con calma.
                     </p>
-                    <p class="body-sm text-graphite/65 max-w-xl">
+                    <p class="body-sm text-graphite/65 max-w-xl solo-amplio">
                         Contamos con habitaciones confortables, suites, piscina para adultos, piscina infantil, jacuzzi,
                         sauna, turco, gimnasio, restaurante, bar, mini tejo, cancha polideportiva, salón de entretenimiento
                         y espacios para eventos: el escenario perfecto para una escapada romántica, un fin de semana
                         familiar, un pasadía especial o una celebración íntima.
                     </p>
-                    <p class="body-sm text-graphite/65 max-w-xl mt-4">
+                    <p class="body-sm text-graphite/65 max-w-xl mt-4 solo-amplio recorte-bajo">
                         Es un lugar amplio, con 15 habitaciones y una cabaña. Así podemos ofrecer una atención
                         personalizada, en la que el cuidado de cada huésped es la prioridad: esa es nuestra vocación boutique.
                     </p>
@@ -1736,6 +2127,8 @@
                 </div>
             </div>
 
+            </div>
+            <div class="pantalla">
             <!-- Recorrido -->
             <div id="steps" class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 reveal">
 
@@ -1841,6 +2234,7 @@
                     <span class="step-name">La mesa</span>
                 </button>
             </div>
+            </div>
 
         </div>
     </section>
@@ -1853,7 +2247,7 @@
                 <div class="max-w-2xl">
                     <span class="eyebrow mb-6">Alojamiento</span>
                     <h2 class="display-lg text-ink mb-6">Habitaciones, suite y cabaña</h2>
-                    <p class="lead text-graphite/70">
+                    <p class="lead text-graphite/70 recorte-celular recorte-bajo">
                         Quince habitaciones y una cabaña, en cuatro tipos de alojamiento. Todas tienen baño privado, aire acondicionado,
                         cajilla de seguridad, clóset amplio, TV de alta definición y wifi, e incluyen desayuno
                         y acceso a las piscinas y zonas verdes del hotel.
@@ -1878,7 +2272,7 @@
             </div>
 
             <!-- Las tarjetas se generan desde los datos de `habitaciones` y `TARIFAS` (script) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10" id="rooms-grid"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 carrusel" data-por-vista="3" id="rooms-grid"></div>
 
             <!-- Notas de tarifa -->
             <div class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 hairline-t pt-10 reveal">
@@ -1909,11 +2303,11 @@
     </section>
 
     <!-- ============================= SERVICIOS ============================= -->
-    <section id="servicios" class="section">
+    <section id="servicios" class="section con-pantallas-movil">
         <div class="shell">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
 
-                <div class="lg:col-span-4 reveal">
+                <div class="lg:col-span-4 reveal pantalla-movil">
                     <div class="lg:sticky lg:top-28">
                         <span class="eyebrow mb-6">Servicios</span>
                         <h2 class="display-lg text-ink mb-6">9.000 m² para descansar <em class="italic text-moss">y compartir</em></h2>
@@ -1940,8 +2334,8 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-8 reveal d1">
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-3">
+                <div class="lg:col-span-8 reveal d1 pantalla-movil">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 carrusel" data-movil="2" data-tableta="3" data-por-vista="4" id="fotos-servicios">
                         <figure class="relative overflow-hidden">
                             <img src="foto-piscina-nadadores-sm.jpg" alt="Huéspedes en la piscina para adultos" class="w-full aspect-[4/5] object-cover" loading="lazy">
                             <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Piscinas</figcaption>
@@ -1975,7 +2369,7 @@
                             <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Zonas verdes</figcaption>
                         </figure>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line carrusel mt-4" data-movil="2" data-tableta="3" data-por-vista="4" id="lista-servicios">
 
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="waves" class="ico-lujo mb-5"></i>
@@ -2051,7 +2445,7 @@
 
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-px bg-line border border-line border-t-0">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-px bg-line border border-line mt-4 atajos-servicios">
                         <a href="#restaurante" class="group bg-bone p-6 sm:p-7 hover:bg-white transition-colors duration-500 flex items-center justify-between gap-4">
                             <span class="flex items-center gap-3"><i data-lucide="utensils-crossed" class="w-4 h-4 text-brass shrink-0"></i><span class="font-display text-lg text-ink">Restaurante Mangolé</span></span>
                             <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-ink/40 group-hover:text-ink transition-colors"></i>
@@ -2072,11 +2466,11 @@
     </section>
 
     <!-- ============================= EVENTOS ============================= -->
-    <section id="eventos" class="section bg-sand/50">
+    <section id="eventos" class="section bg-sand/50 con-pantallas-movil">
         <div class="shell">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
 
-                <div class="lg:col-span-5 reveal">
+                <div class="lg:col-span-5 reveal pantalla-movil">
                     <span class="eyebrow mb-6">Eventos</span>
                     <h2 class="display-lg text-ink mb-6">Celebra <em class="italic text-moss">en Cabaleón</em></h2>
                     <p class="lead text-graphite/70 mb-9">
@@ -2102,8 +2496,8 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-7 reveal d1">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line">
+                <div class="lg:col-span-7 reveal d1 pantalla-movil">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line" id="tipos-eventos">
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="party-popper" class="ico-lujo mb-5"></i>
                             <h3 class="font-display text-xl text-ink mb-2">Celebraciones</h3>
@@ -2149,7 +2543,7 @@
                 <div class="max-w-2xl">
                     <span class="eyebrow mb-6">Planes y promociones</span>
                     <h2 class="display-lg text-ink mb-6">Una razón para <em class="italic text-moss">cada escapada</em></h2>
-                    <p class="lead text-graphite/70">
+                    <p class="lead text-graphite/70 recorte-celular">
                         Planes para cada ocasión, con todo lo que hace especial una estadía en Cabaleón.
                         Elige el tuyo y te enviamos el valor exacto según tus fechas.
                     </p>
@@ -2160,7 +2554,7 @@
             </div>
 
             <!-- Las tarjetas se generan desde `PLANES` (script); `activo: false` oculta un plan -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6" id="plans-grid"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 carrusel" data-por-vista="4" id="plans-grid"></div>
 
             <!-- Beneficios de reservar directo -->
             <div class="mt-12 bg-ink text-white p-8 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center reveal">
@@ -2183,9 +2577,10 @@
     </section>
 
     <!-- ============================= RESTAURANTE MANGOLÉ ============================= -->
-    <section id="restaurante" class="section bg-white">
+    <section id="restaurante" class="section bg-white con-pantallas">
         <div class="shell">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-16 sm:mb-20">
+            <div class="pantalla">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-12 lg:gap-x-16 gap-y-5 items-center mb-16 sm:mb-20">
 
                 <div class="lg:col-span-5 reveal">
                     <img src="logo-mangole.png" alt="Mangolé Restaurante" class="w-56 sm:w-64 h-auto mb-8" loading="lazy">
@@ -2222,7 +2617,7 @@
                 </div>
 
                 <div class="lg:col-span-7 reveal d1">
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-3" id="fotos-mangole">
                         <img src="foto-restaurante-servicio.jpg" alt="Comedor del Restaurante Mangolé con huéspedes" class="col-span-2 w-full aspect-[16/10] object-cover" loading="lazy">
                         <img src="foto-desayuno-familia-sm.jpg" alt="Familia desayunando en Mangolé" class="w-full aspect-[4/3] object-cover object-top" loading="lazy">
                         <img src="foto-almuerzo-familia-sm.jpg" alt="Almuerzo en familia en Mangolé" class="w-full aspect-[4/3] object-cover object-[50%_28%]" loading="lazy">
@@ -2231,12 +2626,14 @@
 
             </div>
 
+            </div>
+            <div class="pantalla">
             <!-- Carta de favoritos con pedido: se genera desde `CARTA_FAVORITOS` (script) -->
             <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8 reveal">
                 <div class="max-w-xl">
                     <span class="eyebrow mb-4">Carta de favoritos · Pide aquí</span>
                     <h3 class="font-display text-3xl sm:text-4xl text-ink mb-3">Inspiración del día</h3>
-                    <p class="body-sm text-graphite/65">
+                    <p class="body-sm text-graphite/65 recorte-celular">
                         Agrega tus platos, elige si es para el almuerzo o la cena y envía el pedido por WhatsApp:
                         el equipo de Mangolé te lo confirma con la hora. Los platos marcados incluyen la bebida del día de cortesía.
                     </p>
@@ -2245,11 +2642,12 @@
                     <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="#i-cloche"/></svg> Ver mi pedido <span data-pedido-cuenta class="ml-1 min-w-[1.4rem] h-[1.4rem] px-1.5 rounded-full bg-brass text-ink text-[0.65rem] tracking-normal inline-flex items-center justify-center">0</span>
                 </button>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4" id="carta-grid"></div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 carrusel" data-movil="2" data-tableta="3" data-por-vista="5" id="carta-grid"></div>
             <p class="text-[0.72rem] text-graphite/45 mt-6">Precios en pesos colombianos, sujetos a cambios. Fotografías de referencia. Toca la foto de un plato para ver su afiche.</p>
 
+            </div>
             <!-- Afiches originales de la carta: se generan desde `CARTA_FAVORITOS` y `AFICHES` -->
-            <div class="mt-14 sm:mt-16 reveal">
+            <div class="reveal pantalla">
                 <div class="flex items-end justify-between gap-4 mb-6">
                     <div>
                         <span class="eyebrow mb-4">Afiches de Mangolé</span>
@@ -2266,9 +2664,10 @@
     </section>
 
     <!-- ============================= CABALANTE BAR ============================= -->
-    <section id="bar" class="section bg-sand/50">
+    <section id="bar" class="section bg-sand/50 con-pantallas">
         <div class="shell">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-14 sm:mb-16">
+            <div class="pantalla">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-12 lg:gap-x-16 gap-y-5 items-center mb-14 sm:mb-16">
 
                 <div class="lg:col-span-6 lg:order-2 reveal">
                     <img src="logo-cabalante.png" alt="Cabalante, bar tropical de montaña" class="w-60 sm:w-72 h-auto mb-8" loading="lazy">
@@ -2298,7 +2697,7 @@
                 </div>
 
                 <div class="lg:col-span-6 lg:order-1 reveal d1">
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-3" id="fotos-bar">
                         <img src="foto-bar-cabalante-sm.jpg" alt="Barra de Cabalante Bar con huéspedes" class="row-span-2 w-full h-full object-cover" loading="lazy">
                         <img src="foto-bar-cabalante-2-sm.jpg" alt="Cócteles en la barra de Cabalante" class="w-full aspect-square object-cover" loading="lazy">
                         <figure class="relative">
@@ -2310,13 +2709,15 @@
 
             </div>
 
+            </div>
             <!-- Carta de bebidas: se genera desde `CARTA_BEBIDAS` (script) -->
+            <div class="pantalla">
             <div class="bg-white border border-line p-6 sm:p-10 reveal">
                 <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-8">
                     <div class="max-w-xl">
                         <span class="eyebrow mb-4">Carta de bebidas · Pide aquí</span>
                         <h3 class="font-display text-3xl sm:text-4xl text-ink mb-3">Para brindar frente a la cordillera</h3>
-                        <p class="body-sm text-graphite/65">
+                        <p class="body-sm text-graphite/65 recorte-celular">
                             Toca <strong class="font-medium text-ink">+</strong> para sumar bebidas a tu pedido; puedes combinarlas con
                             los platos de Mangolé en un solo envío. Cócteles de la casa: muy pronto.
                         </p>
@@ -2325,24 +2726,26 @@
                         <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="#i-cloche"/></svg> Ver mi pedido <span data-pedido-cuenta class="ml-1 min-w-[1.4rem] h-[1.4rem] px-1.5 rounded-full bg-brass text-ink text-[0.65rem] tracking-normal inline-flex items-center justify-center">0</span>
                     </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-10" id="bebidas-grid"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-12 gap-y-10 carrusel" data-tableta="3" data-por-vista="3" id="bebidas-grid"></div>
                 <p class="text-[0.72rem] text-graphite/45 mt-8 leading-relaxed">
                     Precios en pesos colombianos, sujetos a cambios. Los licores se venden por botella.
                     El exceso de alcohol es perjudicial para la salud. Prohíbese el expendio de bebidas embriagantes a menores de edad.
                 </p>
             </div>
+            </div>
         </div>
     </section>
 
     <!-- ============================= GALERÍA ============================= -->
-    <section id="galeria" class="section">
+    <section id="galeria" class="section con-pantallas">
         <div class="shell">
+            <div class="pantalla">
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end mb-10 sm:mb-14 reveal">
                 <div class="lg:col-span-7">
                     <span class="eyebrow mb-6">Galería</span>
                     <h2 class="display-lg text-ink mb-6">Cabaleón en imágenes</h2>
-                    <p class="lead text-graphite/70 max-w-xl">
+                    <p class="lead text-graphite/70 max-w-xl recorte-celular">
                         Un recorrido por el hotel, las habitaciones, la piscina, la gastronomía y la naturaleza
                         que rodea a Cabaleón.
                     </p>
@@ -2373,7 +2776,7 @@
             </div>
 
             <!-- Las fotografías se generan desde `galeria` (script) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-2.5 sm:gap-3 auto-rows-[150px] sm:auto-rows-[200px] lg:auto-rows-[230px] reveal" id="gallery-grid"></div>
+            <div class="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-2.5 sm:gap-3 auto-rows-[150px] sm:auto-rows-[200px] lg:auto-rows-[230px] reveal carrusel" data-tableta="3" data-por-vista="4" id="gallery-grid"></div>
 
             <p id="gallery-empty" class="hidden body-sm text-graphite/50 py-10 text-center">
                 No hay fotografías en esta categoría todavía.
@@ -2384,8 +2787,9 @@
                 </button>
             </div>
 
+            </div>
             <!-- Clips en movimiento: se generan desde `CLIPS` y solo se reproducen en pantalla -->
-            <div class="mt-16 sm:mt-24 reveal">
+            <div class="reveal pantalla">
                 <div class="flex items-end justify-between gap-4 mb-6">
                     <div>
                         <span class="eyebrow mb-4">En movimiento</span>
@@ -2409,7 +2813,7 @@
                 <h2 class="display-lg text-white">Lo que dicen de nosotros</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10 carrusel-movil" id="lista-resenas">
 
                 <figure class="bg-ink p-8 sm:p-10 flex flex-col reveal">
                     <div class="flex gap-1 mb-7">
@@ -2479,8 +2883,9 @@
     </section>
 
     <!-- ============================= ANTES DE TU LLEGADA ============================= -->
-    <section id="informacion" class="section bg-white">
+    <section id="informacion" class="section bg-white con-pantallas">
         <div class="shell">
+            <div class="pantalla">
 
             <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12 sm:mb-16 reveal">
                 <div class="max-w-2xl">
@@ -2497,7 +2902,7 @@
             </div>
 
             <div class="reveal d1">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-line border border-line">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-line border border-line carrusel" data-tableta="3" data-por-vista="3" id="tarjetas-info">
 
                     <div class="bg-bone p-7 sm:p-9 flex flex-col hover:bg-white transition-colors duration-500">
                         <div class="flex items-center gap-3 mb-6">
@@ -2613,11 +3018,13 @@
                 </div>
             </div>
 
+            </div>
+            <div class="pantalla">
             <!-- Guías y folletos del hotel (imágenes de la carpeta; se abren en grande) -->
-            <div class="mt-14 sm:mt-16 reveal">
+            <div class="reveal">
                 <span class="eyebrow mb-4">Guías y folletos</span>
                 <h3 class="font-display text-2xl sm:text-3xl text-ink mb-8">Para tener a mano durante tu estadía</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 carrusel" data-movil="2" data-tableta="3" data-por-vista="6" id="guias-info">
                     <a href="bienvenido.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
                         <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="guia-bienvenida.jpg" alt="Guía de bienvenida" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
                         <div class="p-3 sm:p-4">
@@ -2663,7 +3070,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mt-14 hairline-t pt-10 reveal">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mt-14 hairline-t pt-10 reveal carrusel-movil notas-info">
                 <div class="flex items-start gap-4">
                     <i data-lucide="baby" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                     <div>
@@ -2685,6 +3092,7 @@
                         <p class="body-sm text-graphite/60">Para 5 huéspedes o más combinamos habitaciones. Escríbenos y armamos la mejor opción para todos.</p>
                     </div>
                 </div>
+            </div>
             </div>
 
         </div>
@@ -3012,11 +3420,11 @@
     </section>
 
     <!-- ============================= FAQ ============================= -->
-    <section id="faq" class="section bg-sand/50">
+    <section id="faq" class="section bg-sand/50 con-pantallas-movil">
         <div class="shell">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
 
-                <div class="lg:col-span-4 reveal">
+                <div class="lg:col-span-4 reveal pantalla-movil">
                     <span class="eyebrow mb-6">Antes de venir</span>
                     <h2 class="display-lg text-ink mb-6">Preguntas frecuentes</h2>
                     <p class="body-sm text-graphite/60 mb-8">
@@ -3028,7 +3436,7 @@
                     </a>
                 </div>
 
-                <div class="lg:col-span-8 reveal d1">
+                <div class="lg:col-span-8 reveal d1 pantalla-movil">
 
                     <div class="faq-item hairline-b">
                         <button type="button" class="faq-trigger w-full flex items-start justify-between gap-6 py-7 text-left">
@@ -3192,11 +3600,11 @@
     </section>
 
     <!-- ============================= CONTACTO ============================= -->
-    <section id="contacto" class="section">
+    <section id="contacto" class="section con-pantallas-movil">
         <div class="shell">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
 
-                <div class="lg:col-span-5 reveal">
+                <div class="lg:col-span-5 reveal pantalla-movil">
                     <span class="eyebrow mb-6">Contacto</span>
                     <h2 class="display-lg text-ink mb-8">
                         A dos horas de Bogotá, <br class="hidden sm:block">
@@ -3223,7 +3631,7 @@
                             <dt class="micro text-brass-deep">Cómo llegar</dt>
                             <dd class="body-sm text-graphite/70">Unas 2 horas desde Bogotá por la Calle 13 o la vía Mondoñedo. El último tramo antes de la llegada es una vía veredal.</dd>
                         </div>
-                        <div class="hairline-b py-5 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-6">
+                        <div class="hairline-b py-5 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-6 solo-amplio-info">
                             <dt class="micro text-brass-deep">Distancias</dt>
                             <dd class="body-sm text-graphite/70">
                                 <strong class="font-medium text-graphite">La Gran Vía</strong>, 25 min ·
@@ -3231,7 +3639,7 @@
                                 Mesitas del Colegio, 30 min · Tena (casco urbano), 50 min
                             </dd>
                         </div>
-                        <div class="hairline-b py-5 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-6">
+                        <div class="hairline-b py-5 grid grid-cols-1 sm:grid-cols-[130px_1fr] gap-1 sm:gap-6 solo-amplio-info">
                             <dt class="micro text-brass-deep">El clima</dt>
                             <dd class="body-sm text-graphite/70">Entre 24 °C y 28 °C de día y fresco al caer la tarde.</dd>
                         </div>
@@ -3247,8 +3655,8 @@
                     </div>
 
                     <!-- Redes sociales: reemplazar cada # por el enlace real del hotel -->
-                    <span class="micro text-graphite/40 block mb-4">Síguenos</span>
-                    <div class="flex gap-3 text-ink">
+                    <span class="micro text-graphite/40 block mb-4 redes-contacto">Síguenos</span>
+                    <div class="flex gap-3 text-ink redes-contacto">
                         <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                         </a>
@@ -3265,7 +3673,7 @@
                 </div>
 
                 <div class="lg:col-span-7 reveal d1">
-                    <div class="relative">
+                    <div class="relative pantalla-movil">
                         <!-- Mapa: para el pin exacto, reemplaza el src por el código de
                              Google Maps → Compartir → Insertar un mapa -->
                         <div class="relative w-full aspect-[4/3] border border-line bg-sand overflow-hidden">
@@ -3285,7 +3693,7 @@
                     </div>
 
                     <!-- Formulario de contacto: se envía por WhatsApp o por correo -->
-                    <form id="contact-form" class="mt-8 bg-white border border-line p-7 sm:p-9" novalidate>
+                    <div class="pantalla-movil"><form id="contact-form" class="mt-8 bg-white border border-line p-7 sm:p-9" novalidate>
                         <h3 class="font-display text-2xl sm:text-3xl text-ink mb-2">Escríbenos</h3>
                         <p class="body-sm text-graphite/60 mb-7">Te responde directamente alguien del hotel.</p>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
@@ -3310,7 +3718,7 @@
                             <button type="submit" data-canal="correo" class="btn btn-outline text-ink"><i data-lucide="mail" class="w-4 h-4"></i> Enviar por correo</button>
                         </div>
                         <p id="ct-msg" class="hidden mt-4 text-[0.8rem] text-[#A03C3C]" role="alert"></p>
-                    </form>
+                    </form></div>
                 </div>
 
             </div>
@@ -4254,7 +4662,9 @@
            pantalla, se fija por abajo para que el total siga a la vista. */
         function ajustarFactura() {
             const aside = document.getElementById('factura');
-            aside.style.top = Math.min(96, window.innerHeight - aside.offsetHeight - 16) + 'px';
+            const cuerpo = aside.closest('.vr-cuerpo');
+            const alto = cuerpo ? cuerpo.clientHeight : window.innerHeight;
+            aside.style.top = Math.min(cuerpo ? 24 : 96, alto - aside.offsetHeight - 16) + 'px';
         }
 
         const escaparHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -4315,7 +4725,10 @@
             const el = document.getElementById('rv-msg');
             el.textContent = texto;
             el.classList.toggle('hidden', !texto);
-            if (texto && paso) document.getElementById(paso).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (texto && paso) {
+                irAPaso(paso);
+                if (paso !== 'paso-pago') avisoPaso(paso, texto);
+            }
         }
 
         function renderBooking() {
@@ -4616,7 +5029,198 @@
 
         function irAPaso(id) {
             cerrarCarrito();
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            abrirVentanaReserva(id);
+        }
+
+        /* =========================================================
+           Ventana de reserva
+           La reserva se hace en una ventana aparte de la página, un paso a la
+           vez: fechas → habitaciones → datos del titular → pago. Todos los
+           botones "Reservar" la abren. El formulario es el mismo de siempre:
+           se mueve a la ventana al cargar la página.
+           ========================================================= */
+        const PASOS_RESERVA = ['paso-fechas', 'paso-habitaciones', 'paso-datos', 'paso-pago'];
+        const TITULOS_PASO = {
+            'paso-fechas': 'Fechas y huéspedes', 'paso-habitaciones': 'Elige tus habitaciones',
+            'paso-datos': 'Titular de la reserva', 'paso-pago': 'Método de pago'
+        };
+        let pasoReserva = 'paso-fechas';
+        let ventanaAbierta = false;
+        let seccionAntesDeReservar = null;
+
+        function prepararVentanaReserva() {
+            const v = document.createElement('div');
+            v.id = 'ventana-reserva';
+            v.setAttribute('role', 'dialog');
+            v.setAttribute('aria-modal', 'true');
+            v.setAttribute('aria-labelledby', 'vr-titulo');
+            v.innerHTML =
+                '<div class="vr-barra"><div class="shell">' +
+                    '<div class="flex items-center gap-4 py-3 sm:py-4">' +
+                        '<img src="logo-blanco.png" alt="" class="h-10 w-auto hidden sm:block">' +
+                        '<div class="min-w-0 flex-1"><span id="vr-paso-num" class="micro text-brass block"></span>' +
+                        '<span id="vr-titulo" class="font-display text-xl sm:text-2xl text-white leading-tight block truncate">Tu reserva</span></div>' +
+                        '<button type="button" onclick="cerrarVentanaReserva()" class="w-10 h-10 shrink-0 rounded-full border border-white/25 flex items-center justify-center text-white hover:bg-white hover:text-ink transition-colors" aria-label="Cerrar la reserva">' +
+                            '<i data-lucide="x" class="w-5 h-5"></i></button>' +
+                    '</div>' +
+                    '<div id="vr-progreso" class="pb-3 sm:pb-4"></div>' +
+                    '<p id="vr-resumen" class="hidden pb-3 text-[0.78rem] text-white/70"></p>' +
+                '</div></div>' +
+                '<div class="vr-cuerpo"><div class="shell py-7 sm:py-10" id="vr-contenido"></div></div>';
+            document.body.appendChild(v);
+
+            /* Los pasos (y la factura) pasan a la ventana; en la página queda la invitación a reservar */
+            const pasos = document.querySelector('#reservar ol[aria-label="Pasos de la reserva"]');
+            const copia = pasos.cloneNode(true);
+            document.getElementById('vr-progreso').appendChild(pasos);
+            document.getElementById('vr-contenido').appendChild(document.getElementById('reserva-form'));
+            copia.setAttribute('aria-hidden', 'true');
+            const boton = document.createElement('div');
+            boton.className = 'mt-8';
+            boton.innerHTML = '<button type="button" onclick="abrirVentanaReserva(pasoPendiente())" class="btn btn-brass w-full sm:w-auto">' +
+                '<i data-lucide="calendar-check" class="w-4 h-4"></i> <span id="vr-llamado-txt">Reservar ahora</span></button>' +
+                '<p class="text-[0.75rem] text-white/50 mt-4">Se abre una ventana con 4 pasos cortos: fechas, habitaciones, tus datos y el pago.</p>';
+            const lista = document.querySelector('#reservar ul.flex');
+            lista.parentNode.insertBefore(copia, lista);
+            lista.parentNode.appendChild(boton);
+
+            /* Cada paso con sus botones Atrás y Continuar */
+            PASOS_RESERVA.forEach((p, i) => {
+                const nav = document.createElement('div');
+                nav.className = 'vr-nav';
+                nav.innerHTML = '<p class="vr-aviso hidden" role="alert"></p><div class="flex items-center justify-between gap-3">' +
+                    (i ? '<button type="button" class="btn btn-outline-light btn-sm" data-vr-ir="' + PASOS_RESERVA[i - 1] + '"><i data-lucide="arrow-left" class="w-4 h-4"></i> Atrás</button>'
+                       : '<button type="button" class="btn btn-outline-light btn-sm" onclick="cerrarVentanaReserva()">Cerrar</button>') +
+                    (i < PASOS_RESERVA.length - 1 ? '<button type="button" class="btn btn-brass btn-sm" data-vr-siguiente="' + p + '">Continuar <i data-lucide="arrow-right" class="w-4 h-4"></i></button>' : '') +
+                    '</div>';
+                document.getElementById(p).appendChild(nav);
+            });
+            v.addEventListener('click', e => {
+                const atras = e.target.closest('[data-vr-ir]');
+                if (atras) return mostrarPasoReserva(atras.dataset.vrIr);
+                const sigue = e.target.closest('[data-vr-siguiente]');
+                if (sigue) {
+                    const p = sigue.dataset.vrSiguiente;
+                    const error = validarPasoReserva(p);
+                    if (error) return avisoPaso(p, error);
+                    if (p === 'paso-fechas' && !booking.fechasElegidas) { booking.fechasElegidas = true; registrarUnaVez('fechas'); }
+                    return mostrarPasoReserva(PASOS_RESERVA[PASOS_RESERVA.indexOf(p) + 1]);
+                }
+                const prog = e.target.closest('.rv-prog');
+                if (prog) return irDesdeProgreso('paso-' + prog.dataset.paso);
+            });
+            /* El resumen de arriba (en celular) sigue a lo que se elige */
+            ['input', 'change', 'click'].forEach(tipo => document.getElementById('reserva-form').addEventListener(tipo, () => setTimeout(resumenVentana, 0)));
+
+            /* Todos los enlaces a #reservar abren la ventana */
+            document.addEventListener('click', e => {
+                const a = e.target.closest && e.target.closest('a[href="#reservar"]');
+                if (!a) return;
+                e.preventDefault();
+                abrirVentanaReserva(pasoPendiente());
+            });
+            window.addEventListener('popstate', () => { if (ventanaAbierta && history.state !== 'reserva') cerrarVentanaReserva(true); });
+            if (location.hash === '#reservar') setTimeout(() => abrirVentanaReserva(pasoPendiente()), 400);
+            lucide.createIcons();
+        }
+
+        /* El primer paso que falta completar */
+        function pasoPendiente() {
+            if (!booking.fechasElegidas || !(booking.checkin && booking.checkout)) return 'paso-fechas';
+            const est = estimarEstadia();
+            if (!est || !est.cabe) return 'paso-habitaciones';
+            return validarTitular(leerTitular()) ? 'paso-datos' : 'paso-pago';
+        }
+
+        function validarPasoReserva(p) {
+            if (p === 'paso-fechas') return booking.checkin && booking.checkout && booking.checkout > booking.checkin ? '' : 'Elige la fecha de llegada y la de salida.';
+            if (p === 'paso-habitaciones') {
+                const est = estimarEstadia();
+                if (!est) return 'Elige al menos una habitación para continuar.';
+                if (!est.cabe) return 'Las habitaciones elegidas no alcanzan para ' + plural(parseInt(booking.guests, 10), 'huésped', 'huéspedes') + '. Agrega otra habitación.';
+                return '';
+            }
+            if (p === 'paso-datos') return validarTitular(leerTitular()) || '';
+            return '';
+        }
+
+        /* Desde la barra de progreso solo se avanza si los pasos anteriores están completos */
+        function irDesdeProgreso(destino) {
+            const i = PASOS_RESERVA.indexOf(destino);
+            for (let j = 0; j < i; j++) {
+                const error = validarPasoReserva(PASOS_RESERVA[j]);
+                if (error) { mostrarPasoReserva(PASOS_RESERVA[j]); return avisoPaso(PASOS_RESERVA[j], error); }
+            }
+            mostrarPasoReserva(destino);
+        }
+
+        function avisoPaso(p, texto) {
+            const el = document.querySelector('#' + p + ' .vr-aviso');
+            if (!el) return;
+            el.textContent = texto;
+            el.classList.toggle('hidden', !texto);
+        }
+
+        function abrirVentanaReserva(paso) {
+            const v = document.getElementById('ventana-reserva');
+            if (!v) return;
+            if (!ventanaAbierta) {
+                ventanaAbierta = true;
+                v.classList.add('is-open');
+                document.body.classList.add('no-scroll');
+                cerrarCarrito();
+                if (history.state !== 'reserva') history.pushState('reserva', '', '#reservar');
+                /* Para las estadísticas: la visita llegó a Reservar y su tiempo cuenta ahí */
+                registrarUnaVez('seccion', 'reservar');
+                sumarTiempoSeccion();
+                seccionAntesDeReservar = seccionEnPantalla;
+                seccionEnPantalla = 'reservar';
+                seccionDesde = document.visibilityState === 'visible' ? Date.now() : 0;
+            }
+            mostrarPasoReserva(paso || pasoReserva);
+        }
+
+        function cerrarVentanaReserva(desdeHistorial) {
+            if (!ventanaAbierta) return;
+            ventanaAbierta = false;
+            document.getElementById('ventana-reserva').classList.remove('is-open');
+            document.body.classList.remove('no-scroll');
+            sumarTiempoSeccion();
+            seccionEnPantalla = seccionAntesDeReservar;
+            seccionDesde = seccionEnPantalla && document.visibilityState === 'visible' ? Date.now() : 0;
+            if (!desdeHistorial && history.state === 'reserva') history.back();
+            pintarCarrito(estimarEstadia());
+        }
+
+        function mostrarPasoReserva(id) {
+            const verFactura = id === 'factura';
+            if (verFactura) id = 'paso-pago';
+            if (!PASOS_RESERVA.includes(id)) id = 'paso-fechas';
+            pasoReserva = id;
+            const v = document.getElementById('ventana-reserva');
+            v.dataset.paso = id;
+            PASOS_RESERVA.forEach(p => document.getElementById(p).classList.toggle('is-actual', p === id));
+            document.querySelectorAll('#vr-progreso .rv-prog').forEach(li => li.classList.toggle('is-actual', 'paso-' + li.dataset.paso === id));
+            document.getElementById('vr-paso-num').textContent = 'Paso ' + (PASOS_RESERVA.indexOf(id) + 1) + ' de ' + PASOS_RESERVA.length;
+            document.getElementById('vr-titulo').textContent = TITULOS_PASO[id];
+            avisoPaso(id, '');
+            const cuerpo = v.querySelector('.vr-cuerpo');
+            cuerpo.scrollTop = 0;
+            if (verFactura) setTimeout(() => { const f = document.getElementById('factura'); cuerpo.scrollTop = f.getBoundingClientRect().top - cuerpo.getBoundingClientRect().top + cuerpo.scrollTop - 16; }, 60);
+            ajustarFactura();
+            resumenVentana();
+        }
+
+        /* Resumen corto (celular): lo que lleva elegido y el total */
+        function resumenVentana() {
+            const el = document.getElementById('vr-resumen');
+            if (!el) return;
+            const est = estimarEstadia();
+            el.classList.toggle('hidden', !est || pasoReserva === 'paso-pago');
+            if (est) el.innerHTML = '<span class="text-white">' + COP(est.total) + '</span> · ' + plural(est.noches, 'noche', 'noches') + ' · ' +
+                escaparHtml(habitacionesElegidas().map(nombreHabitacion).join(', '));
+            const txt = document.getElementById('vr-llamado-txt');
+            if (txt) txt.textContent = est ? 'Continuar mi reserva · ' + COP(est.total) : 'Reservar ahora';
         }
 
         /* Lleva al primer paso que falta: habitaciones, datos del titular o pago */
@@ -4904,7 +5508,7 @@
         }
 
         function irAReservar() {
-            document.getElementById(habitacionesElegidas().length ? 'reservar' : 'paso-habitaciones').scrollIntoView({ behavior: 'smooth' });
+            abrirVentanaReserva(pasoPendiente());
         }
 
         function reservarHabitacion(key) {
@@ -4914,7 +5518,7 @@
                 registrar('habitacion_agregada', key);
             }
             renderBooking();
-            document.getElementById('paso-habitaciones').scrollIntoView({ behavior: 'smooth' });
+            abrirVentanaReserva(booking.checkin && booking.checkout ? 'paso-habitaciones' : 'paso-fechas');
             if (sinCupo) sinCupoAviso(key);
             else showToast(nombreHabitacion(key) + ' está en tu reserva. Revisa tu factura y elige cómo pagar.');
         }
@@ -5030,7 +5634,7 @@
                 /* Con servidor de reservas, la reserva queda guardada para el panel del hotel
                    con el mismo número que lleva el mensaje de WhatsApp */
                 const orden = BOLD_ACTIVO ? nuevaOrdenReserva() : '';
-                registrar('reserva_whatsapp', habitacionesElegidas().join('+'), est.total);
+                registrar('reserva_whatsapp', habitacionesElegidas().join('+') + (orden ? '|' + orden : ''), est.total);
                 abrirWhatsApp(mensajeFacturaWhatsApp(est, titular, orden));
                 enviarEventos();
                 if (orden) {
@@ -5106,7 +5710,7 @@
                 };
                 const retorno = urlRetornoBold();
                 if (retorno) opciones.redirectionUrl = retorno;
-                registrar('pago_iniciado', Object.keys(habs).join('+'), p.total);
+                registrar('pago_iniciado', Object.keys(habs).join('+') + '|' + p.orden, p.total);
                 enviarEventos();
                 new BoldCheckout(opciones).open();
             } catch (e) {
@@ -5275,7 +5879,7 @@
 
         function verFacturaPagada() {
             cerrarPago();
-            document.getElementById('factura').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            abrirVentanaReserva('factura');
         }
 
         /* Después de un pago rechazado: misma reserva, lista para pagar otra vez */
@@ -5283,7 +5887,7 @@
             const p = pagoMostrado;
             cerrarPago();
             const fechasVigentes = restaurarReserva(p);
-            document.getElementById(fechasVigentes ? 'paso-pago' : 'paso-fechas').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            abrirVentanaReserva(fechasVigentes ? 'paso-pago' : 'paso-fechas');
         }
 
         /* =========================================================
@@ -5544,6 +6148,43 @@
             }).join('');
         }
 
+        /* --- Carruseles: flechas, puntos y "1 / 4" debajo de cada lista que se recorre de lado --- */
+        function prepararCarruseles() {
+            document.querySelectorAll('.carrusel, .carrusel-movil').forEach(c => {
+                if (c.dataset.listo) return;
+                c.dataset.listo = '1';
+                const nav = document.createElement('div');
+                nav.className = 'carrusel-nav';
+                nav.innerHTML = '<span class="carrusel-puntos" aria-hidden="true"></span>' +
+                    '<span class="flex items-center gap-3"><span class="carrusel-cuenta"></span>' +
+                    '<button type="button" class="carrusel-flecha" data-dir="-1" aria-label="Anterior">' + icono('arrow-left', 'w-4 h-4') + '</button>' +
+                    '<button type="button" class="carrusel-flecha" data-dir="1" aria-label="Siguiente">' + icono('arrow-right', 'w-4 h-4') + '</button></span>';
+                c.after(nav);
+                const items = () => [...c.children].filter(x => x.offsetParent !== null);
+                const paso = () => { const i = items(); return i.length > 1 ? i[1].offsetLeft - i[0].offsetLeft : c.clientWidth; };
+                const pintar = () => {
+                    const lista = items();
+                    const porVista = Math.max(1, Math.round(c.clientWidth / (paso() || 1)));
+                    const total = Math.max(1, lista.length - porVista + 1);
+                    const actual = Math.min(total - 1, Math.round(c.scrollLeft / (paso() || 1)));
+                    nav.classList.toggle('is-vacio', c.scrollWidth <= c.clientWidth + 4);
+                    nav.querySelector('.carrusel-cuenta').textContent = (actual + 1) + ' / ' + total;
+                    nav.querySelector('.carrusel-puntos').innerHTML = total > 10 ? '' : Array.from({ length: total }, (_, k) => '<span class="' + (k === actual ? 'is-actual' : '') + '"></span>').join('');
+                    nav.querySelector('[data-dir="-1"]').disabled = actual <= 0;
+                    nav.querySelector('[data-dir="1"]').disabled = actual >= total - 1;
+                };
+                nav.addEventListener('click', e => {
+                    const b = e.target.closest('[data-dir]');
+                    if (b) c.scrollBy({ left: Number(b.dataset.dir) * paso(), behavior: 'smooth' });
+                });
+                let espera;
+                c.addEventListener('scroll', () => { clearTimeout(espera); espera = setTimeout(pintar, 60); }, { passive: true });
+                new ResizeObserver(pintar).observe(c);
+                new MutationObserver(pintar).observe(c, { childList: true });
+                pintar();
+            });
+        }
+
         /* --- Ficha de la habitación (con enlace propio: #habitacion-suite, etc.) --- */
         let habitacionAbierta = null;
         let fotoHabitacion = 0;
@@ -5714,9 +6355,13 @@
                 '</article>'
             ).join('');
 
-            document.getElementById('bebidas-grid').innerHTML = CARTA_BEBIDAS.map(c =>
+            /* Las categorías largas se parten en tarjetas de hasta 6 bebidas, para que quepan en la pantalla */
+            const tarjetasBebidas = [];
+            CARTA_BEBIDAS.forEach(c => { for (let i = 0; i < c.items.length; i += 6) tarjetasBebidas.push({ ...c, items: c.items.slice(i, i + 6), sigue: i > 0 }); });
+            document.getElementById('bebidas-grid').innerHTML = tarjetasBebidas.map(c =>
                 '<div>' +
-                    '<h4 class="flex items-center gap-2.5 font-display text-2xl text-ink mb-4">' + icono(c.icono, 'w-4 h-4 text-brass') + c.categoria + '</h4>' +
+                    '<h4 class="flex items-center gap-2.5 font-display text-2xl text-ink mb-4">' + icono(c.icono, 'w-4 h-4 text-brass') + c.categoria +
+                        (c.sigue ? ' <span class="text-[0.7rem] font-sans text-graphite/45 tracking-normal">(continúa)</span>' : '') + '</h4>' +
                     '<ul class="space-y-2.5">' + c.items.map(([nombre, medida, precio]) =>
                         '<li class="bebida-fila flex items-center gap-2 body-sm">' +
                             '<span class="text-graphite/80">' + nombre + ' <span class="text-graphite/45 text-[0.72rem] whitespace-nowrap">' + medida + '</span></span>' +
@@ -7100,6 +7745,9 @@
                         } else if (a.h && a.h.indexOf('#habitacion-') === 0) {
                             toggleChat(false);
                             openRoom(a.h.slice(12));
+                        } else if (a.h === '#reservar') {
+                            toggleChat(false);
+                            abrirVentanaReserva(pasoPendiente());
                         } else if (a.h) {
                             toggleChat(false);
                             const destino = document.querySelector(a.h);
@@ -7256,11 +7904,14 @@
             /* --- Contenido que sale de los datos: habitaciones, planes, cartas, galería y tarifas --- */
             renderHabitaciones();
             renderPlanes();
+            prepararCarruseles();
             renderCartas();
             cargarPedido();
             prepararFormularioPedido();
             pintarPedido();
+            if (document.documentElement.classList.contains('pantallas')) galeriaCompleta = true;
             renderGaleria();
+            prepararCarruseles();
             document.querySelectorAll('[data-tarifa="mascota"]').forEach(el => { el.textContent = COP(TARIFA_MASCOTA); });
             const valoresNoche = Object.values(TARIFAS).flatMap(t => [t.finde, t.semana]);
             document.querySelectorAll('[data-tarifa="desde"]').forEach(el => { el.textContent = COP(Math.min(...valoresNoche)); });
@@ -7312,7 +7963,15 @@
                 el.classList.toggle('hidden', (el.dataset.bold === 'si') !== BOLD_ACTIVO);
             });
             document.getElementById('pago-modal').addEventListener('click', (e) => { if (e.target.id === 'pago-modal') cerrarPago(); });
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { cerrarPago(); cerrarCarrito(); } });
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                const otraVentana = ['pago-modal', 'room-modal'].some(id => !document.getElementById(id).classList.contains('is-hidden')) ||
+                    !document.getElementById('lightbox').classList.contains('is-hidden');
+                cerrarPago();
+                cerrarCarrito();
+                if (!otraVentana) cerrarVentanaReserva();
+            });
+            prepararVentanaReserva();
             iniciarMedicion();
             prepararReserva();
             revisarRetornoBold();

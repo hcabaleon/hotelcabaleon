@@ -619,6 +619,7 @@
                                             <button class="chip" data-metrica="interes">Con interés</button>
                                             <button class="chip" data-metrica="whatsapp">WhatsApp</button>
                                             <button class="chip" data-metrica="reservas">Reservas</button>
+                                            <button class="chip" data-metrica="pagadas">Pagadas</button>
                                         </span>
                                         <button type="button" class="chip" data-ver-tabla="est-dias">Ver tabla</button>
                                     </span>
@@ -1667,6 +1668,7 @@
                 await actualizarReserva(id, { estado });
                 if (CONECTADO) toast(estado === 'cancelada' ? 'Reserva cancelada.' : 'Reserva confirmada.');
                 renderTodo();
+                if (vistaActual === 'estadisticas') cargarEstadisticas();
                 abrirReserva(id);
             } catch (e) {
                 toast(e.message);
@@ -1690,7 +1692,7 @@
                 reservas = reservas.filter(x => String(x.id) !== String(id));
                 cerrarModal();
                 renderTodo();
-                if (vistaActual === 'estadisticas' && datosEstadisticas) renderEstadisticas(datosEstadisticas);
+                if (vistaActual === 'estadisticas') cargarEstadisticas();
                 toast(CONECTADO ? 'Reserva eliminada.' : 'Modo de ejemplo: la reserva se quitó solo de esta pantalla.');
             } catch (e) {
                 toast(e.message);
@@ -1996,7 +1998,8 @@
         };
         const PASOS_EMBUDO = {
             visita: 'Visitaron la página', reservar: 'Llegaron a Reservar', fechas: 'Eligieron fechas',
-            habitacion: 'Agregaron una habitación', datos: 'Completaron sus datos', confirmo: 'Enviaron su reserva'
+            habitacion: 'Agregaron una habitación', datos: 'Completaron sus datos', confirmo: 'Enviaron su reserva',
+            pago: 'Pagaron o confirmaron'
         };
         const TEMAS = {
             precios: 'Precios', incluye_tarifa: 'Qué incluye la tarifa', descuento: 'Descuentos', temporada: 'Temporadas y festivos',
@@ -2027,7 +2030,11 @@
             carrito: 'Su reserva', 'ficha de habitación': 'Ficha de habitación', 'resultado del pago': 'Resultado del pago', 'galería': 'Fotos de la galería',
             'menú': 'Menú', 'pie de página': 'Pie de página', otro: 'Otro lugar'
         };
-        const METRICAS = { visitas: 'visitas', visitantes: 'visitantes', interes: 'visitas con interés', whatsapp: 'escribieron por WhatsApp', reservas: 'reservas enviadas' };
+        const METRICAS = { visitas: 'visitas', visitantes: 'visitantes', interes: 'visitas con interés', whatsapp: 'escribieron por WhatsApp', reservas: 'reservas enviadas', pagadas: 'reservas pagadas' };
+        /* Reservas pagadas (pagadas con Bold o confirmadas en el panel) y sin pagar (siguen pendientes) */
+        const pagadasDe = x => (x.pagadas != null ? x.pagadas : x.pagos || 0);
+        const pendientesDe = x => (x.pendientes != null ? x.pendientes : Math.max(0, (x.reservas || 0) - pagadasDe(x)));
+        const valorPagadoDe = x => (x.valor_pagadas != null ? x.valor_pagadas : x.valor || 0);
         /* [id, texto, utm_source, utm_medium, campaña por defecto]. Los nombres coinciden con los de index.html */
         const LUGARES_ENLACE = [
             ['instagram-bio', 'Instagram · biografía', 'instagram', 'social', 'biografia'],
@@ -2188,28 +2195,29 @@
                 ['Tiempo promedio', duracionTxt(r.duracion), 'Con la página a la vista, por visita', cambio(r.duracion, a.duracion)],
                 ['Visitas con interés', pct(interes, r.visitas) + ' %', num(interes) + ' se quedaron 10 s o más o tocaron un botón', cambio(interes, a.interes)],
                 ['Escribieron por WhatsApp', num(r.whatsapp), pct(r.whatsapp, r.visitas) + ' % de las visitas', cambio(r.whatsapp, a.whatsapp)],
-                ['Reservas enviadas', num(r.reservas), 'Por WhatsApp o pagando con Bold', cambio(r.reservas, a.reservas)],
-                ['Valor reservado', copCorto(r.valor), 'Estadías enviadas desde la página' + (r.pagado ? ' · pagado con Bold: ' + COP(r.pagado) : ''), cambio(r.valor, a.valor)],
-                ['Conversión', pctDecimal(r.reservas, r.visitas), 'De las visitas terminan en reserva', '']
+                ['Reservas pagadas', num(pagadasDe(r)), valorPagadoDe(r) ? COP(valorPagadoDe(r)) + ' en estadías pagadas o confirmadas' : 'Pagadas con Bold o confirmadas en el panel', cambio(pagadasDe(r), a.pagadas)],
+                ['Sin pagar', num(pendientesDe(r)), pendientesDe(r) ? 'Dejaron la reserva pendiente · ' + COP(Math.max(0, (r.valor || 0) - valorPagadoDe(r))) + ' por cobrar' : 'Reservas enviadas que siguen pendientes', ''],
+                ['Conversión', pctDecimal(r.reservas, r.visitas), 'Envían una reserva · ' + pctDecimal(pagadasDe(r), r.visitas) + ' la pagan', '']
             ]);
             graficoDias(d.por_dia || []);
             claves(d);
             const total = r.visitas || 0;
             barras('est-fuentes-top', (d.fuentes || []).slice(0, 6), {
                 total: origenEstadisticas ? sumar(d.fuentes || [], f => f.visitas) : total,
-                nota: f => num(f.whatsapp) + ' WhatsApp · ' + plural(f.reservas || 0, 'reserva', 'reservas') + (f.valor ? ' · ' + copCorto(f.valor) : ''),
+                nota: f => num(f.whatsapp) + ' WhatsApp · ' + num(pagadasDe(f)) + ' pagadas · ' + num(pendientesDe(f)) + ' sin pagar',
                 dato: f => 'data-origen="' + esc(f.nombre) + '"', vacio: 'Aún no hay visitas en este período.'
             });
             embudo(d.embudo || []);
         }
 
         function graficoDias(dias) {
-            document.getElementById('est-dias-tabla').innerHTML = tabla(['Día', 'Visitas', 'Visitantes', 'Con interés', 'WhatsApp', 'Reservas', 'Valor'],
-                dias.map(d => [fechaLarga(d.dia), num(d.visitas), num(d.visitantes), num(d.interes != null ? d.interes : 0), num(d.whatsapp), num(d.reservas), COP(d.valor || 0)]));
-            graficoLinea('est-dias', dias.map(d => ({ dia: d.dia, v: Number(d[metricaDias]) || 0, d })), {
+            document.getElementById('est-dias-tabla').innerHTML = tabla(['Día', 'Visitas', 'Visitantes', 'Con interés', 'WhatsApp', 'Reservas', 'Pagadas', 'Sin pagar', 'Valor'],
+                dias.map(d => [fechaLarga(d.dia), num(d.visitas), num(d.visitantes), num(d.interes != null ? d.interes : 0), num(d.whatsapp), num(d.reservas),
+                    num(pagadasDe(d)), num(pendientesDe(d)), COP(d.valor || 0)]));
+            graficoLinea('est-dias', dias.map(d => ({ dia: d.dia, v: Number(metricaDias === 'pagadas' ? pagadasDe(d) : d[metricaDias]) || 0, d })), {
                 etiqueta: 'Evolución por día',
                 tip: p => '<strong>' + num(p.v) + '</strong> ' + METRICAS[metricaDias] + ' · ' + fechaLarga(p.dia) +
-                    '<br>' + num(p.d.visitas) + ' visitas · ' + num(p.d.whatsapp) + ' WhatsApp · ' + num(p.d.reservas) + ' reservas'
+                    '<br>' + num(p.d.visitas) + ' visitas · ' + num(p.d.whatsapp) + ' WhatsApp · ' + num(p.d.reservas) + ' reservas (' + num(pagadasDe(p.d)) + ' pagadas)'
             });
         }
 
@@ -2243,6 +2251,8 @@
                     if (!caida || sigue < caida.sigue) caida = { sigue, de: pasos[i - 1].paso, a: pasos[i].paso };
                 }
                 if (caida && pasos[0].visitas >= 10) lista.push(['route', 'Donde más visitas se pierden: de "' + PASOS_EMBUDO[caida.de] + '" a "' + PASOS_EMBUDO[caida.a] + '" (sigue el <strong>' + Math.round(caida.sigue * 100) + ' %</strong>).']);
+                if (r.reservas) lista.push(['badge-check', 'De ' + plural(r.reservas, 'reserva enviada', 'reservas enviadas') + ' desde la página, <strong>' + num(pagadasDe(r)) +
+                    '</strong> ya ' + (pagadasDe(r) === 1 ? 'está pagada o confirmada' : 'están pagadas o confirmadas') + ' y ' + num(pendientesDe(r)) + ' siguen sin pagar.']);
                 const celular = (d.dispositivos || []).find(x => x.nombre === 'Celular');
                 if (celular) lista.push(['smartphone', '<strong>' + pct(celular.visitas, r.visitas) + ' %</strong> de las visitas son desde el celular.']);
             }
@@ -2268,9 +2278,11 @@
                 color: p => RAMPA_EMBUDO[Math.max(0, pasos.indexOf(p))] || AZUL,
                 nota: p => { const i = pasos.indexOf(p); return i ? pct(p.visitas, pasos[i - 1].visitas) + ' % del paso anterior' : ''; }
             });
-            const ultimo = pasos[pasos.length - 1];
+            const enviaron = (pasos.find(p => p.paso === 'confirmo') || {}).visitas || 0;
+            const pagaron = (pasos.find(p => p.paso === 'pago') || {}).visitas;
             cont.insertAdjacentHTML('beforeend', '<p class="text-[0.76rem] text-graphite/65 mt-4 pt-4 border-t border-line">De cada 100 visitas, <strong class="font-medium text-ink">' +
-                pctDecimal(ultimo.visitas, base).replace(' %', '') + '</strong> envían una reserva.</p>');
+                pctDecimal(enviaron, base).replace(' %', '') + '</strong> envían una reserva' +
+                (pagaron != null ? ' y <strong class="font-medium text-ink">' + pctDecimal(pagaron, base).replace(' %', '') + '</strong> la pagan' : '') + '.</p>');
         }
 
         /* =================== DE DÓNDE LLEGAN =================== */
@@ -2308,7 +2320,7 @@
                 '</div>' +
                 '<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-px bg-line border border-line mb-6">' +
                     [['Visitas', num(r.visitas)], ['Visitantes', num(r.visitantes)], ['Tiempo promedio', duracionTxt(r.duracion)],
-                     ['Con interés', pct(interes, r.visitas) + ' %'], ['WhatsApp', num(r.whatsapp)], ['Reservas', num(r.reservas) + '<span class="text-[0.8rem] text-graphite/45"> · ' + pctDecimal(r.reservas, r.visitas) + '</span>']]
+                     ['Con interés', pct(interes, r.visitas) + ' %'], ['WhatsApp', num(r.whatsapp)], ['Reservas', num(r.reservas) + '<span class="text-[0.8rem] text-graphite/45"> · ' + num(pagadasDe(r)) + ' pagadas</span>']]
                     .map(([t, v]) => '<div class="bg-white p-4"><span class="micro text-graphite/40">' + t + '</span><span class="block est-kpi-chico mt-2">' + v + '</span></div>').join('') +
                 '</div>' +
                 '<span class="micro text-graphite/40 block mb-2">Visitas por día</span>' +
@@ -2333,14 +2345,15 @@
         const COLUMNAS_FUENTES = [
             ['nombre', 'Fuente'], ['serie', 'Tendencia'], ['visitas', 'Visitas'], ['parte', '% del total'], ['visitantes', 'Visitantes'],
             ['nuevos', 'Nuevos'], ['duracion', 'Tiempo'], ['interes', 'Con interés'], ['whatsapp', 'WhatsApp'],
-            ['reservas', 'Reservas'], ['conversion', 'Conversión'], ['valor', 'Valor']
+            ['pagadas', 'Pagadas'], ['pendientes', 'Sin pagar'], ['conversion', 'Conversión'], ['valor', 'Valor pagado']
         ];
         function tablaFuentes(fuentes) {
             const t = document.getElementById('est-tabla-fuentes');
             const total = sumar(fuentes, f => f.visitas);
             if (!fuentes.length) { t.innerHTML = '<tbody><tr><td class="!text-left !pl-6">' + vacioEst('Aún no hay visitas en este período.') + '</td></tr></tbody>'; return; }
             const valor = (f, c) => c === 'parte' ? f.visitas / (total || 1) : c === 'conversion' ? (f.reservas || 0) / (f.visitas || 1)
-                : c === 'interes' ? (f.interes || 0) / (f.visitas || 1) : c === 'nuevos' ? (f.nuevos || 0) / (f.visitantes || 1) : Number(f[c]) || 0;
+                : c === 'interes' ? (f.interes || 0) / (f.visitas || 1) : c === 'nuevos' ? (f.nuevos || 0) / (f.visitantes || 1)
+                : c === 'pagadas' ? pagadasDe(f) : c === 'pendientes' ? pendientesDe(f) : c === 'valor' ? valorPagadoDe(f) : Number(f[c]) || 0;
             const filas = fuentes.slice().sort((a, b) => {
                 if (ordenFuentes.clave === 'nombre') return (ordenFuentes.desc ? -1 : 1) * a.nombre.localeCompare(b.nombre, 'es');
                 const x = valor(a, ordenFuentes.clave), y = valor(b, ordenFuentes.clave);
@@ -2354,11 +2367,11 @@
                     '<td class="!text-left">' + sparkline(f.serie) + '</td>' +
                     '<td>' + num(f.visitas) + '</td><td class="est-tenue">' + pct(f.visitas, total) + ' %</td><td>' + num(f.visitantes) + '</td>' +
                     '<td class="est-tenue">' + pct(f.nuevos, f.visitantes) + ' %</td><td>' + duracionTxt(f.duracion) + '</td>' +
-                    '<td>' + pct(f.interes, f.visitas) + ' %</td><td>' + num(f.whatsapp) + '</td><td>' + num(f.reservas) + '</td>' +
-                    '<td>' + pctDecimal(f.reservas, f.visitas) + '</td><td>' + (f.valor ? COP(f.valor) : '<span class="est-tenue">—</span>') + '</td></tr>').join('') +
+                    '<td>' + pct(f.interes, f.visitas) + ' %</td><td>' + num(f.whatsapp) + '</td><td>' + num(pagadasDe(f)) + '</td><td>' + num(pendientesDe(f)) + '</td>' +
+                    '<td>' + pctDecimal(f.reservas, f.visitas) + '</td><td>' + (valorPagadoDe(f) ? COP(valorPagadoDe(f)) : '<span class="est-tenue">—</span>') + '</td></tr>').join('') +
                 '</tbody><tfoot><tr><td class="!text-left font-medium">Total</td><td></td><td class="font-medium">' + num(total) + '</td><td class="est-tenue">100 %</td>' +
                 '<td>' + num(sumar(fuentes, f => f.visitantes)) + '</td><td></td><td></td><td></td><td>' + num(sumar(fuentes, f => f.whatsapp)) + '</td>' +
-                '<td>' + num(sumar(fuentes, f => f.reservas)) + '</td><td>' + pctDecimal(sumar(fuentes, f => f.reservas), total) + '</td><td>' + COP(sumar(fuentes, f => f.valor)) + '</td></tr></tfoot>';
+                '<td>' + num(sumar(fuentes, pagadasDe)) + '</td><td>' + num(sumar(fuentes, pendientesDe)) + '</td><td>' + pctDecimal(sumar(fuentes, f => f.reservas), total) + '</td><td>' + COP(sumar(fuentes, valorPagadoDe)) + '</td></tr></tfoot>';
             lucide.createIcons();
         }
 
@@ -2368,10 +2381,10 @@
                 cont.innerHTML = '<div class="px-5 sm:px-6 pb-5">' + vacioEst('Todavía no hay visitas desde enlaces con seguimiento. Créalos en la pestaña Enlaces y compártelos.') + '</div>';
                 return;
             }
-            cont.innerHTML = '<table class="est-pro"><thead><tr><th>Campaña</th><th class="!text-left">Fuente</th><th>Visitas</th><th>WhatsApp</th><th>Reservas</th><th>Conversión</th><th>Valor</th></tr></thead><tbody>' +
+            cont.innerHTML = '<table class="est-pro"><thead><tr><th>Campaña</th><th class="!text-left">Fuente</th><th>Visitas</th><th>WhatsApp</th><th>Pagadas</th><th>Sin pagar</th><th>Conversión</th><th>Valor</th></tr></thead><tbody>' +
                 lista.map(c => '<tr tabindex="0" data-origen="' + esc(c.fuente || '') + '" title="Ver el panel de ' + esc(c.fuente || '') + '">' +
                     '<td class="font-medium">' + esc(legible(c.nombre)) + '</td><td class="!text-left">' + esc(c.fuente || '') + '<span class="est-tenue">' + (c.medio ? ' · ' + esc(c.medio) : '') + '</span></td>' +
-                    '<td>' + num(c.visitas) + '</td><td>' + num(c.whatsapp) + '</td><td>' + num(c.reservas) + '</td><td>' + pctDecimal(c.reservas, c.visitas) + '</td>' +
+                    '<td>' + num(c.visitas) + '</td><td>' + num(c.whatsapp) + '</td><td>' + num(pagadasDe(c)) + '</td><td>' + num(pendientesDe(c)) + '</td><td>' + pctDecimal(c.reservas, c.visitas) + '</td>' +
                     '<td>' + (c.valor ? COP(c.valor) : '<span class="est-tenue">—</span>') + '</td></tr>').join('') + '</tbody></table>';
         }
 
@@ -2404,7 +2417,7 @@
                         '<span class="block text-[0.66rem] text-graphite/50 mt-1">' + (vistas ? num(vistas) + ' visitas' + (s.segundos ? ' · ' + duracionTxt(s.segundos) : '') : 'Nadie la vio') + '</span></span>' +
                         '<span class="shrink-0 opacity-90">' + (s ? sparkline(s.serie, { ancho: 84, alto: 28 }) : '') + '</span>' +
                     '</span>' +
-                    (vistas ? '<span class="block text-[0.66rem] text-graphite/50 mt-2 pt-2 border-t border-line">' + num(s.whatsapp) + ' escribieron · ' + plural(s.reservas || 0, 'reservó', 'reservaron') + '</span>' : '') +
+                    (vistas ? '<span class="block text-[0.66rem] text-graphite/50 mt-2 pt-2 border-t border-line">' + num(s.whatsapp) + ' escribieron · ' + plural(s.reservas || 0, 'reservó', 'reservaron') + ' · ' + num(pagadasDe(s)) + ' pagaron</span>' : '') +
                 '</button>';
             }).join('');
             barras('est-profundidad', d.profundidad || [], { total: r.visitas, vacio: 'Se mide desde esta versión de la página.' });
@@ -2459,7 +2472,7 @@
                     cifra('Entraron por aquí', num(s.entradas), '<span class="block text-[0.66rem] text-graphite/45 mt-1">Primera sección de su visita</span>') +
                     cifra('Contactos desde aquí', num(s.clics), '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + (contactos.map(c => (CONTACTOS[c.tipo] ? CONTACTOS[c.tipo][1] : c.tipo) + ': ' + c.total).join(' · ') || 'WhatsApp, llamadas y cómo llegar') + '</span>') +
                     cifra('Escribieron', pctDecimal(s.whatsapp, s.visitas), comparar(s.whatsapp, s.visitas, r.whatsapp, r.visitas)) +
-                    cifra('Reservaron', pctDecimal(s.reservas, s.visitas), comparar(s.reservas, s.visitas, r.reservas, r.visitas)) +
+                    cifra('Reservaron', pctDecimal(s.reservas, s.visitas), '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + num(s.reservas) + ' reservas · ' + num(pagadasDe(s)) + ' pagadas</span>' + comparar(s.reservas, s.visitas, r.reservas, r.visitas)) +
                 '</div>' +
                 '<div class="mt-7"><span class="micro text-graphite/40 block mb-2">Visitas que la vieron, por día</span>' +
                 '<div id="est-modal-dias" class="relative" tabindex="0" aria-label="Visitas por día a esta sección"></div></div>' +
@@ -2485,9 +2498,17 @@
             const validas = enPeriodo.filter(r => !['cancelada', 'rechazada', 'anulada'].includes(r.estado));
             const anticipacion = validas.map(r => Math.max(0, nochesEntre(creadaEl(r), r.llegada)));
             const porDia = {};
-            enPeriodo.forEach(r => { const c = creadaEl(r); const x = porDia[c] = porDia[c] || { n: 0, ventas: 0 }; x.n++; if (OCUPAN.includes(r.estado)) x.ventas += Number(r.total) || 0; });
+            enPeriodo.forEach(r => {
+                const c = creadaEl(r);
+                const x = porDia[c] = porDia[c] || { n: 0, ventas: 0, pagadas: 0, pendientes: 0, canceladas: 0 };
+                x.n++;
+                if (OCUPAN.includes(r.estado)) { x.pagadas++; x.ventas += Number(r.total) || 0; }
+                else if (r.estado === 'pendiente') x.pendientes++;
+                else x.canceladas++;
+            });
             const dias = [];
-            for (let dia = desde; dia <= hasta; dia = sumarDias(dia, 1)) dias.push({ dia, n: (porDia[dia] || {}).n || 0, ventas: (porDia[dia] || {}).ventas || 0 });
+            for (let dia = desde; dia <= hasta; dia = sumarDias(dia, 1)) dias.push({ dia, n: 0, ventas: 0, pagadas: 0, pendientes: 0, canceladas: 0, ...(porDia[dia] || {}) });
+            const pendientes = enPeriodo.filter(r => r.estado === 'pendiente');
             const contar = (lista, clave) => { const m = {}; lista.forEach(r => { const k = clave(r); const x = m[k] = m[k] || { nombre: k, visitas: 0, valor: 0 }; x.visitas++; x.valor += Number(r.total) || 0; }); return Object.values(m).sort((a, b) => b.visitas - a.visitas); };
             const nochesPorTipo = {};
             validas.forEach(r => Object.keys(r.habitaciones || {}).forEach(k => { nochesPorTipo[k] = (nochesPorTipo[k] || 0) + (Number(r.habitaciones[k]) || 0) * (Number(r.noches) || 0); }));
@@ -2502,6 +2523,7 @@
             }
             return {
                 total: enPeriodo.length, vigentes: vigentes.length, caidas: caidas.length,
+                pendientes: pendientes.length, valorPendiente: sumar(pendientes, r => r.total),
                 ventas: sumar(vigentes, r => r.total), cobrado: sumar(enPeriodo, r => r.pagado),
                 ticket: vigentes.length ? sumar(vigentes, r => r.total) / vigentes.length : 0,
                 noches: validas.length ? sumar(validas, r => r.noches) / validas.length : 0,
@@ -2519,34 +2541,34 @@
             const a = analisisReservas(desde, hasta);
             const r = d.resumen || {};
             tarjetas('est-kpis-reservas', [
-                ['Reservas recibidas', num(a.total), num(a.vigentes) + ' pagadas o confirmadas', ''],
-                ['Ventas confirmadas', copCorto(a.ventas), COP(a.ventas) + ' · reservas pagadas o confirmadas', ''],
+                ['Reservas recibidas', num(a.total), num(a.vigentes) + ' pagadas · ' + num(a.pendientes) + ' sin pagar · ' + num(a.caidas) + ' canceladas', ''],
+                ['Pagadas o confirmadas', num(a.vigentes), copCorto(a.ventas) + ' en ventas confirmadas', ''],
+                ['Sin pagar', num(a.pendientes), a.pendientes ? COP(a.valorPendiente) + ' en reservas pendientes de pago' : 'Ninguna reserva pendiente de pago', ''],
                 ['Cobrado', copCorto(a.cobrado), 'Pagos registrados en el período', ''],
-                ['Valor promedio', copCorto(a.ticket), 'Por reserva confirmada', ''],
-                ['Noches promedio', a.noches ? a.noches.toFixed(1).replace('.', ',') : '0', (a.huespedes ? a.huespedes.toFixed(1).replace('.', ',') : '0') + ' huéspedes por reserva', ''],
+                ['Valor promedio', copCorto(a.ticket), 'Por reserva pagada o confirmada', ''],
+                ['Noches promedio', a.noches ? a.noches.toFixed(1).replace('.', ',') : '0', (a.huespedes ? a.huespedes.toFixed(1).replace('.', ',') : '0') + ' huéspedes · ' + pct(a.mascotas, a.validas) + ' % con mascotas', ''],
                 ['Anticipación', Math.round(a.anticipacion) + (Math.round(a.anticipacion) === 1 ? ' día' : ' días'), 'Promedio entre la reserva y la llegada', ''],
-                ['Cancelaciones', pct(a.caidas, a.total) + ' %', plural(a.caidas, 'reserva cancelada, rechazada o anulada', 'reservas canceladas, rechazadas o anuladas'), ''],
-                ['Con mascotas', pct(a.mascotas, a.validas) + ' %', 'Reservas Pet Friendly', '']
+                ['Cancelaciones', pct(a.caidas, a.total) + ' %', plural(a.caidas, 'reserva cancelada, rechazada o anulada', 'reservas canceladas, rechazadas o anuladas'), '']
             ]);
             if (origenEstadisticas) {
                 document.getElementById('est-kpis-reservas').insertAdjacentHTML('afterbegin', '<p class="col-span-full text-[0.76rem] text-graphite/60 bg-white border border-line p-3 flex gap-2.5">' +
                     '<i data-lucide="info" class="w-4 h-4 text-brass shrink-0"></i><span>Las reservas del hotel no se separan por fuente: estas cifras son de todas. "Lo que generó la página" sí muestra solo ' + esc(origenEstadisticas) + '.</span></p>');
             }
             const dias = a.dias.length > 62 ? porSemanas(a.dias) : a.dias;
-            columnas('est-reservas-dia', dias.map(x => x.n), {
+            columnasApiladas('est-reservas-dia', dias, [['pagadas', 'Pagadas o confirmadas', AZUL], ['pendientes', 'Sin pagar', AZUL_CLARO], ['canceladas', 'Canceladas', '#D8D2C7']], {
                 etiqueta: i => dias[i].hasta ? fechaCorta(dias[i].dia) + ' – ' + fechaCorta(dias[i].hasta) : fechaLarga(dias[i].dia),
-                valorTip: i => plural(dias[i].n, 'reserva', 'reservas') + (dias[i].ventas ? ' · ' + COP(dias[i].ventas) + ' confirmadas' : ''),
-                ejes: [[0, fechaCorta(dias[0].dia)], [dias.length - 1, fechaCorta(dias[dias.length - 1].dia)]],
+                ejes: [fechaCorta(dias[0].dia), fechaCorta(dias[dias.length - 1].dia)],
                 vacio: 'No llegaron reservas en este período.'
             });
             document.getElementById('est-reservas-dia-sub').textContent = 'Todas las reservas creadas en el período, de la página y del panel' + (dias !== a.dias ? ' · por semana' : '');
-            document.getElementById('est-reservas-dia-tabla').innerHTML = tabla(['Día', 'Reservas', 'Ventas confirmadas'], a.dias.filter(x => x.n).map(x => [fechaLarga(x.dia), num(x.n), COP(x.ventas)]));
+            document.getElementById('est-reservas-dia-tabla').innerHTML = tabla(['Día', 'Reservas', 'Pagadas', 'Sin pagar', 'Canceladas', 'Ventas confirmadas'],
+                a.dias.filter(x => x.n).map(x => [fechaLarga(x.dia), num(x.n), num(x.pagadas), num(x.pendientes), num(x.canceladas), COP(x.ventas)]));
             barras('est-canales', a.canales, { total: a.total, nombre: c => CANALES[c.nombre] || legible(c.nombre), nota: c => COP(c.valor) + ' en reservas', vacio: 'Sin reservas en este período.' });
             barras('est-estados', a.estados, { total: a.total, nombre: e => ESTADOS[e.nombre] ? ESTADOS[e.nombre].txt : legible(e.nombre), vacio: 'Sin reservas en este período.' });
             barras('est-anticipacion', a.anticipaciones.filter(x => x.visitas), { total: a.validas, vacio: 'Sin reservas en este período.' });
-            const web = [['Reservas enviadas', num(r.reservas), pctDecimal(r.reservas, r.visitas) + ' de las visitas'],
-                ['Valor de esas estadías', COP(r.valor), 'Suma del total de cada reserva enviada'],
-                ['Pagos aprobados con Bold', num(r.pagos), r.pagado ? COP(r.pagado) + ' pagados' : 'Desde la página'],
+            const web = [['Reservas enviadas', num(r.reservas), pctDecimal(r.reservas, r.visitas) + ' de las visitas · ' + COP(r.valor) + ' en estadías'],
+                ['Pagadas o confirmadas', num(pagadasDe(r)), COP(valorPagadoDe(r)) + ' · cobrado: ' + COP(r.pagado)],
+                ['Sin pagar', num(pendientesDe(r)), 'Dejaron la reserva y aún no pagan: conviene escribirles'],
                 ['Escribieron por WhatsApp', num(r.whatsapp), 'Posibles reservas para responder']];
             document.getElementById('est-web').innerHTML = '<div class="divide-y divide-line">' + web.map(([t, v, n]) =>
                 '<div class="flex items-baseline justify-between gap-4 py-3"><span><span class="block text-[0.8rem] text-ink">' + t + '</span><span class="block text-[0.68rem] text-graphite/45 mt-0.5">' + n + '</span></span>' +
@@ -2564,7 +2586,8 @@
             const semanas = [];
             for (let i = 0; i < dias.length; i += 7) {
                 const grupo = dias.slice(i, i + 7);
-                semanas.push({ dia: grupo[0].dia, hasta: grupo[grupo.length - 1].dia, n: sumar(grupo, x => x.n), ventas: sumar(grupo, x => x.ventas) });
+                semanas.push({ dia: grupo[0].dia, hasta: grupo[grupo.length - 1].dia, n: sumar(grupo, x => x.n), ventas: sumar(grupo, x => x.ventas),
+                    pagadas: sumar(grupo, x => x.pagadas), pendientes: sumar(grupo, x => x.pendientes), canceladas: sumar(grupo, x => x.canceladas) });
             }
             return semanas;
         }
@@ -2683,7 +2706,8 @@
             if (!a.visitas) { cont.innerHTML = vacioEst('Aparece cuando alguien use el asistente.'); return; }
             const filas = [
                 ['Escribieron por WhatsApp', a.whatsapp, a.visitas, (r.whatsapp || 0) - (a.whatsapp || 0), otras],
-                ['Enviaron una reserva', a.reservas, a.visitas, (r.reservas || 0) - (a.reservas || 0), otras]
+                ['Enviaron una reserva', a.reservas, a.visitas, (r.reservas || 0) - (a.reservas || 0), otras],
+                ['Pagaron su reserva', pagadasDe(a), a.visitas, pagadasDe(r) - pagadasDe(a), otras]
             ];
             cont.innerHTML = '<div class="flex flex-wrap gap-4 mb-4 text-[0.7rem] text-graphite/60">' +
                 '<span class="flex items-center gap-1.5"><span class="w-3 h-2 rounded-sm" style="background:' + AZUL + '"></span> Usaron el asistente</span>' +
@@ -2842,6 +2866,28 @@
                 '<p class="text-[0.74rem] text-graphite/60 mt-3">El día con más: <strong class="font-medium text-ink">' + esc(op.etiqueta ? op.etiqueta(pico) : '') + '</strong>, ' + esc(op.valorTip ? op.valorTip(pico) : num(max)) + '.</p>';
         }
 
+        /* Columnas apiladas con leyenda: cada parte con su color y un filo blanco entre partes */
+        function columnasApiladas(id, filas, series, op = {}) {
+            const cont = document.getElementById(id);
+            const totales = filas.map(f => series.reduce((s, [k]) => s + (f[k] || 0), 0));
+            const max = Math.max(0, ...totales);
+            if (!max) { cont.innerHTML = vacioEst(op.vacio); return; }
+            const pico = totales.indexOf(max);
+            cont.innerHTML = '<div class="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-[0.7rem] text-graphite/60">' + series.map(([, nombre, color]) =>
+                    '<span class="flex items-center gap-1.5"><span class="w-3 h-2 rounded-sm" style="background:' + color + '"></span>' + nombre + '</span>').join('') + '</div>' +
+                '<div class="flex items-end gap-[2px]" style="height:9.5rem">' + filas.map((f, i) => {
+                    const total = totales[i];
+                    const nota = series.filter(([k]) => f[k]).map(([k, nombre]) => nombre + ': ' + f[k]).join(' · ');
+                    return '<span class="flex-1 min-w-0 h-full flex flex-col-reverse outline-none" tabindex="0" data-tip="' + esc(op.etiqueta(i)) + '" data-tip-valor="' +
+                        esc(plural(total, 'reserva', 'reservas')) + '" data-tip-nota="' + esc(nota) + '">' +
+                        (total ? series.map(([k, , color], j) => f[k] ? '<span style="height:' + (100 * f[k] / max).toFixed(2) + '%;background:' + color +
+                            (j ? ';box-shadow:inset 0 -1px 0 #fff' : '') + '"></span>' : '').join('') : '<span style="height:1%;background:rgba(10,33,46,.08)"></span>') +
+                    '</span>';
+                }).join('') + '</div>' +
+                (op.ejes ? '<div class="flex justify-between mt-2 text-[0.66rem] text-graphite/45">' + op.ejes.map(e => '<span>' + e + '</span>').join('') + '</div>' : '') +
+                '<p class="text-[0.74rem] text-graphite/60 mt-3">El día con más: <strong class="font-medium text-ink">' + esc(op.etiqueta(pico)) + '</strong>, ' + plural(max, 'reserva', 'reservas') + '.</p>';
+        }
+
         /* Aviso flotante de las gráficas: el valor primero, después la etiqueta */
         function mostrarTip(html, cx, cy) {
             const tip = document.getElementById('est-tip');
@@ -2993,7 +3039,7 @@
                 return { dia: b.dia, visitas, visitantes: Math.round(visitas * 0.86), nuevos: Math.round(visitas * 0.62), interes: Math.round(visitas * 0.58),
                     whatsapp: Math.round(visitas * (0.06 + azar() * 0.05)), reservas: Math.round(visitas * (0.012 + azar() * 0.02)), valor: 0 };
             });
-            por_dia.forEach(p => { p.valor = p.reservas * 540000; });
+            por_dia.forEach(p => { p.valor = p.reservas * 540000; p.pagadas = Math.round(p.reservas * 0.55); p.pendientes = p.reservas - p.pagadas; });
             const suma = k => por_dia.reduce((s, d) => s + d[k], 0);
             const visitas = suma('visitas');
             const parte = p => Math.max(0, Math.round(visitas * p));
@@ -3004,7 +3050,8 @@
                 const v = Math.round(visitas / factor * p);
                 return { nombre, medio, visitas: v, visitantes: Math.round(v * 0.86), nuevos: Math.round(v * 0.6), duracion: Math.round(110 + azar() * 90),
                     interes: Math.round(v * (0.45 + azar() * 0.25)), secciones: Math.round(40 + azar() * 30) / 10, whatsapp: Math.round(v * w * 0.6),
-                    reservas: Math.round(v * r), pagos: Math.round(v * r * 0.45), valor: Math.round(v * r) * 540000, serie: serieDe(p) };
+                    reservas: Math.round(v * r), pagos: Math.round(v * r * 0.55), pagadas: Math.round(v * r * 0.55), pendientes: Math.round(v * r) - Math.round(v * r * 0.55),
+                    valor: Math.round(v * r) * 540000, valor_pagadas: Math.round(v * r * 0.55) * 540000, serie: serieDe(p) };
             });
             const vistasPorSeccion = { inicio: 1, destacados: 0.9, hotel: 0.78, habitaciones: 0.66, servicios: 0.52, eventos: 0.41, planes: 0.38, restaurante: 0.33,
                 bar: 0.29, galeria: 0.27, resenas: 0.24, informacion: 0.21, reservar: 0.46, faq: 0.14, catalogo: 0.11, contacto: 0.12 };
@@ -3022,9 +3069,10 @@
                 desde, hasta, origen: origen || null,
                 resumen: { visitas, visitantes: suma('visitantes'), nuevos: Math.round(suma('visitantes') * 0.71), regresaron: Math.round(suma('visitantes') * 0.29),
                     duracion: 152, interes: suma('interes'), interactuaron: parte(0.57), secciones: 4.6, whatsapp: suma('whatsapp'), reservas: reservasEj,
-                    pagos: Math.round(reservasEj * 0.45), valor: suma('valor'), pagado: Math.round(reservasEj * 0.45) * 270000, paginas: parte(1.21) },
+                    pagos: suma('pagadas'), pagadas: suma('pagadas'), pendientes: suma('pendientes'), valor: suma('valor'), valor_pagadas: suma('pagadas') * 540000,
+                    pagado: suma('pagadas') * 270000, paginas: parte(1.21) },
                 anterior: { visitas: Math.round(visitas * 0.87), visitantes: Math.round(suma('visitantes') * 0.9), duracion: 141, interes: Math.round(suma('interes') * 0.84),
-                    whatsapp: Math.round(suma('whatsapp') * 0.82), reservas: Math.round(reservasEj * 0.94), valor: Math.round(suma('valor') * 0.9) },
+                    whatsapp: Math.round(suma('whatsapp') * 0.82), reservas: Math.round(reservasEj * 0.94), pagadas: Math.round(suma('pagadas') * 0.9), valor: Math.round(suma('valor') * 0.9) },
                 por_dia, fuentes,
                 medios: [['Redes', 0.5], ['Buscador', 0.27], ['Directo', 0.18], ['Impreso', 0.03], ['Referido', 0.02]]
                     .map(([nombre, p]) => ({ nombre, visitas: Math.round(visitas / factor * p), reservas: Math.round(visitas / factor * p * 0.025), valor: Math.round(visitas / factor * p * 0.025) * 540000 })),
@@ -3067,7 +3115,8 @@
                 pedidos: { pedidos: parte(0.012), visitas: parte(0.011), platos: parte(0.03), valor: parte(0.012) * 68000 },
                 horas: horas.map(v => Math.round(v * visitas / 270)),
                 dias_semana: pesoDia.map(v => Math.round(v * visitas / 92)),
-                embudo: [['visita', 1], ['reservar', 0.46], ['fechas', 0.21], ['habitacion', 0.14], ['datos', 0.06], ['confirmo', reservasEj / (visitas || 1)]]
+                embudo: [['visita', 1], ['reservar', 0.46], ['fechas', 0.21], ['habitacion', 0.14], ['datos', 0.06], ['confirmo', reservasEj / (visitas || 1)],
+                         ['pago', suma('pagadas') / (visitas || 1)]]
                     .map(([paso, p]) => ({ paso, visitas: parte(p) }))
             };
         }
