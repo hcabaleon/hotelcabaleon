@@ -108,7 +108,11 @@
         /* En celular y tableta la barra de acciones (.m-bar) tapa el pie de la pantalla: cada pantalla termina encima de ella */
         @media (max-width: 1023px) { :root { --alto-mbar: calc(3.6rem + env(safe-area-inset-bottom, 0px)); } }
         section[id], .pantalla { scroll-margin-top: var(--alto-nav); }
-        html.pantallas { scroll-snap-type: y mandatory; scroll-padding-bottom: var(--alto-mbar); }
+        /* El ajuste por paradas solo se enciende dentro de las zonas con efecto (recorrido, Servicios, Planes,
+           "Inspiración del día", bebidas y "Antes de tu llegada"): lo maneja prepararParadasEnZonas.
+           En el resto de la página el desplazamiento es libre. */
+        html.pantallas { scroll-padding-bottom: var(--alto-mbar); }
+        html.pantallas.paradas-activas { scroll-snap-type: y mandatory; }
         @media (max-width: 1023px) { html.pantallas header#inicio { min-height: calc(100svh - var(--alto-mbar)); } }
         html.pantallas header#inicio,
         html.pantallas section[id]:not(.con-pantallas),
@@ -289,34 +293,20 @@
         html.pantallas #restaurante .carta-fijo { position: sticky; }
         html.pantallas #restaurante .carta-pausa { display: block; flex: 0 0 auto; }
         html.pantallas #restaurante .carta-pantalla > .marca-lateral { display: block; }
-        /* "La carta, como la ves en el restaurante": de a dos afiches; al bajar pasan los demás */
-        html.pantallas #restaurante .afiches-pantalla { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-        html.pantallas #restaurante .afiches-fijo { position: sticky; }
-        html.pantallas #restaurante .afiches-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas #restaurante .afiches-pantalla > .marca-lateral { display: block; }
         /* Carta de bebidas de Cabalante: queda fija y las columnas pasan de lado (prepararBebidasAlDesplazar) */
         html.pantallas #bar .bebidas-pantalla { position: relative; scroll-snap-align: none; justify-content: flex-start; padding-block: clamp(0.75rem, 2.4vh, 2.5rem); }
         html.pantallas #bar .bebidas-fijo { position: sticky; }
         html.pantallas #bar .bebidas-pausa { display: block; flex: 0 0 auto; }
         html.pantallas #bar .bebidas-pantalla > .marca-lateral { display: block; }
-        /* Planes y Reseñas: en celular, una tarjeta por desplazamiento */
-        html.pantallas #planes, html.pantallas #resenas { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-        html.pantallas .planes-fijo, html.pantallas .resenas-fijo { position: sticky; }
-        html.pantallas .planes-pausa, html.pantallas .resenas-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas #planes > .marca-lateral, html.pantallas #resenas > .marca-lateral { display: block; }
-        /* Blog: en celular, un artículo por desplazamiento */
-        html.pantallas #blog { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-        html.pantallas #blog .blog-fijo { position: sticky; }
-        html.pantallas #blog .blog-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas #blog > .marca-lateral { display: block; }
-        /* Galería (una categoría por desplazamiento), clips y "Antes de tu llegada" (una flecha por desplazamiento) */
-        html.pantallas .galeria-pantalla, html.pantallas .reels-pantalla,
+        /* Planes: en celular, una tarjeta por desplazamiento */
+        html.pantallas #planes { position: relative; scroll-snap-align: none; justify-content: flex-start; }
+        html.pantallas .planes-fijo { position: sticky; }
+        html.pantallas .planes-pausa { display: block; flex: 0 0 auto; }
+        html.pantallas #planes > .marca-lateral { display: block; }
+        /* "Antes de tu llegada" (una flecha por desplazamiento) */
         html.pantallas .info-pantalla, html.pantallas .guias-pantalla { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-        html.pantallas .galeria-fijo, html.pantallas .reels-fijo,
         html.pantallas .info-fijo, html.pantallas .guias-fijo { position: sticky; }
-        html.pantallas .galeria-pausa, html.pantallas .reels-pausa,
         html.pantallas .info-pausa, html.pantallas .guias-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas .galeria-pantalla > .marca-lateral, html.pantallas .reels-pantalla > .marca-lateral,
         html.pantallas .info-pantalla > .marca-lateral, html.pantallas .guias-pantalla > .marca-lateral { display: block; }
 
         /* ---------- Servicios ---------- */
@@ -6074,6 +6064,7 @@
                 if (history.state !== 'reserva') history.pushState('reserva', '', '#reservar');
                 /* Para las estadísticas: la visita llegó a Reservar y su tiempo cuenta ahí */
                 registrarUnaVez('seccion', 'reservar');
+                ultimaSeccionVista = 'reservar';
                 sumarTiempoSeccion();
                 seccionAntesDeReservar = seccionEnPantalla;
                 seccionEnPantalla = 'reservar';
@@ -6165,6 +6156,8 @@
         let activoDesde = null;
         let seccionEnPantalla = null;     // la sección que cruza el centro de la pantalla
         let seccionDesde = 0;
+        let ultimaSeccionVista = null;    // la última sección que contó como vista (por si se va entre dos)
+        let esperaSeccionVista = null;
         const segundosPorSeccion = {};
 
         const idAlAzar = () => [...crypto.getRandomValues(new Uint8Array(12))].map(b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
@@ -6293,15 +6286,21 @@
             seccionDesde = seccionEnPantalla && document.visibilityState === 'visible' ? Date.now() : 0;
         }
 
+        /* Envía los segundos acumulados de cada sección (el panel los suma por visita) */
+        function registrarSegundosSecciones() {
+            sumarTiempoSeccion();
+            // La sección en pantalla va al final: así el último evento dice dónde está la persona
+            Object.keys(segundosPorSeccion).sort((a, b) => (a === seccionEnPantalla) - (b === seccionEnPantalla)).forEach(id => {
+                const s = Math.round(segundosPorSeccion[id]);
+                if (s >= 1) { registrar('seccion', id, Math.min(s, 3600)); delete segundosPorSeccion[id]; }
+            });
+        }
+
         function registrarTiempo() {
             if (activoDesde) { segundosActivos += (Date.now() - activoDesde) / 1000; activoDesde = null; }
-            sumarTiempoSeccion();
-            Object.keys(segundosPorSeccion).forEach(id => {
-                const s = Math.round(segundosPorSeccion[id]);
-                if (s >= 1) registrar('seccion', id, Math.min(s, 3600));
-                delete segundosPorSeccion[id];
-            });
-            if (segundosActivos >= 1) registrar('salida', null, segundosActivos);
+            registrarSegundosSecciones();
+            /* La salida lleva la sección que estaba en pantalla: así el panel sabe dónde terminan las visitas */
+            if (segundosActivos >= 1) registrar('salida', seccionEnPantalla || ultimaSeccionVista, segundosActivos);
             enviarEventos();
         }
 
@@ -6321,11 +6320,14 @@
                 : { visitante, sesion: idAlAzar(), atributos: atributosDeLlegada(nuevo), vistos: new Set() };
             registrar('visita', (location.hash || '#inicio').slice(1, 60));
 
-            /* Secciones vistas (cuentan cuando cruzan el centro de la pantalla) y cuánto tiempo estuvo cada una ahí */
+            /* Secciones vistas (cuentan cuando cruzan el centro de la pantalla y se quedan ahí al menos un segundo:
+               pasar de largo al tocar el menú no cuenta) y cuánto tiempo estuvo cada una ahí */
+            const contarVista = id => { registrarUnaVez('seccion', id); ultimaSeccionVista = id; };
             const observador = new IntersectionObserver(entradas => entradas.forEach(e => {
                 const id = e.target.id;
                 if (e.isIntersecting) {
-                    registrarUnaVez('seccion', id);
+                    clearTimeout(esperaSeccionVista);
+                    esperaSeccionVista = setTimeout(() => { if (seccionEnPantalla === id) contarVista(id); }, 1000);
                     if (id !== seccionEnPantalla) {
                         sumarTiempoSeccion();
                         seccionEnPantalla = id;
@@ -6365,6 +6367,9 @@
             });
             window.addEventListener('pagehide', registrarTiempo);
             setInterval(enviarEventos, 8000);
+            /* Cada minuto con la página a la vista se guarda el tiempo de la sección en pantalla: no se pierde si el
+               navegador se cierra de golpe y el panel sabe quién sigue en la página ("Ahora en la página") */
+            setInterval(() => { if (document.visibilityState === 'visible') { registrarSegundosSecciones(); enviarEventos(); } }, 60000);
         }
 
         /* =========================================================
@@ -6871,6 +6876,7 @@
             const zona = document.querySelector('.recorrido-scroll');
             if (!zona || !document.documentElement.classList.contains('pantallas')) return;
             recorridoConScroll = true;
+            zonasConParadas.push(() => zona);
             detenerPasos();
             const total = zona.querySelectorAll('.recorrido-marca').length;
             let pendiente = false;
@@ -6907,6 +6913,7 @@
             let ultimoPaso = -1;
             const computador = window.matchMedia('(min-width: 1024px)');
             let actual = null, pasos = 1, recorrido = 0;
+            zonasConParadas.push(() => actual && actual.zona);
 
             const medidas = c => {
                 const items = [...c.children].filter(x => x.offsetParent !== null);
@@ -7035,9 +7042,9 @@
                 { carruseles: [document.getElementById('bebidas-grid')] });
         }
 
-        /* Planes y Reseñas: en celular, una tarjeta por desplazamiento (en computador se ven todas juntas) */
-        function prepararPlanesYResenasAlDesplazar() {
-            [['planes', 'plans-grid'], ['resenas', 'lista-resenas']].forEach(([id, lista]) => {
+        /* Planes: en celular, una tarjeta por desplazamiento (en computador se ven todas juntas) */
+        function prepararPlanesAlDesplazar() {
+            [['planes', 'plans-grid']].forEach(([id, lista]) => {
                 const z = document.getElementById(id);
                 if (!z) return;
                 prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.' + id + '-fijo'), pausa: z.querySelector('.' + id + '-pausa') }),
@@ -7192,6 +7199,41 @@
             addEventListener('resize', programar);
             addEventListener('load', programar);
             revisar();
+        }
+
+        /* El ajuste por paradas (scroll-snap) se enciende solo mientras una zona con efecto cubre la pantalla;
+           al salir de ella y quedar quieto, se apaga y el resto de la página se desplaza libre.
+           (Encendido en toda la página, la rueda saltaría siempre a la parada más cercana.) */
+        const zonasConParadas = [];
+        function prepararParadasEnZonas() {
+            const html = document.documentElement;
+            if (!html.classList.contains('pantallas')) return;
+            const dentro = () => {
+                const nav = parseFloat(getComputedStyle(html).getPropertyValue('--alto-nav')) || 0;
+                const barra = document.querySelector('.m-bar');
+                const abajo = window.innerHeight - (barra && getComputedStyle(barra).display !== 'none' ? barra.offsetHeight : 0);
+                return zonasConParadas.some(zona => {
+                    const z = zona();
+                    if (!z || !z.offsetParent) return false;
+                    const r = z.getBoundingClientRect();
+                    return r.top <= nav + 2 && r.bottom >= abajo - 2;
+                });
+            };
+            let pendiente = false, espera;
+            const revisar = alQuedarQuieto => {
+                pendiente = false;
+                // Solo se toca la clase si cambia: reescribirla hace que el navegador vuelva a ajustar y frena el desplazamiento
+                const activa = html.classList.contains('paradas-activas');
+                if (dentro()) { if (!activa) html.classList.add('paradas-activas'); }
+                else if (alQuedarQuieto && activa) html.classList.remove('paradas-activas');
+            };
+            addEventListener('scroll', () => {
+                if (!pendiente) { pendiente = true; requestAnimationFrame(() => revisar(false)); }
+                clearTimeout(espera);
+                espera = setTimeout(() => revisar(true), 180);
+            }, { passive: true });
+            addEventListener('resize', () => revisar(true));
+            revisar(true);
         }
 
         /* Flechas y pestañas: se desplaza hasta la marca del paso (después del último, a la siguiente sección) */
@@ -9324,13 +9366,10 @@
             prepararPantallasLargas();
             prepararServiciosAlDesplazar();
             prepararCartaAlDesplazar();
-            prepararAfichesAlDesplazar();
             prepararBebidasAlDesplazar();
-            prepararGaleriaAlDesplazar();
-            prepararClipsAlDesplazar();
             prepararInformacionAlDesplazar();
-            prepararBlogAlDesplazar();
-            prepararPlanesYResenasAlDesplazar();
+            prepararPlanesAlDesplazar();
+            prepararParadasEnZonas();
             const zonaPasos = document.getElementById('steps');
             if (zonaPasos) {
                 zonaPasos.addEventListener('mouseenter', detenerPasos);

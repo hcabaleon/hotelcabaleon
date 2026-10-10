@@ -252,6 +252,69 @@
         .est-seccion:hover, .est-seccion:focus-visible { border-color: var(--ink); outline: none; box-shadow: 0 14px 28px -22px rgba(10,33,46,.55); transform: translateY(-1px); }
         .est-seccion.is-vacia { background: var(--bone); }
 
+        /* Botones pequeños con ícono (descargas y páginas de la lista de visitas) */
+        .chip[data-csv], .chip[data-pagina-visitas] { display: inline-flex; align-items: center; gap: 0.35rem; }
+        .chip[data-pagina-visitas]:disabled { opacity: .35; cursor: default; }
+        /* Tablas que solo se leen (sin fila para tocar) */
+        .est-quieta tbody tr { cursor: default; }
+        .est-quieta tbody tr:hover { background: transparent; }
+        /* Insignias de lo que hizo una visita */
+        .est-insignia { display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.62rem; line-height: 1.4; padding: 0.1rem 0.45rem; border-radius: 99px; background: var(--bone); color: rgba(32,41,46,.75); white-space: nowrap; }
+        .est-insignia svg { width: 11px; height: 11px; }
+        .est-insignia.is-buena { background: rgba(78,107,79,.14); color: #3D5A3E; }
+        .est-insignia.is-dorada { background: rgba(168,131,74,.16); color: #7A5A2A; }
+        .est-insignia.is-tenue { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: rgba(32,41,46,.5); }
+        /* Fila corta de una visita (resumen e historial) */
+        .est-mini { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.25rem 0.75rem; align-items: center; width: 100%; text-align: left; padding: 0.6rem 0.4rem; border-bottom: 1px solid var(--line); border-radius: 2px; transition: background-color .2s; }
+        .est-mini:last-child { border-bottom: none; }
+        .est-mini:hover, .est-mini:focus-visible { background: var(--bone); outline: none; }
+        .est-mini.is-actual { background: rgba(201,160,99,.13); }
+        /* Recorrido de una visita, paso a paso */
+        .est-paso { display: grid; grid-template-columns: 3.1rem 1.6rem minmax(0, 1fr); column-gap: 0.65rem; align-items: start; padding: 0.4rem 0; position: relative; }
+        .est-paso::before { content: ""; position: absolute; left: calc(3.1rem + 0.65rem + 0.8rem - 0.5px); top: 0; bottom: 0; width: 1px; background: var(--line); }
+        .est-paso:first-child::before { top: 1rem; }
+        .est-paso:last-child::before { bottom: calc(100% - 1rem); }
+        .est-paso-hora { font-size: 0.68rem; color: rgba(32,41,46,.45); text-align: right; font-variant-numeric: tabular-nums; padding-top: 0.3rem; }
+        .est-paso-icono { width: 1.6rem; height: 1.6rem; border-radius: 99px; background: var(--bone); color: #8A6A3A; display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; box-shadow: 0 0 0 3px #fff; }
+        .est-paso-icono svg { width: 13px; height: 13px; }
+        .est-paso.is-clave .est-paso-icono { background: #1C4A62; color: #fff; }
+        .est-paso.is-meta .est-paso-icono { background: #A8834A; color: #fff; }
+        .est-paso-texto { font-size: 0.8rem; color: var(--ink); line-height: 1.45; padding-top: 0.2rem; }
+        .est-paso-nota { display: block; font-size: 0.68rem; color: rgba(32,41,46,.5); margin-top: 0.05rem; }
+
+        /* La página de arriba abajo: una fila por sección con hasta dónde bajan, su tiempo y cuántos terminan ahí */
+        .est-ruta-cabeza, .est-ruta {
+            display: grid; grid-template-columns: minmax(9.5rem, 1.25fr) minmax(8rem, 2fr) 5.6rem 6.4rem 7.4rem; column-gap: 1rem; align-items: center;
+        }
+        .est-ruta-cabeza { padding: 0 0.5rem 0.6rem; border-bottom: 1px solid var(--line); font-size: 0.52rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: rgba(10,33,46,.45); }
+        .est-ruta-cabeza > :nth-child(n+3) { text-align: right; }
+        .est-ruta { width: 100%; text-align: left; padding: 0.55rem 0.5rem; border-bottom: 1px solid var(--line); font-size: 0.8rem; color: var(--ink); transition: background-color .2s; }
+        .est-ruta:last-child { border-bottom: none; }
+        .est-ruta:hover, .est-ruta:focus-visible { background: var(--bone); outline: none; }
+        .est-ruta-nombre { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+        .est-ruta-nombre svg { width: 15px; height: 15px; color: var(--brass); flex-shrink: 0; }
+        .est-ruta-num { font-size: 0.6rem; color: rgba(32,41,46,.35); width: 1.1rem; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+        .est-ruta-alcance { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+        .est-ruta-alcance .est-pista { flex: 1 1 auto; min-width: 0; height: 8px; background: rgba(10,33,46,.05); border-radius: 0 4px 4px 0; }
+        .est-ruta-dato { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .est-ruta-alcance .est-ruta-dato { width: 2.6rem; flex-shrink: 0; }
+        .est-ruta-calor { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; margin-right: 0.4rem; vertical-align: -1px; box-shadow: inset 0 0 0 1px rgba(10,33,46,.08); }
+        .est-ruta-etiqueta { display: none; }
+        .est-ruta.is-fuerte .est-ruta-salida { color: #8A5A2B; font-weight: 500; }
+        @media (max-width: 767px) {
+            .est-ruta-cabeza { display: none; }
+            .est-ruta { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 0.5rem; padding: 0.85rem 0.35rem; }
+            .est-ruta-nombre, .est-ruta-alcance { grid-column: 1 / -1; }
+            .est-ruta-dato { text-align: left; font-size: 0.78rem; }
+            .est-ruta-alcance .est-ruta-dato { text-align: right; }
+            .est-ruta-etiqueta { display: block; font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; color: rgba(10,33,46,.42); margin-bottom: 0.15rem; }
+        }
+        /* Punto "en vivo" de quién está ahora en la página */
+        .est-vivo { width: 9px; height: 9px; border-radius: 99px; background: #4E6B4F; flex-shrink: 0; margin-top: 0.45rem; animation: est-pulso 2s infinite; }
+        .est-vivo.is-quieto { background: rgba(10,33,46,.2); animation: none; }
+        @keyframes est-pulso { 0% { box-shadow: 0 0 0 0 rgba(78,107,79,.5); } 70% { box-shadow: 0 0 0 8px rgba(78,107,79,0); } 100% { box-shadow: 0 0 0 0 rgba(78,107,79,0); } }
+        @media (prefers-reduced-motion: reduce) { .est-vivo { animation: none; } }
+
         /* Mapa de calor día × hora: un solo tono, de claro a oscuro */
         .est-calor { display: grid; grid-template-columns: 1.6rem repeat(24, minmax(0, 1fr)); gap: 2px; align-items: center; }
         .est-celda { aspect-ratio: 1 / 1; min-height: 9px; border-radius: 2px; outline: none; }
@@ -631,8 +694,9 @@
 
                     <div class="est-tabs mb-6" id="est-tabs" role="tablist" aria-label="Apartados de estadísticas">
                         <button class="est-tab is-active" role="tab" aria-selected="true" data-est-tab="resumen"><i data-lucide="layout-grid"></i> Resumen</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="visitas"><i data-lucide="footprints"></i> Visitas una a una</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="origen"><i data-lucide="compass"></i> De dónde llegan</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="secciones"><i data-lucide="panels-top-left"></i> Secciones de la página</button>
+                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="secciones"><i data-lucide="panels-top-left"></i> Secciones: dónde se quedan</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="blog"><i data-lucide="newspaper"></i> Blog</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="reservas"><i data-lucide="calendar-check"></i> Reservas y ventas</button>
                         <button class="est-tab" role="tab" aria-selected="false" data-est-tab="habitaciones"><i data-lucide="bed-double"></i> Habitaciones y servicios</button>
@@ -663,6 +727,7 @@
                                             <button class="chip" data-metrica="lectores">Blog</button>
                                         </span>
                                         <button type="button" class="chip" data-ver-tabla="est-dias">Ver tabla</button>
+                                        <button type="button" class="chip" data-csv="dias" title="Descargar los datos de cada día"><i data-lucide="download" class="w-3.5 h-3.5"></i> CSV</button>
                                     </span>
                                 </figcaption>
                                 <div id="est-dias" class="relative" tabindex="0" aria-label="Evolución por día. Usa las flechas para recorrer los días."></div>
@@ -685,6 +750,72 @@
                                     <div id="est-embudo"></div>
                                 </figure>
                             </div>
+
+                            <!-- Indicadores del período frente al anterior -->
+                            <figure class="card p-0 mt-6 overflow-hidden">
+                                <figcaption class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 p-5 sm:p-6 pb-4">
+                                    <span><span class="est-titulo">Indicadores del período</span><span class="est-sub" id="est-indicadores-sub">Cada indicador frente al período anterior de la misma duración</span></span>
+                                    <button type="button" class="chip shrink-0" data-csv="indicadores"><i data-lucide="download" class="w-3.5 h-3.5"></i> Descargar CSV</button>
+                                </figcaption>
+                                <div class="overflow-x-auto"><table class="est-pro est-quieta" id="est-indicadores"></table></div>
+                            </figure>
+                            <div class="grid grid-cols-1 gap-6 mt-6">
+                                <figure class="card p-0 overflow-hidden">
+                                    <figcaption class="flex items-start justify-between gap-3 p-5 sm:p-6 pb-4">
+                                        <span><span class="est-titulo">Semana a semana</span><span class="est-sub">De lunes a domingo, la más reciente primero</span></span>
+                                        <button type="button" class="chip shrink-0" data-csv="semanas"><i data-lucide="download" class="w-3.5 h-3.5"></i> CSV</button>
+                                    </figcaption>
+                                    <div class="overflow-x-auto max-h-96"><table class="est-pro est-quieta" id="est-semanas"></table></div>
+                                </figure>
+                                <figure class="card p-0 overflow-hidden">
+                                    <figcaption class="flex items-start justify-between gap-3 p-5 sm:p-6 pb-4">
+                                        <span><span class="est-titulo">Comparar grupos</span><span class="est-sub">Cómo se comportan según el equipo y si es su primera visita</span></span>
+                                        <button type="button" class="chip shrink-0" data-csv="grupos"><i data-lucide="download" class="w-3.5 h-3.5"></i> CSV</button>
+                                    </figcaption>
+                                    <div class="overflow-x-auto"><table class="est-pro est-quieta" id="est-grupos"></table></div>
+                                </figure>
+                            </div>
+                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Quiénes reservan</span><span class="est-sub">Las visitas que enviaron una reserva en el período: cuánto tardan, qué ven y desde dónde</span></figcaption>
+                                    <div id="est-perfil-reserva"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="flex items-start justify-between gap-3 mb-3">
+                                        <span><span class="est-titulo">Últimas visitas</span><span class="est-sub">Toca una para ver todo lo que hizo, en orden</span></span>
+                                        <button type="button" class="chip shrink-0" data-ir-tab="visitas">Ver todas</button>
+                                    </figcaption>
+                                    <div id="est-ultimas"></div>
+                                </figure>
+                            </div>
+                        </div>
+
+                        <!-- VISITAS UNA A UNA -->
+                        <div class="est-panel" data-est-panel="visitas" role="tabpanel">
+                            <div id="est-kpis-visitas" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                            <figure class="card p-0 overflow-hidden">
+                                <figcaption class="p-5 sm:p-6 pb-4">
+                                    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3">
+                                        <span><span class="est-titulo">Cada visita, una por una</span><span class="est-sub">Las más recientes del período. Toca una para ver todo lo que hizo, en orden, y las otras veces que volvió. Sin datos personales: cada navegador tiene un número al azar.</span></span>
+                                        <span class="flex flex-wrap items-center gap-2 shrink-0">
+                                            <input type="search" id="est-visitas-buscar" class="field-input py-2 text-[0.8rem] w-full sm:w-60" placeholder="Buscar fuente, ciudad, sección…" aria-label="Buscar visitas">
+                                            <button type="button" class="chip" data-csv="visitas"><i data-lucide="download" class="w-3.5 h-3.5"></i> CSV</button>
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 mt-4" id="est-visitas-filtros" role="group" aria-label="Filtrar visitas">
+                                        <button class="chip is-active" data-filtro-visitas="todas">Todas</button>
+                                        <button class="chip" data-filtro-visitas="interes">Con interés</button>
+                                        <button class="chip" data-filtro-visitas="whatsapp">Escribieron</button>
+                                        <button class="chip" data-filtro-visitas="reservaron">Reservaron</button>
+                                        <button class="chip" data-filtro-visitas="pagaron">Pagaron</button>
+                                        <button class="chip" data-filtro-visitas="volvieron">Volvieron</button>
+                                        <button class="chip" data-filtro-visitas="rebote">Se fueron sin bajar</button>
+                                        <button class="chip" data-filtro-visitas="blog">Leyeron el blog</button>
+                                    </div>
+                                </figcaption>
+                                <div class="overflow-x-auto"><table class="est-pro" id="est-tabla-visitas"></table></div>
+                                <div class="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 py-4 border-t border-line text-[0.75rem] text-graphite/60" id="est-visitas-paginas"></div>
+                            </figure>
                         </div>
 
                         <!-- DE DÓNDE LLEGAN -->
@@ -723,6 +854,31 @@
                         <!-- SECCIONES DE LA PÁGINA -->
                         <div class="est-panel" data-est-panel="secciones" role="tabpanel">
                             <div id="est-kpis-secciones" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6"></div>
+                            <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="mb-5">
+                                    <span class="est-titulo">La página de arriba abajo: dónde se quedan y dónde se van</span>
+                                    <span class="est-sub">Cada fila es una sección, en el orden de la página: cuántas visitas bajaron hasta ahí, cuánto tiempo la miran, qué parte de todo el tiempo se llevan y cuántas visitas terminaron ahí. Toca una para ver su detalle.</span>
+                                </figcaption>
+                                <div id="est-recorrido"></div>
+                                <ul id="est-recorrido-nota" class="space-y-2.5 mt-5 pt-5 border-t border-line"></ul>
+                            </figure>
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-6">
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Dónde termina la visita</span><span class="est-sub">La sección que tenían en pantalla al cerrar o dejar la página</span></figcaption>
+                                    <div id="est-salidas"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4"><span class="est-titulo">Cuánto tiempo se quedan</span><span class="est-sub">Duración de cada visita, solo con la página a la vista</span></figcaption>
+                                    <div id="est-duraciones"></div>
+                                </figure>
+                                <figure class="card p-5 sm:p-6">
+                                    <figcaption class="mb-4 flex items-start justify-between gap-3">
+                                        <span><span class="est-titulo">Ahora en la página</span><span class="est-sub">Personas activas en los últimos 5 minutos y en qué sección van. Se actualiza cada minuto.</span></span>
+                                        <span class="est-vivo is-quieto" id="est-vivo-punto" aria-hidden="true"></span>
+                                    </figcaption>
+                                    <div id="est-en-linea"></div>
+                                </figure>
+                            </div>
                             <figure class="card p-5 sm:p-6 mb-6">
                                 <figcaption class="mb-5">
                                     <span class="est-titulo">Cada sección de la página</span>
@@ -2225,7 +2381,7 @@
 
         function renderEstadisticas(d) {
             const r = d.resumen || {};
-            avisoEstadisticas(CONECTADO && (!d.mapa_calor || !d.blog)
+            avisoEstadisticas(CONECTADO && (!d.mapa_calor || !d.blog || !d.pagina || !d.visitas_lista)
                 ? 'Falta un paso para ver todas las estadísticas nuevas (también las del blog): en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.'
                 : !CONECTADO ? 'Datos de ejemplo. Al conectar el panel con Supabase aquí aparecen las visitas reales de la página.'
                 : !r.visitas ? (origenEstadisticas ? 'No hay visitas de ' + origenEstadisticas + ' en este período.'
@@ -2233,6 +2389,8 @@
             poblarOrigenes(d.fuentes || []);
             pintarFiltroActivo(d);
             renderResumenEst(d);
+            renderResumenPro(d);
+            renderVisitasEst(d);
             renderOrigenEst(d);
             renderSeccionesEst(d);
             renderBlogEst(d);
@@ -2364,6 +2522,12 @@
                 if (masVista) lista.push(['eye', 'Después de la portada, lo más visto es <strong>' + SECCIONES[masVista.nombre] + '</strong> (' + pct(masVista.visitas, r.visitas) + ' % de las visitas).']);
                 const masTiempo = secciones.filter(s => s.segundos).sort((x, y) => y.segundos - x.segundos)[0];
                 if (masTiempo) lista.push(['timer', 'Donde más se quedan: <strong>' + SECCIONES[masTiempo.nombre] + '</strong>, ' + duracionTxt(masTiempo.segundos) + ' en promedio.']);
+                const pg = d.pagina || {};
+                if (pg.medidas) {
+                    lista.push(['log-out', '<strong>' + pct(pg.rebote, r.visitas) + ' %</strong> de las visitas se va sin pasar de la primera sección ni tocar nada.']);
+                    const sale = (pg.salidas || []).filter(s => s.nombre !== 'inicio' && SECCIONES[s.nombre])[0];
+                    if (sale) lista.push(['door-open', 'Donde más terminan la visita (sin contar la portada): <strong>' + SECCIONES[sale.nombre] + '</strong>, ' + pct(sale.visitas, pg.con_salida || r.visitas) + ' % de las visitas.']);
+                }
                 const momento = mejorMomento(d.mapa_calor);
                 if (momento) lista.push(['clock', 'El mejor momento para publicar: los <strong>' + momento + '</strong>.']);
                 const pasos = d.embudo || [];
@@ -2375,7 +2539,7 @@
                 }
                 if (caida && pasos[0].visitas >= 10) lista.push(['route', 'Donde más visitas se pierden: de "' + PASOS_EMBUDO[caida.de] + '" a "' + PASOS_EMBUDO[caida.a] + '" (sigue el <strong>' + Math.round(caida.sigue * 100) + ' %</strong>).']);
                 if (r.reservas) lista.push(['badge-check', 'De ' + plural(r.reservas, 'reserva enviada', 'reservas enviadas') + ' desde la página, <strong>' + num(pagadasDe(r)) +
-                    '</strong> ya ' + (pagadasDe(r) === 1 ? 'está pagada o confirmada' : 'están pagadas o confirmadas') + ' y ' + num(pendientesDe(r)) + ' siguen sin pagar.']);
+                    '</strong> ya ' + (pagadasDe(r) === 1 ? 'está pagada o confirmada' : 'están pagadas o confirmadas') + ' y ' + num(pendientesDe(r)) + (pendientesDe(r) === 1 ? ' sigue' : ' siguen') + ' sin pagar.']);
                 const blog = d.blog || {};
                 const masLeido = (blog.articulos || [])[0];
                 if (masLeido && masLeido.lectores) lista.push(['newspaper', 'El artículo más leído del blog es <strong>' + esc(nombreArticulo(masLeido.nombre)) + '</strong> (' +
@@ -2384,7 +2548,7 @@
                 if (celular) lista.push(['smartphone', '<strong>' + pct(celular.visitas, r.visitas) + ' %</strong> de las visitas son desde el celular.']);
             }
             document.getElementById('est-claves').innerHTML = lista.length
-                ? lista.slice(0, 9).map(([icono, texto]) => '<li class="est-clave"><i data-lucide="' + icono + '"></i><span>' + texto + '</span></li>').join('')
+                ? lista.slice(0, 11).map(([icono, texto]) => '<li class="est-clave"><i data-lucide="' + icono + '"></i><span>' + texto + '</span></li>').join('')
                 : '<li>' + vacioEst('Las conclusiones aparecen cuando haya visitas en el período.') + '</li>';
         }
 
@@ -2410,6 +2574,446 @@
             cont.insertAdjacentHTML('beforeend', '<p class="text-[0.76rem] text-graphite/65 mt-4 pt-4 border-t border-line">De cada 100 visitas, <strong class="font-medium text-ink">' +
                 pctDecimal(enviaron, base).replace(' %', '') + '</strong> envían una reserva' +
                 (pagaron != null ? ' y <strong class="font-medium text-ink">' + pctDecimal(pagaron, base).replace(' %', '') + '</strong> la pagan' : '') + '.</p>');
+        }
+
+        /* =================== RESUMEN PROFESIONAL =================== */
+        const tasa = (x, y) => (y ? (Number(x) || 0) / y : 0);
+        const pctTxt = v => (100 * v).toFixed(v < 0.1 ? 1 : 0).replace('.', ',') + ' %';
+        const decimalTxt = v => String(Math.round((Number(v) || 0) * 10) / 10).replace('.', ',');
+        const minutosTxt = m => { m = Number(m) || 0; return m < 1 ? Math.round(m * 60) + ' s' : m < 60 ? decimalTxt(m) + ' min' : decimalTxt(m / 60) + ' h'; };
+        const zonaBogota = { timeZone: 'America/Bogota' };
+        const fechaVisita = iso => new Date(iso).toLocaleDateString('es-CO', { ...zonaBogota, weekday: 'short', day: 'numeric', month: 'short' });
+        const horaVisita = iso => new Date(iso).toLocaleTimeString('es-CO', { ...zonaBogota, hour: 'numeric', minute: '2-digit' });
+
+        function renderResumenPro(d) {
+            renderIndicadores(d);
+            renderSemanas(d);
+            renderGrupos(d);
+            renderPerfilReserva(d);
+            renderUltimas(d);
+        }
+
+        /* Cada indicador: [nombre, este período, período anterior, formato, mejor si sube, serie por día, 'tasa' si se compara en puntos] */
+        function indicadoresDe(d) {
+            const r = d.resumen || {}, a = d.anterior || {};
+            const hay = k => a[k] != null;
+            return [
+                ['Visitas', r.visitas, a.visitas, num, true, p => p.visitas],
+                ['Visitantes (personas distintas)', r.visitantes, a.visitantes, num, true, p => p.visitantes],
+                ['Visitantes nuevos', r.nuevos, a.nuevos, num, true, p => p.nuevos],
+                ['Visitas de personas que vuelven', r.recurrentes, a.recurrentes, num, true],
+                ['Tiempo promedio por visita', r.duracion, a.duracion, duracionTxt, true],
+                ['Tiempo típico por visita (mediana)', r.duracion_mediana, a.duracion_mediana, duracionTxt, true],
+                ['Secciones vistas por visita', r.secciones, a.secciones, decimalTxt, true],
+                ['Se van sin bajar (rebote)', r.rebote != null ? tasa(r.rebote, r.visitas) : null, hay('rebote') ? tasa(a.rebote, a.visitas) : null, pctTxt, false, null, 'tasa'],
+                ['Visitas con interés', tasa(r.interes, r.visitas), hay('interes') ? tasa(a.interes, a.visitas) : null, pctTxt, true, p => p.interes, 'tasa'],
+                ['Escribieron por WhatsApp', r.whatsapp, a.whatsapp, num, true, p => p.whatsapp],
+                ['Reservas enviadas', r.reservas, a.reservas, num, true, p => p.reservas],
+                ['Reservas pagadas o confirmadas', pagadasDe(r), a.pagadas, num, true, p => pagadasDe(p)],
+                ['Conversión a reserva', tasa(r.reservas, r.visitas), hay('reservas') ? tasa(a.reservas, a.visitas) : null, v => pctDecimal(v, 1), true, null, 'tasa'],
+                ['Conversión a pago', tasa(pagadasDe(r), r.visitas), hay('pagadas') ? tasa(a.pagadas, a.visitas) : null, v => pctDecimal(v, 1), true, null, 'tasa'],
+                ['Valor de las reservas enviadas', r.valor, a.valor, COP, true, p => p.valor],
+                ['Valor pagado o confirmado', valorPagadoDe(r), a.valor_pagadas, COP, true],
+                ['Ingreso por visita', tasa(valorPagadoDe(r), r.visitas), hay('valor_pagadas') ? tasa(a.valor_pagadas, a.visitas) : null, COP, true],
+                ['Valor promedio por reserva pagada', pagadasDe(r) ? tasa(valorPagadoDe(r), pagadasDe(r)) : null, hay('valor_pagadas') && a.pagadas ? tasa(a.valor_pagadas, a.pagadas) : null, COP, true],
+                ['Leyeron el blog', r.lectores, a.lectores, num, true, p => p.lectores]
+            ];
+        }
+
+        /* Cambio frente al período anterior: en % (o en puntos, para las tasas), verde si mejora y rojo si empeora */
+        function cambioIndicador(actual, antes, mejorSiSube, tipo) {
+            if (actual == null || antes == null) return { txt: '—', clase: 'est-tenue' };
+            if (tipo === 'tasa') {
+                const puntos = 100 * (actual - antes);
+                if (Math.abs(puntos) < 0.05) return { txt: 'Igual', clase: 'est-tenue' };
+                return { txt: (puntos > 0 ? '+' : '−') + Math.abs(puntos).toFixed(1).replace('.', ',') + ' pts', clase: (puntos > 0) === mejorSiSube ? 'text-moss' : 'text-[#8a3d3d]' };
+            }
+            if (!antes) return { txt: actual ? 'Antes: 0' : 'Igual', clase: 'est-tenue' };
+            const v = 100 * (actual - antes) / antes;
+            if (Math.abs(v) < 0.5) return { txt: 'Igual', clase: 'est-tenue' };
+            return { txt: (v > 0 ? '+' : '−') + Math.abs(Math.round(v)) + ' %', clase: (v > 0) === mejorSiSube ? 'text-moss' : 'text-[#8a3d3d]' };
+        }
+
+        function renderIndicadores(d) {
+            const dias = d.por_dia || [];
+            const { desde, hasta } = periodoEstadisticas();
+            document.getElementById('est-indicadores-sub').textContent = 'Del ' + fechaCorta(desde) + ' al ' + fechaCorta(hasta) +
+                ', frente a los ' + plural(dias.length || 1, 'día anterior', 'días anteriores') + (origenEstadisticas ? ' · solo visitas de ' + origenEstadisticas : '') +
+                '. Verde: mejoró; rojo: empeoró.';
+            document.getElementById('est-indicadores').innerHTML = '<thead><tr><th>Indicador</th><th>Este período</th><th>Período anterior</th><th>Cambio</th><th class="!text-left">Día a día</th></tr></thead><tbody>' +
+                indicadoresDe(d).map(([nombre, actual, antes, formato, sube, serie, tipo]) => {
+                    const c = cambioIndicador(actual, antes, sube, tipo);
+                    return '<tr><td class="font-medium">' + nombre + '</td><td>' + (actual == null ? '—' : formato(actual)) + '</td>' +
+                        '<td class="est-tenue">' + (antes == null ? '—' : formato(antes)) + '</td><td class="' + c.clase + '">' + c.txt + '</td>' +
+                        '<td class="!text-left">' + (serie && dias.length > 1 ? sparkline(dias.map(serie), { ancho: 110, alto: 24 }) : '') + '</td></tr>';
+                }).join('') + '</tbody>';
+        }
+
+        /* Los días del período agrupados por semana (de lunes a domingo) */
+        function semanasDe(dias) {
+            const grupos = [];
+            dias.forEach(p => {
+                const lunes = sumarDias(p.dia, -((fechaD(p.dia).getDay() + 6) % 7));
+                let g = grupos[grupos.length - 1];
+                if (!g || g.lunes !== lunes) {
+                    g = { lunes, desde: p.dia, hasta: p.dia, dias: 0, visitas: 0, interes: 0, whatsapp: 0, reservas: 0, pagadas: 0, valor: 0, lectores: 0 };
+                    grupos.push(g);
+                }
+                g.hasta = p.dia;
+                g.dias++;
+                ['visitas', 'interes', 'whatsapp', 'reservas', 'valor', 'lectores'].forEach(k => { g[k] += Number(p[k]) || 0; });
+                g.pagadas += pagadasDe(p);
+            });
+            return grupos;
+        }
+        const nombreSemana = g => (g.desde === g.hasta ? fechaCorta(g.desde) : fechaCorta(g.desde) + ' – ' + fechaCorta(g.hasta));
+
+        function renderSemanas(d) {
+            const t = document.getElementById('est-semanas');
+            const semanas = semanasDe(d.por_dia || []);
+            if (!semanas.some(s => s.visitas)) { t.innerHTML = '<tbody><tr><td class="!text-left !pl-6">' + vacioEst('Aún no hay visitas en este período.') + '</td></tr></tbody>'; return; }
+            t.innerHTML = '<thead><tr><th>Semana</th><th>Visitas</th><th>Cambio</th><th>Con interés</th><th>WhatsApp</th><th>Reservas</th><th>Pagadas</th><th>Conversión</th><th>Valor</th></tr></thead><tbody>' +
+                semanas.map((s, i) => {
+                    const antes = semanas[i - 1];
+                    // Si la semana está incompleta, se compara el promedio por día
+                    const c = antes && antes.visitas ? cambioIndicador(s.visitas / s.dias, antes.visitas / antes.dias, true) : { txt: '—', clase: 'est-tenue' };
+                    return { s, c };
+                }).reverse().map(({ s, c }) => '<tr><td><span class="block font-medium">' + nombreSemana(s) + '</span>' +
+                    (s.dias < 7 ? '<span class="block text-[0.64rem] est-tenue">' + plural(s.dias, 'día', 'días') + '</span>' : '') + '</td>' +
+                    '<td>' + num(s.visitas) + '</td><td class="' + c.clase + '">' + c.txt + '</td><td>' + pct(s.interes, s.visitas) + ' %</td>' +
+                    '<td>' + num(s.whatsapp) + '</td><td>' + num(s.reservas) + '</td><td>' + num(s.pagadas) + '</td>' +
+                    '<td>' + pctDecimal(s.reservas, s.visitas) + '</td><td>' + (s.valor ? copCorto(s.valor) : '<span class="est-tenue">—</span>') + '</td></tr>').join('') + '</tbody>';
+        }
+
+        /* Grupos: cada equipo y visitantes nuevos frente a los que vuelven */
+        function gruposDe(d) {
+            return [...(d.dispositivos || []).map(x => ({ ...x, grupo: 'Equipo', icono: ICONOS_EQUIPO[x.nombre] || 'circle' })),
+                    ...(d.tipo_visitante || []).map(x => ({ ...x, grupo: 'Visitante', icono: x.nombre === 'Nuevos' ? 'user-plus' : 'repeat' }))];
+        }
+        function renderGrupos(d) {
+            const t = document.getElementById('est-grupos');
+            const r = d.resumen || {};
+            const grupos = gruposDe(d);
+            if (!grupos.some(g => g.visitas)) { t.innerHTML = '<tbody><tr><td class="!text-left !pl-6">' + vacioEst('Aún no hay visitas en este período.') + '</td></tr></tbody>'; return; }
+            const dato = (v, f) => (v == null ? '<span class="est-tenue">—</span>' : f(v));
+            t.innerHTML = '<thead><tr><th>Grupo</th><th>Visitas</th><th>Tiempo</th><th>Rebote</th><th>Secciones</th><th>WhatsApp</th><th>Conversión</th><th>Pagadas</th><th>Valor pagado</th></tr></thead><tbody>' +
+                grupos.map((g, i) => '<tr' + (i && g.grupo !== grupos[i - 1].grupo ? ' style="border-top:2px solid var(--line)"' : '') + '>' +
+                    '<td><span class="inline-flex items-center gap-2"><i data-lucide="' + g.icono + '" class="w-3.5 h-3.5 text-brass shrink-0"></i>' + esc(g.nombre) + '</span></td>' +
+                    '<td>' + num(g.visitas) + '<span class="est-tenue"> · ' + pct(g.visitas, r.visitas) + ' %</span></td>' +
+                    '<td>' + duracionTxt(g.duracion) + '</td><td>' + dato(g.rebote, v => pct(v, g.visitas) + ' %') + '</td>' +
+                    '<td>' + dato(g.secciones, decimalTxt) + '</td><td>' + dato(g.whatsapp, v => pctDecimal(v, g.visitas)) + '</td>' +
+                    '<td>' + pctDecimal(g.reservas, g.visitas) + '</td><td>' + dato(g.pagadas, num) + '</td>' +
+                    '<td>' + dato(g.valor_pagadas, v => (v ? copCorto(v) : '<span class="est-tenue">—</span>')) + '</td></tr>').join('') + '</tbody>';
+        }
+
+        /* Quiénes reservan: cuánto tardan, en qué visita, qué vieron y desde qué equipo */
+        function renderPerfilReserva(d) {
+            const cont = document.getElementById('est-perfil-reserva');
+            const c = d.conversion;
+            if (!c) { cont.innerHTML = vacioEst('Aparece al actualizar Supabase.'); return; }
+            if (!c.reservas) { cont.innerHTML = vacioEst('Nadie envió una reserva desde la página en este período.'); return; }
+            const dato = (t, v, n) => '<div class="bg-white p-4"><span class="micro text-graphite/40">' + t + '</span><span class="block est-kpi-chico mt-2">' + v + '</span>' +
+                '<span class="block text-[0.66rem] text-graphite/45 mt-1 leading-snug">' + n + '</span></div>';
+            cont.innerHTML = '<div class="grid grid-cols-2 sm:grid-cols-3 gap-px bg-line border border-line mb-5">' +
+                    dato('Tardan en reservar', minutosTxt(c.minutos_mediana), 'Desde que entran (lo típico) · promedio ' + minutosTxt(c.minutos)) +
+                    dato('En su primera visita', pct(c.primera_visita, c.reservas) + ' %', 'En promedio reservan en su visita ' + decimalTxt(c.visita_promedio)) +
+                    dato('Ven antes', decimalTxt(c.secciones) + ' secc.', 'Y pasan ' + duracionTxt(c.duracion) + ' en la página') +
+                    dato('Escribieron', pct(c.escribieron, c.reservas) + ' %', num(c.escribieron) + ' de ' + num(c.reservas) + ' también usaron WhatsApp') +
+                    dato('Usaron el asistente', pct(c.usaron_asistente, c.reservas) + ' %', num(c.usaron_asistente) + ' de ' + num(c.reservas)) +
+                    dato('Leyeron el blog', pct(c.leyeron_blog, c.reservas) + ' %', num(c.leyeron_blog) + ' de ' + num(c.reservas)) +
+                '</div>' +
+                '<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Lo que vieron</span><div id="est-reserva-secciones"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Desde qué equipo</span><div id="est-reserva-equipos"></div></div>' +
+                '</div>';
+            barras('est-reserva-secciones', (c.secciones_vistas || []).filter(x => SECCIONES[x.nombre]), {
+                valor: x => x.reservas, total: c.reservas, nombre: x => SECCIONES[x.nombre], icono: x => ICONOS_SECCION[x.nombre] || 'circle',
+                dato: x => 'data-seccion="' + x.nombre + '"'
+            });
+            barras('est-reserva-equipos', c.equipos || [], { valor: x => x.reservas, total: c.reservas, icono: x => ICONOS_EQUIPO[x.nombre] || 'circle' });
+        }
+
+        /* Lo que hizo una visita, en insignias */
+        function insigniasVisita(v) {
+            return [
+                v.confirmo ? '<span class="est-insignia ' + (v.pago ? 'is-buena' : 'is-dorada') + '"><i data-lucide="calendar-check"></i>' + (v.pago ? 'Pagó' : 'Reservó') + '</span>' : '',
+                v.escribio ? '<span class="est-insignia is-buena"><i data-lucide="message-circle"></i>WhatsApp</span>' : '',
+                v.blog ? '<span class="est-insignia"><i data-lucide="newspaper"></i>Blog</span>' : '',
+                v.asistente ? '<span class="est-insignia"><i data-lucide="message-square"></i>Asistente</span>' : '',
+                !v.confirmo && !v.escribio && v.interacciones ? '<span class="est-insignia"><i data-lucide="mouse-pointer-click"></i>' + plural(v.interacciones, 'clic', 'clics') + '</span>' : '',
+                v.reboto ? '<span class="est-insignia is-tenue">Se fue sin bajar</span>' : ''
+            ].filter(Boolean).join('');
+        }
+        const visitanteTxt = v => '#' + String(v.visitante || '').slice(0, 4) +
+            (v.visitas_visitante > 1 ? ' · ' + v.visitas_visitante + ' visitas' : v.nuevo ? ' · primera vez' : ' · ya había venido');
+
+        function renderUltimas(d) {
+            const cont = document.getElementById('est-ultimas');
+            const lista = d.visitas_lista;
+            if (!lista) { cont.innerHTML = vacioEst('Aparece al actualizar Supabase.'); return; }
+            if (!lista.length) { cont.innerHTML = vacioEst('Aún no hay visitas en este período.'); return; }
+            cont.innerHTML = lista.slice(0, 7).map(v => '<button type="button" class="est-mini" data-visita="' + esc(v.sesion) + '">' +
+                '<span class="min-w-0"><span class="block text-[0.8rem] text-ink truncate">' + fechaVisita(v.inicio) + ' · ' + horaVisita(v.inicio) + ' · ' + esc(v.fuente || 'Directo') + '</span>' +
+                    '<span class="block text-[0.68rem] text-graphite/50 truncate">' + esc([v.dispositivo, v.ciudad].filter(Boolean).join(' · ')) + ' · ' + duracionTxt(v.duracion) + ' · ' + plural(v.secciones || 0, 'sección', 'secciones') +
+                    (v.se_fue_en ? ' · terminó en ' + esc(nombreLugar(v.se_fue_en)) : '') + '</span></span>' +
+                '<span class="flex flex-wrap justify-end gap-1 max-w-[11rem]">' + insigniasVisita(v) + '</span></button>').join('');
+        }
+
+        /* =================== VISITAS UNA A UNA =================== */
+        let filtroVisitas = 'todas', paginaVisitas = 0, buscarVisitas = '';
+        const POR_PAGINA_VISITAS = 25;
+        const FILTROS_VISITAS = {
+            todas: () => true, interes: v => v.interes, whatsapp: v => v.escribio, reservaron: v => v.confirmo, pagaron: v => v.confirmo && v.pago,
+            volvieron: v => !v.nuevo || v.visitas_visitante > 1, rebote: v => v.reboto, blog: v => v.blog
+        };
+        function visitasFiltradas(d) {
+            const q = buscarVisitas.trim().toLowerCase();
+            return (d.visitas_lista || []).filter(FILTROS_VISITAS[filtroVisitas] || FILTROS_VISITAS.todas).filter(v => !q ||
+                [v.fuente, v.medio, v.campana, v.referente, v.ciudad, v.dispositivo, v.sistema, v.navegador, v.visitante,
+                 v.se_fue_en && nombreLugar(v.se_fue_en), v.entrada && nombreLugar(v.entrada)].some(x => String(x || '').toLowerCase().includes(q)));
+        }
+
+        function renderVisitasEst(d) {
+            const r = d.resumen || {};
+            const lista = d.visitas_lista;
+            const volvieron = (d.recurrencia || []).filter(x => !/^1 /.test(x.nombre)).reduce((s, x) => s + (x.visitantes || 0), 0);
+            tarjetas('est-kpis-visitas', [
+                ['Visitas en el período', num(d.visitas_total != null ? d.visitas_total : r.visitas), lista ? 'Abajo están las ' + num(lista.length) + ' más recientes' : 'La lista aparece al actualizar Supabase', ''],
+                ['Personas distintas', num(r.visitantes), pct(r.nuevos, r.visitantes) + ' % vino por primera vez', ''],
+                ['Volvieron más de una vez', num(volvieron), pct(volvieron, r.visitantes) + ' % de las personas del período', ''],
+                ['Visitas que reservaron', num(r.reservas), num(pagadasDe(r)) + ' pagadas · ' + num(pendientesDe(r)) + ' sin pagar', '']
+            ], true);
+            tablaVisitas(d);
+        }
+
+        function tablaVisitas(d) {
+            const t = document.getElementById('est-tabla-visitas');
+            const pie = document.getElementById('est-visitas-paginas');
+            const vacio = texto => { t.innerHTML = '<tbody><tr><td class="!text-left !pl-6 !whitespace-normal">' + vacioEst(texto) + '</td></tr></tbody>'; pie.innerHTML = ''; };
+            if (!d.visitas_lista) return vacio('Para ver cada visita falta un paso: en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.');
+            const lista = visitasFiltradas(d);
+            if (!lista.length) return vacio(d.visitas_lista.length ? 'Ninguna visita coincide con este filtro.' : 'Aún no hay visitas en este período.');
+            const paginas = Math.ceil(lista.length / POR_PAGINA_VISITAS);
+            paginaVisitas = Math.max(0, Math.min(paginaVisitas, paginas - 1));
+            const ini = paginaVisitas * POR_PAGINA_VISITAS;
+            t.innerHTML = '<thead><tr><th>Fecha</th><th class="!text-left">Visitante</th><th class="!text-left">Llegó desde</th><th class="!text-left">Equipo</th><th class="!text-left">Ciudad</th>' +
+                    '<th>Tiempo</th><th>Secciones</th><th class="!text-left">Qué hizo</th><th class="!text-left">Terminó en</th></tr></thead><tbody>' +
+                lista.slice(ini, ini + POR_PAGINA_VISITAS).map(v => '<tr tabindex="0" data-visita="' + esc(v.sesion) + '" title="Ver el recorrido de esta visita">' +
+                    '<td><span class="block font-medium">' + fechaVisita(v.inicio) + '</span><span class="block text-[0.66rem] est-tenue">' + horaVisita(v.inicio) + '</span></td>' +
+                    '<td class="!text-left">' + esc(visitanteTxt(v)) + '</td>' +
+                    '<td class="!text-left"><span class="block">' + esc(v.fuente || 'Directo') + '</span><span class="block text-[0.66rem] est-tenue">' +
+                        esc([v.medio, v.campana ? legible(v.campana) : ''].filter(Boolean).join(' · ') || ' ') + '</span></td>' +
+                    '<td class="!text-left"><span class="inline-flex items-center gap-1.5"><i data-lucide="' + (ICONOS_EQUIPO[v.dispositivo] || 'circle') + '" class="w-3.5 h-3.5 text-brass"></i>' +
+                        esc(v.dispositivo || 'Otro') + '</span><span class="block text-[0.66rem] est-tenue">' + esc([v.sistema, v.navegador].filter(Boolean).join(' · ')) + '</span></td>' +
+                    '<td class="!text-left">' + esc(v.ciudad || '—') + (v.pais && v.pais !== 'CO' ? '<span class="block text-[0.66rem] est-tenue">' + esc(nombrePais(v.pais)) + '</span>' : '') + '</td>' +
+                    '<td>' + duracionTxt(v.duracion) + '</td><td>' + num(v.secciones) + '</td>' +
+                    '<td class="!text-left"><span class="flex flex-wrap gap-1">' + (insigniasVisita(v) || '<span class="est-tenue text-[0.72rem]">Solo miró</span>') + '</span></td>' +
+                    '<td class="!text-left">' + esc(v.se_fue_en ? nombreLugar(v.se_fue_en) : '—') + '</td></tr>').join('') + '</tbody>';
+            pie.innerHTML = '<span>' + num(ini + 1) + '–' + num(Math.min(ini + POR_PAGINA_VISITAS, lista.length)) + ' de ' + num(lista.length) +
+                (lista.length !== d.visitas_lista.length ? ' (con el filtro)' : '') + (d.visitas_total > d.visitas_lista.length ? ' · se muestran las ' + num(d.visitas_lista.length) + ' más recientes de ' + num(d.visitas_total) : '') + '</span>' +
+                '<span class="flex gap-2"><button type="button" class="chip" data-pagina-visitas="-1"' + (paginaVisitas ? '' : ' disabled') + '><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Más recientes</button>' +
+                '<button type="button" class="chip" data-pagina-visitas="1"' + (paginaVisitas < paginas - 1 ? '' : ' disabled') + '>Anteriores <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button></span>';
+            lucide.createIcons();
+        }
+
+        /* Una visita completa: se pide a Supabase (o se arma de ejemplo) y se dibuja paso a paso */
+        async function abrirVisita(sesion) {
+            const d = datosEstadisticas || {};
+            const item = (d.visitas_lista || []).find(v => v.sesion === sesion);
+            abrirModal('<div class="p-6 sm:p-8"><p class="text-[0.8rem] text-graphite/55">Cargando la visita…</p></div>');
+            let det;
+            try {
+                det = CONECTADO ? await api('POST', 'rpc/visita_detalle', { p_sesion: sesion }) : visitaDeEjemplo(item, d);
+            } catch (e) {
+                abrirModal('<div class="p-6 sm:p-8">' + vacioEst('No se pudo cargar la visita: ' + esc(e.message) + '. Si acabas de actualizar la página, vuelve a ejecutar supabase-reservas.sql en Supabase.') + '</div>');
+                return;
+            }
+            if (!det) { abrirModal('<div class="p-6 sm:p-8">' + vacioEst('No se encontró esta visita: puede ser de hace más de 400 días.') + '</div>'); return; }
+            pintarVisita(det, item);
+        }
+
+        function pintarVisita(det, item) {
+            const ev = det.eventos || [];
+            const at = det.atributos || {};
+            const t0 = ev.length ? new Date(ev[0].creado).getTime() : new Date(item ? item.inicio : Date.now()).getTime();
+            const reloj = iso => {
+                const s = Math.max(0, Math.round((new Date(iso).getTime() - t0) / 1000));
+                return s < 3600 ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') : Math.floor(s / 3600) + ' h ' + Math.floor((s % 3600) / 60) + ' m';
+            };
+            const tiempo = {};
+            ev.forEach(e => { if (e.tipo === 'seccion' && e.valor != null && e.detalle) tiempo[e.detalle] = (tiempo[e.detalle] || 0) + e.valor; });
+            const salidas = ev.filter(e => e.tipo === 'salida');
+            const ultimaSalida = salidas[salidas.length - 1];
+            const duracion = Math.max(ultimaSalida ? ultimaSalida.valor || 0 : 0, ev.length ? Math.round((new Date(ev[ev.length - 1].creado).getTime() - t0) / 1000) : 0);
+            const pasos = ev.map(e => { const p = pasoDeEvento(e, tiempo, e === ultimaSalida); return p && { ...p, hora: reloj(e.creado) }; }).filter(Boolean);
+            const vistas = ev.filter(e => e.tipo === 'seccion' && e.valor == null && e.detalle).length;
+            const reservas = det.reservas || [];
+            const hist = det.historial || [];
+            const iActual = hist.findIndex(h => h.sesion === det.sesion);
+            const numero = iActual >= 0 ? hist.length - iActual : 1;
+            const pago = ev.some(e => e.tipo === 'pago' && e.detalle === 'aprobado') || reservas.some(x => x.estado === 'pagada' || x.estado === 'confirmada');
+            const reservo = ev.some(e => e.tipo === 'reserva_whatsapp' || e.tipo === 'pago_iniciado');
+            const escribio = ev.some(e => e.tipo === 'whatsapp');
+            const toco = ev.some(e => !['visita', 'seccion', 'salida', 'articulo', 'lectura'].includes(e.tipo));
+            const resultado = pago ? 'Pagó su reserva' : reservo ? 'Envió una reserva' : escribio ? 'Escribió por WhatsApp' : vistas <= 1 && !toco ? 'Se fue sin bajar' : toco ? 'Miró y tocó botones' : 'Solo miró';
+            const fecha = new Date(t0);
+            const fechaTxt = capitalize(fecha.toLocaleDateString('es-CO', { ...zonaBogota, weekday: 'long', day: 'numeric', month: 'long' })) + ', ' + fecha.toLocaleTimeString('es-CO', { ...zonaBogota, hour: 'numeric', minute: '2-digit' });
+            const cifra = (titulo, valor, nota) => '<div class="bg-white p-4"><span class="micro text-graphite/40">' + titulo + '</span><span class="block text-[0.92rem] text-ink mt-1.5 leading-snug">' + valor + '</span>' +
+                (nota ? '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + nota + '</span>' : '') + '</div>';
+            abrirModal('<div class="p-6 sm:p-8">' +
+                '<div class="flex items-center gap-3 pr-10">' +
+                    '<span class="w-10 h-10 rounded-full bg-brass/15 text-brass-deep flex items-center justify-center shrink-0"><i data-lucide="footprints" class="w-5 h-5"></i></span>' +
+                    '<span class="min-w-0"><span class="micro text-graphite/40 block">' + (hist.length > 1 ? 'Visita ' + numero + ' de ' + hist.length + ' de esta persona' : at.nuevo === false ? 'Ya había venido antes' : 'Primera visita') + '</span>' +
+                    '<span class="block font-display text-2xl sm:text-3xl text-ink leading-tight">' + esc(fechaTxt) + '</span></span>' +
+                '</div>' +
+                '<p class="text-[0.72rem] text-graphite/50 mt-2">Visitante #' + esc(String(det.visitante || '').slice(0, 4)) + ' · número al azar de su navegador, sin datos personales</p>' +
+                '<div class="grid grid-cols-2 sm:grid-cols-3 gap-px bg-line border border-line mt-6">' +
+                    cifra('Llegó desde', esc(at.fuente || 'Directo'), esc([at.medio, at.campana ? 'campaña ' + legible(at.campana) : '', at.referente].filter(Boolean).join(' · '))) +
+                    cifra('Entró por', esc(nombreLugar(at.entrada || 'inicio'))) +
+                    cifra('Equipo', esc(at.dispositivo || 'Otro'), esc([at.sistema, at.navegador].filter(Boolean).join(' · '))) +
+                    cifra('Ubicación', esc([at.ciudad, at.pais ? nombrePais(at.pais) : ''].filter(Boolean).join(', ') || '—'), at.idioma ? 'Idioma ' + esc(nombreIdioma(String(at.idioma).split('-')[0])) : '') +
+                    cifra('Duración', duracionTxt(duracion), plural(vistas, 'sección vista', 'secciones vistas')) +
+                    cifra('Resultado', '<strong class="font-medium">' + resultado + '</strong>') +
+                '</div>' +
+                (reservas.length ? '<div class="mt-6"><span class="micro text-graphite/40 block mb-2">Su reserva</span>' + reservas.map(x =>
+                    '<div class="flex flex-wrap items-center justify-between gap-2 p-3 border border-line text-[0.8rem] mb-2"><span><strong class="font-medium">' + esc(x.orden) + '</strong>' +
+                    '<span class="text-graphite/55"> · ' + esc(legible(x.estado)) + ' · ' + esc(legible(x.canal)) + '</span></span>' +
+                    '<span>' + COP(x.total || 0) + '<span class="text-graphite/45"> · llega el ' + fechaCorta(x.llegada) + ' · ' + plural(x.noches || 0, 'noche', 'noches') + '</span></span></div>').join('') + '</div>' : '') +
+                '<div class="mt-7"><span class="micro text-graphite/40 block mb-3">Recorrido, paso a paso</span>' +
+                    (pasos.length ? '<div>' + pasos.map(p => '<div class="est-paso' + (p.clase ? ' ' + p.clase : '') + '"><span class="est-paso-hora">' + p.hora + '</span>' +
+                        '<span class="est-paso-icono"><i data-lucide="' + p.icono + '"></i></span><span class="est-paso-texto">' + esc(p.texto) +
+                        (p.nota ? '<span class="est-paso-nota">' + esc(p.nota) + '</span>' : '') + '</span></div>').join('') + '</div>' : vacioEst('No hay pasos registrados en esta visita.')) +
+                '</div>' +
+                (hist.length > 1 ? '<div class="mt-7 pt-5 border-t border-line"><span class="micro text-graphite/40 block mb-1">Todas sus visitas</span>' +
+                    hist.map(h => '<button type="button" class="est-mini' + (h.sesion === det.sesion ? ' is-actual' : '') + '" data-visita="' + esc(h.sesion) + '">' +
+                        '<span class="min-w-0"><span class="block text-[0.8rem] text-ink">' + fechaVisita(h.inicio) + ' · ' + horaVisita(h.inicio) + ' · ' + esc(h.fuente || 'Directo') +
+                        (h.sesion === det.sesion ? ' <span class="text-graphite/45">(esta)</span>' : '') + '</span>' +
+                        '<span class="block text-[0.68rem] text-graphite/50">' + esc(h.dispositivo || 'Otro') + ' · ' + duracionTxt(h.duracion) + ' · ' + plural(h.secciones || 0, 'sección', 'secciones') + '</span></span>' +
+                        '<span class="flex gap-1">' + (h.reservo ? '<span class="est-insignia is-dorada"><i data-lucide="calendar-check"></i>Reservó</span>' : '') +
+                        (h.escribio ? '<span class="est-insignia is-buena"><i data-lucide="message-circle"></i>WhatsApp</span>' : '') + '</span></button>').join('') + '</div>' : '') +
+            '</div>');
+            lucide.createIcons();
+        }
+
+        /* Cada evento como un paso legible del recorrido (null: no se muestra) */
+        function pasoDeEvento(e, tiempo, esUltimaSalida) {
+            const d = e.detalle || '';
+            const [hab, orden] = d.split('|');
+            const habs = s => String(s || '').split('+').filter(Boolean).map(k => CORTOS[k] || legible(k)).join(', ');
+            const valorReserva = [habs(hab), orden, e.valor ? COP(e.valor) : ''].filter(Boolean).join(' · ');
+            switch (e.tipo) {
+                case 'visita':
+                    if (d.startsWith('blog')) return { icono: 'log-in', texto: d === 'blog' ? 'Abrió la lista del blog' : 'Abrió el artículo «' + nombreArticulo(d.slice(5)) + '»', clase: 'is-clave' };
+                    return { icono: 'log-in', texto: d && d !== 'inicio' ? 'Abrió la página en ' + nombreLugar(d) : 'Abrió la página', clase: 'is-clave' };
+                case 'seccion':
+                    if (e.valor != null || !d) return null;
+                    return { icono: ICONOS_SECCION[d] || 'eye', texto: 'Vio ' + nombreLugar(d), nota: tiempo[d] ? duracionTxt(tiempo[d]) + ' en pantalla en total' : '' };
+                case 'salida':
+                    return esUltimaSalida
+                        ? { icono: 'log-out', texto: 'Se fue' + (d ? ' desde ' + nombreLugar(d) : ''), nota: e.valor ? duracionTxt(e.valor) + ' con la página a la vista' : '', clase: 'is-clave' }
+                        : { icono: 'eye-off', texto: 'Dejó la página en segundo plano' + (d ? ' (en ' + nombreLugar(d) + ')' : ''), nota: 'Cambió de pestaña o de aplicación' };
+                case 'whatsapp': return { icono: 'message-circle', texto: 'Tocó WhatsApp', nota: d ? 'Desde ' + nombreLugar(d) : '', clase: 'is-meta' };
+                case 'llamada': return { icono: 'phone', texto: 'Llamó al hotel', nota: d ? 'Desde ' + nombreLugar(d) : '', clase: 'is-meta' };
+                case 'correo': return { icono: 'mail', texto: 'Escribió un correo', nota: d ? 'Desde ' + nombreLugar(d) : '', clase: 'is-meta' };
+                case 'como_llegar': return { icono: 'navigation', texto: 'Abrió cómo llegar', nota: d ? 'Desde ' + nombreLugar(d) : '' };
+                case 'ficha_habitacion': return { icono: 'bed-double', texto: 'Abrió la ficha de ' + habs(d) };
+                case 'habitacion_agregada': return { icono: 'plus', texto: 'Agregó a su reserva: ' + habs(d) };
+                case 'fechas': return { icono: 'calendar', texto: 'Eligió fechas' };
+                case 'carrito': return { icono: 'key', texto: 'Abrió su reserva' };
+                case 'datos_completos': return { icono: 'user-check', texto: 'Completó sus datos' };
+                case 'reserva_whatsapp': return { icono: 'send', texto: 'Envió la reserva por WhatsApp', nota: valorReserva, clase: 'is-meta' };
+                case 'pago_iniciado': return { icono: 'credit-card', texto: 'Abrió el pago con Bold', nota: valorReserva, clase: 'is-meta' };
+                case 'pago': return { icono: 'badge-check', texto: d === 'aprobado' ? 'Pago aprobado' : 'Volvió del pago: ' + legible(d), nota: e.valor ? COP(e.valor) : '', clase: d === 'aprobado' ? 'is-meta' : '' };
+                case 'plan': return { icono: 'sparkles', texto: 'Pidió el plan ' + (NOMBRES_PLANES[d] || legible(d)) };
+                case 'documento': return { icono: 'file-text', texto: 'Abrió ' + (NOMBRES_DOCUMENTOS[d] || legible(d)) };
+                case 'red_social': return { icono: 'share-2', texto: 'Fue a ' + legible(d) };
+                case 'galeria': return { icono: 'images', texto: 'Abrió fotos' + (d ? ' de ' + (CATEGORIAS_GALERIA[d] || legible(d)) : '') };
+                case 'asistente': return { icono: 'message-square', texto: 'Abrió el asistente' };
+                case 'asistente_tema': return { icono: 'circle-help', texto: 'Preguntó al asistente', nota: TEMAS[d] || legible(d) };
+                case 'pedido_mangole': return { icono: 'utensils', texto: 'Envió un pedido a Mangolé', nota: [d ? plural(Number(d) || 0, 'plato', 'platos') : '', e.valor ? COP(e.valor) : ''].filter(Boolean).join(' · ') };
+                case 'blog': return { icono: 'newspaper', texto: d === 'todos' ? 'Abrió la lista del blog' : 'Abrió el artículo «' + nombreArticulo(d) + '» desde la página' };
+                case 'articulo': return e.valor != null ? { icono: 'book-open', texto: 'Leyó «' + nombreArticulo(d) + '»', nota: duracionTxt(e.valor) + ' de lectura' } : null;
+                case 'lectura': return { icono: 'book-open-check', texto: 'Llegó al ' + (e.valor || 0) + ' % de «' + nombreArticulo(d) + '»' };
+                case 'blog_clic': { const [art, destino] = d.split('|'); return { icono: destinoBlog(destino)[0], texto: destinoBlog(destino)[1], nota: art ? 'Desde «' + nombreArticulo(art) + '»' : '' }; }
+                default: return { icono: (INTERACCIONES[e.tipo] || ['circle'])[0], texto: (INTERACCIONES[e.tipo] || [null, legible(e.tipo)])[1] };
+            }
+        }
+
+        /* =================== DESCARGAS EN CSV (se abren en Excel) =================== */
+        function descargarCSV(nombre, titulos, filas) {
+            const celda = v => { const s = String(v == null ? '' : v); return /[";\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+            const texto = '\ufeff' + [titulos, ...filas].map(f => f.map(celda).join(';')).join('\r\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([texto], { type: 'text/csv;charset=utf-8' }));
+            a.download = nombre + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+            toast('Descargando ' + nombre + '.csv');
+        }
+
+        function exportarCSV(tipo) {
+            const d = datosEstadisticas;
+            if (!d) return;
+            const { desde, hasta } = periodoEstadisticas();
+            const nombre = base => 'cabaleon-' + base + (origenEstadisticas ? '-' + origenEstadisticas.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-') : '') + '-' + desde + '-a-' + hasta;
+            const decimal = v => String(Math.round((Number(v) || 0) * 1000) / 1000).replace('.', ',');
+            if (tipo === 'indicadores') return descargarCSV(nombre('indicadores'), ['Indicador', 'Este período', 'Período anterior', 'Cambio'],
+                indicadoresDe(d).map(([n, actual, antes, formato, sube, , tp]) => [n, actual == null ? '' : formato(actual), antes == null ? '' : formato(antes), cambioIndicador(actual, antes, sube, tp).txt]));
+            if (tipo === 'dias') return descargarCSV(nombre('dia-a-dia'), ['Día', 'Visitas', 'Visitantes', 'Nuevos', 'Con interés', 'WhatsApp', 'Reservas', 'Pagadas', 'Sin pagar', 'Valor', 'Lectores del blog'],
+                (d.por_dia || []).map(p => [p.dia, p.visitas, p.visitantes, p.nuevos, p.interes, p.whatsapp, p.reservas, pagadasDe(p), pendientesDe(p), p.valor, p.lectores]));
+            if (tipo === 'semanas') return descargarCSV(nombre('semanas'), ['Desde', 'Hasta', 'Días', 'Visitas', 'Con interés', 'WhatsApp', 'Reservas', 'Pagadas', 'Conversión (%)', 'Valor'],
+                semanasDe(d.por_dia || []).map(s => [s.desde, s.hasta, s.dias, s.visitas, s.interes, s.whatsapp, s.reservas, s.pagadas, decimal(100 * tasa(s.reservas, s.visitas)), s.valor]));
+            if (tipo === 'grupos') return descargarCSV(nombre('grupos'), ['Grupo', 'Nombre', 'Visitas', 'Tiempo promedio (s)', 'Rebote (%)', 'Secciones por visita', 'WhatsApp', 'Reservas', 'Conversión (%)', 'Pagadas', 'Valor pagado'],
+                gruposDe(d).map(g => [g.grupo, g.nombre, g.visitas, g.duracion, g.rebote == null ? '' : decimal(100 * tasa(g.rebote, g.visitas)), g.secciones == null ? '' : decimal(g.secciones),
+                    g.whatsapp == null ? '' : g.whatsapp, g.reservas, decimal(100 * tasa(g.reservas, g.visitas)), g.pagadas == null ? '' : g.pagadas, g.valor_pagadas == null ? '' : g.valor_pagadas]));
+            if (tipo === 'visitas') {
+                const fecha = iso => new Date(iso).toLocaleDateString('en-CA', zonaBogota);
+                const hora = iso => new Date(iso).toLocaleTimeString('es-CO', { ...zonaBogota, hour: '2-digit', minute: '2-digit', hour12: false });
+                const si = v => (v ? 'Sí' : 'No');
+                return descargarCSV(nombre('visitas'), ['Fecha', 'Hora', 'Visitante', 'Visitas de esa persona', 'Primera vez', 'Fuente', 'Medio', 'Campaña', 'Sitio de origen', 'Entró por',
+                    'Equipo', 'Sistema', 'Navegador', 'Ciudad', 'País', 'Duración (s)', 'Secciones vistas', 'Clics', 'Con interés', 'WhatsApp', 'Reservó', 'Pagó', 'Valor de la reserva',
+                    'Leyó el blog', 'Usó el asistente', 'Se fue sin bajar', 'Terminó en'],
+                    visitasFiltradas(d).map(v => [fecha(v.inicio), hora(v.inicio), v.visitante, v.visitas_visitante, si(v.nuevo), v.fuente, v.medio, v.campana, v.referente, v.entrada ? nombreLugar(v.entrada) : '',
+                        v.dispositivo, v.sistema, v.navegador, v.ciudad, v.pais, v.duracion, v.secciones, v.interacciones, si(v.interes), si(v.escribio), si(v.confirmo), si(v.pago), v.valor || '',
+                        si(v.blog), si(v.asistente), si(v.reboto), v.se_fue_en ? nombreLugar(v.se_fue_en) : '']));
+            }
+        }
+
+        /* Visita de ejemplo (sin conexión): un recorrido coherente con lo que dice la lista */
+        function visitaDeEjemplo(v, d) {
+            if (!v) return null;
+            const t0 = new Date(v.inicio).getTime();
+            const orden = ordenPagina(d);
+            const vistas = orden.slice(Math.max(0, orden.indexOf(v.entrada || 'inicio')), Math.max(0, orden.indexOf(v.entrada || 'inicio')) + Math.max(1, v.secciones || 1));
+            if (v.confirmo && !vistas.includes('reservar')) vistas.push('reservar');
+            const por = Math.max(3, Math.round((v.duracion || 30) / vistas.length));
+            let t = t0;
+            const ev = [];
+            const nuevo = (tipo, detalle, valor, seg) => { t += (seg || 0) * 1000; ev.push({ creado: new Date(t).toISOString(), tipo, detalle: detalle == null ? null : detalle, valor: valor == null ? null : valor }); };
+            nuevo('visita', v.entrada || 'inicio');
+            vistas.forEach((s, i) => {
+                nuevo('seccion', s, null, i ? 2 : 1);
+                if (s === 'habitaciones' && v.interacciones) nuevo('ficha_habitacion', 'suite', null, 6);
+                if (s === 'galeria' && v.interacciones > 1) nuevo('galeria', 'piscina', null, 5);
+                if (s === 'reservar' && v.confirmo) {
+                    nuevo('fechas', null, null, 8); nuevo('habitacion_agregada', 'suite', null, 6); nuevo('datos_completos', null, null, 25);
+                    nuevo(v.pago ? 'pago_iniciado' : 'reserva_whatsapp', 'suite|CAB-EJEMPLO', v.valor || 540000, 10);
+                    if (v.pago) nuevo('pago', 'aprobado', Math.round((v.valor || 540000) / 2), 70);
+                }
+                t += por * 1000;
+            });
+            if (v.escribio) nuevo('whatsapp', vistas[vistas.length - 1], null, 3);
+            vistas.forEach(s => ev.push({ creado: new Date(t).toISOString(), tipo: 'seccion', detalle: s, valor: por }));
+            nuevo('salida', v.confirmo ? 'reservar' : v.se_fue_en || vistas[vistas.length - 1], v.duracion, 1);
+            const historial = [{ sesion: v.sesion, inicio: v.inicio, duracion: v.duracion, fuente: v.fuente, dispositivo: v.dispositivo, secciones: v.secciones, escribio: v.escribio, reservo: v.confirmo }];
+            for (let k = 1; k < (v.visitas_visitante || 1); k++) historial.push({ sesion: v.sesion + '-antes' + k, inicio: new Date(t0 - k * 2.5 * 86400e3).toISOString(), duracion: 50 + k * 40, fuente: k % 2 ? 'Instagram' : 'Google', dispositivo: v.dispositivo, secciones: 2 + k, escribio: false, reservo: false });
+            return {
+                sesion: v.sesion, visitante: v.visitante, eventos: ev, historial,
+                atributos: { fuente: v.fuente, medio: v.medio, campana: v.campana, referente: v.referente, entrada: v.entrada, dispositivo: v.dispositivo, navegador: v.navegador, sistema: v.sistema, idioma: 'es-CO', pais: v.pais, ciudad: v.ciudad, nuevo: v.nuevo },
+                reservas: v.confirmo ? [{ orden: 'CAB-EJEMPLO', estado: v.pago ? 'pagada' : 'pendiente', canal: v.pago ? 'bold' : 'whatsapp', total: v.valor || 540000, llegada: sumarDias(hoyISO(), 12), noches: 2 }] : []
+            };
         }
 
         /* =================== DE DÓNDE LLEGAN =================== */
@@ -2521,20 +3125,46 @@
         }
 
         /* =================== SECCIONES DE LA PÁGINA =================== */
+        /* Orden de las secciones de la página (el de Supabase si viene; si no, el de SECCIONES) */
+        const ordenPagina = d => ((d.pagina || {}).orden || []).filter(k => SECCIONES[k]).length
+            ? d.pagina.orden.filter(k => SECCIONES[k]) : Object.keys(SECCIONES).filter(k => !SECCIONES_ANTERIORES.includes(k));
+        const parteTxt = p => (p ? (100 * p).toFixed(p < 0.1 ? 1 : 0).replace('.', ',') + ' %' : '—');
+
         function renderSeccionesEst(d) {
             const r = d.resumen || {};
+            const pg = d.pagina || {};
             const lista = d.secciones || [];
             const porId = {};
             lista.forEach(s => { porId[s.nombre] = s; });
             const conocidas = lista.filter(s => SECCIONES[s.nombre]);
             const masVista = conocidas.filter(s => s.nombre !== 'inicio').sort((a, b) => b.visitas - a.visitas)[0];
             const masTiempo = conocidas.filter(s => s.segundos).sort((a, b) => b.segundos - a.segundos)[0];
+            const salidas = (pg.salidas || []).filter(s => SECCIONES[s.nombre]);
+            const masSalida = salidas.filter(s => s.nombre !== 'inicio')[0];
+            const conSalida = pg.con_salida || r.visitas || 0;
+            const orden = ordenPagina(d);
+            const ultima = orden[orden.length - 1];
+            const enLinea = d.en_linea || {};
+            const hay = pg.medidas != null;
             tarjetas('est-kpis-secciones', [
-                ['Secciones por visita', r.secciones != null ? String(r.secciones).replace('.', ',') : '—', 'De las ' + (Object.keys(SECCIONES).length - SECCIONES_ANTERIORES.length) + ' que tiene la página', ''],
+                ['Se van sin bajar', hay ? pct(pg.rebote, r.visitas) + ' %' : '—', hay ? num(pg.rebote) + ' visitas vieron una sola sección y no tocaron nada' : 'Aparece al actualizar Supabase', ''],
+                ['Llegan hasta el final', hay ? pct(pg.llegaron_final, pg.medidas) + ' %' : '—', hay ? num(pg.llegaron_final) + ' visitas bajaron hasta ' + (SECCIONES[ultima] || 'el final') : 'Aparece al actualizar Supabase', ''],
+                ['Secciones por visita', r.secciones != null ? String(r.secciones).replace('.', ',') : '—', 'De las ' + orden.length + ' que tiene la página', ''],
                 ['Tiempo en la página', duracionTxt(r.duracion), 'Promedio por visita', ''],
                 ['La más vista', masVista ? SECCIONES[masVista.nombre] : '—', masVista ? pct(masVista.visitas, r.visitas) + ' % de las visitas, sin contar la portada' : 'Sin datos', ''],
-                ['Donde más se quedan', masTiempo ? SECCIONES[masTiempo.nombre] : '—', masTiempo ? duracionTxt(masTiempo.segundos) + ' en pantalla, en promedio' : 'Se mide desde esta versión de la página', '']
+                ['Donde más se quedan', masTiempo ? SECCIONES[masTiempo.nombre] : '—', masTiempo ? duracionTxt(masTiempo.segundos) + ' en pantalla, en promedio' : 'Sin datos', ''],
+                ['Donde más se van', masSalida ? SECCIONES[masSalida.nombre] : '—', masSalida ? pct(masSalida.visitas, conSalida) + ' % de las visitas termina ahí (sin contar la portada)' : 'Aparece con las visitas nuevas', ''],
+                ['Ahora en la página', enLinea.personas != null ? num(enLinea.personas) : '—', enLinea.personas != null ? 'Personas activas en los últimos 5 minutos' : 'Aparece al actualizar Supabase', '']
             ], true);
+            recorridoPagina(d, orden, porId);
+            barras('est-salidas', salidas.slice(0, 8), {
+                total: conSalida, nombre: s => SECCIONES[s.nombre], icono: s => ICONOS_SECCION[s.nombre] || 'circle',
+                dato: s => 'data-seccion="' + s.nombre + '"',
+                nota: s => { const x = porId[s.nombre]; return x && x.visitas ? pct(s.visitas, x.visitas) + ' % de quienes la vieron terminó ahí' : ''; },
+                vacio: hay ? 'Aún no hay visitas en este período.' : 'Aparece al actualizar Supabase.'
+            });
+            barras('est-duraciones', pg.duraciones || [], { total: r.visitas, vacio: hay ? 'Aún no hay visitas en este período.' : 'Aparece al actualizar Supabase.' });
+            enLineaEst(enLinea);
             document.getElementById('est-secciones').innerHTML = seccionesVisibles(d).map((k, i) => {
                 const s = porId[k];
                 const vistas = s ? s.visitas : 0;
@@ -2549,7 +3179,8 @@
                         '<span class="block text-[0.66rem] text-graphite/50 mt-1">' + (vistas ? num(vistas) + ' visitas' + (s.segundos ? ' · ' + duracionTxt(s.segundos) : '') : 'Nadie la vio') + '</span></span>' +
                         '<span class="shrink-0 opacity-90 hidden sm:block">' + (s ? sparkline(s.serie, { ancho: 84, alto: 28 }) : '') + '</span>' +
                     '</span>' +
-                    (vistas ? '<span class="block text-[0.66rem] text-graphite/50 mt-2 pt-2 border-t border-line">' + num(s.whatsapp) + ' escribieron · ' + plural(s.reservas || 0, 'reservó', 'reservaron') + ' · ' + num(pagadasDe(s)) + ' pagaron</span>' : '') +
+                    (vistas && s.llegaron != null ? '<span class="block text-[0.66rem] text-graphite/50 mt-2 pt-2 border-t border-line">Bajó hasta aquí el ' + pct(s.llegaron, (d.pagina || {}).medidas || r.visitas) + ' % · terminó aquí el ' + pct(s.salidas, (d.pagina || {}).con_salida || r.visitas) + ' %</span>' : '') +
+                    (vistas ? '<span class="block text-[0.66rem] text-graphite/50 mt-1' + (s.llegaron != null ? '' : ' mt-2 pt-2 border-t border-line') + '">' + num(s.whatsapp) + ' escribieron · ' + plural(s.reservas || 0, 'reservó', 'reservaron') + ' · ' + num(pagadasDe(s)) + ' pagaron</span>' : '') +
                 '</button>';
             }).join('');
             barras('est-profundidad', d.profundidad || [], { total: r.visitas, vacio: 'Se mide desde esta versión de la página.' });
@@ -2568,6 +3199,79 @@
                 nota: l => Object.keys(CONTACTOS).filter(t => l.tipos[t]).map(t => CONTACTOS[t][1] + ': ' + l.tipos[t]).join(' · '),
                 dato: l => SECCIONES[l.nombre] ? 'data-seccion="' + l.nombre + '"' : '',
                 vacio: 'Nadie ha usado los botones de contacto en este período.'
+            });
+        }
+
+        /* La página de arriba abajo: hasta dónde bajan, cuánto tiempo, qué parte del tiempo y cuántos terminan en cada sección */
+        function recorridoPagina(d, orden, porId) {
+            const cont = document.getElementById('est-recorrido');
+            const nota = document.getElementById('est-recorrido-nota');
+            const r = d.resumen || {};
+            const pg = d.pagina || {};
+            const base = pg.medidas || r.visitas || 0;
+            if (!base) { cont.innerHTML = vacioEst('El recorrido aparece cuando haya visitas en el período.'); nota.innerHTML = ''; return; }
+            const alcance = {}, salidas = {};
+            (pg.alcance || []).forEach(a => { alcance[a.nombre] = a.llegaron; });
+            (pg.salidas || []).forEach(s => { salidas[s.nombre] = s.visitas; });
+            const totalSeg = pg.segundos_total || sumar(Object.values(porId), s => s.total_segundos || 0);
+            const conSalida = pg.con_salida || r.visitas || 0;
+            const filas = orden.map(k => {
+                const s = porId[k] || {};
+                return { k, llegaron: alcance[k] != null ? alcance[k] : (s.visitas || 0), seg: s.segundos || 0,
+                         parte: totalSeg ? (s.total_segundos || 0) / totalSeg : 0, salidas: salidas[k] || 0, vieron: s.visitas || 0 };
+            });
+            const maxParte = Math.max(0, ...filas.map(f => f.parte));
+            const maxSalida = Math.max(0, ...filas.filter(f => f.k !== 'inicio').map(f => f.salidas));
+            const nivel = v => (v && maxParte ? Math.min(5, Math.max(1, Math.ceil(5 * v / maxParte))) : 0);
+            cont.innerHTML = '<div class="est-ruta-cabeza"><span>Sección</span><span>Bajaron hasta aquí</span><span>Tiempo promedio</span><span>Parte del tiempo</span><span>Terminaron aquí</span></div>' +
+                filas.map((f, i) => '<button type="button" class="est-ruta' + (f.k !== 'inicio' && f.salidas && f.salidas === maxSalida ? ' is-fuerte' : '') + '" data-seccion="' + f.k + '"' +
+                    ' data-tip="' + esc(SECCIONES[f.k]) + '" data-tip-valor="' + pct(f.llegaron, base) + ' % bajó hasta aquí"' +
+                    ' data-tip-nota="' + esc(num(f.vieron) + ' la vieron · ' + (f.seg ? duracionTxt(f.seg) + ' en promedio · ' : '') + num(f.salidas) + ' terminaron aquí') + '">' +
+                    '<span class="est-ruta-nombre"><span class="est-ruta-num">' + String(i + 1).padStart(2, '0') + '</span><i data-lucide="' + (ICONOS_SECCION[f.k] || 'circle') + '"></i><span class="truncate">' + SECCIONES[f.k] + '</span></span>' +
+                    '<span class="est-ruta-alcance"><span class="est-pista"><span class="est-barra" style="width:' + Math.max(1, 100 * f.llegaron / base).toFixed(1) + '%"></span></span>' +
+                        '<span class="est-ruta-dato">' + pct(f.llegaron, base) + ' %</span></span>' +
+                    '<span class="est-ruta-dato"><span class="est-ruta-etiqueta">Tiempo</span>' + (f.seg ? duracionTxt(f.seg) : '—') + '</span>' +
+                    '<span class="est-ruta-dato"><span class="est-ruta-etiqueta">Del tiempo</span><span class="est-ruta-calor" style="background:' + RAMPA_CALOR[nivel(f.parte)] + '"></span>' + parteTxt(f.parte) + '</span>' +
+                    '<span class="est-ruta-dato est-ruta-salida"><span class="est-ruta-etiqueta">Terminaron aquí</span>' +
+                        (f.salidas ? pct(f.salidas, conSalida) + ' %<span class="text-graphite/40 font-normal"> · ' + num(f.salidas) + '</span>' : '—') + '</span>' +
+                '</button>').join('');
+            // Conclusiones del recorrido
+            const frases = [];
+            const a = k => (filas.find(f => f.k === k) || {}).llegaron;
+            const pasan = filas[1] ? filas[1].llegaron : 0;
+            const ult = filas[filas.length - 1];
+            frases.push(['arrow-down', 'De cada 100 visitas, <strong>' + pct(pasan, base) + '</strong> bajan de la portada' +
+                (a('habitaciones') != null ? ', <strong>' + pct(a('habitaciones'), base) + '</strong> llegan a Habitaciones' : '') +
+                (ult ? ' y <strong>' + pct(ult.llegaron, base) + '</strong> llegan hasta ' + SECCIONES[ult.k] : '') + '.']);
+            let caida = null;
+            for (let i = 1; i < filas.length; i++) {
+                const de = filas[i - 1].llegaron, hasta = filas[i].llegaron;
+                if (de >= 5 && (!caida || de - hasta > caida.n)) caida = { n: de - hasta, de: filas[i - 1].k, a: filas[i].k, p: pct(de - hasta, de) };
+            }
+            if (caida && caida.n > 0) frases.push(['trending-down', 'La mayor caída es entre <strong>' + SECCIONES[caida.de] + '</strong> y <strong>' + SECCIONES[caida.a] + '</strong>: ahí deja de bajar el ' + caida.p + ' % de quienes seguían.']);
+            const tiempo = filas.slice().sort((x, y) => y.parte - x.parte)[0];
+            if (tiempo && tiempo.parte) frases.push(['timer', 'Donde pasan más tiempo: <strong>' + SECCIONES[tiempo.k] + '</strong>, con el ' + parteTxt(tiempo.parte) + ' de todo el tiempo en la página.']);
+            const sale = filas.filter(f => f.k !== 'inicio' && f.salidas).sort((x, y) => y.salidas - x.salidas)[0];
+            if (sale) frases.push(['door-open', 'Donde más terminan la visita, sin contar la portada: <strong>' + SECCIONES[sale.k] + '</strong> (' + pct(sale.salidas, conSalida) + ' % de las visitas' +
+                (sale.vieron ? '; ' + pct(sale.salidas, sale.vieron) + ' % de quienes la vieron' : '') + ').']);
+            nota.innerHTML = frases.map(([icono, texto]) => '<li class="est-clave"><i data-lucide="' + icono + '"></i><span>' + texto + '</span></li>').join('');
+        }
+
+        /* Quién está ahora en la página (últimos 5 minutos) y en qué sección va */
+        function enLineaEst(en) {
+            const cont = document.getElementById('est-en-linea');
+            const personas = en.personas || 0;
+            document.getElementById('est-vivo-punto').classList.toggle('is-quieto', !personas);
+            if (en.personas == null) { cont.innerHTML = vacioEst('Aparece al actualizar Supabase.'); return; }
+            const hora = new Date().toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+            if (!personas) { cont.innerHTML = vacioEst('Nadie ha estado en la página en los últimos 5 minutos (revisado a las ' + hora + ').'); return; }
+            const equipos = (en.equipos || []).map(e => num(e.personas) + ' en ' + String(e.nombre).toLowerCase()).join(' · ');
+            cont.innerHTML = '<span class="block est-kpi-valor">' + num(personas) + '</span>' +
+                '<span class="block text-[0.72rem] text-graphite/55 mt-1 mb-4">' + (personas === 1 ? 'persona' : 'personas') + (equipos ? ' · ' + esc(equipos) : '') + ' · a las ' + hora + '</span>' +
+                '<div id="est-en-linea-lista"></div>';
+            barras('est-en-linea-lista', en.secciones || [], {
+                valor: s => s.personas, total: personas, nombre: s => nombreLugar(s.nombre), icono: s => ICONOS_SECCION[s.nombre] || 'circle',
+                dato: s => SECCIONES[s.nombre] ? 'data-seccion="' + s.nombre + '"' : ''
             });
         }
 
@@ -2591,6 +3295,9 @@
                 return '<span class="block text-[0.66rem] mt-1 ' + (mejor ? 'text-moss' : 'text-graphite/45') + '">' + (mejor ? 'Más' : 'Menos') + ' que el promedio (' + pctDecimal(promedioParte, promedioTotal) + ')</span>';
             };
             const cifra = (t, v, nota) => '<div class="bg-white p-4"><span class="micro text-graphite/40">' + t + '</span><span class="block est-kpi-chico mt-2">' + v + '</span>' + (nota || '') + '</div>';
+            const pg = d.pagina || {};
+            const nota = texto => '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + texto + '</span>';
+            const totalSeg = pg.segundos_total || sumar(d.secciones || [], x => x.total_segundos || 0);
             abrirModal('<div class="p-6 sm:p-8">' +
                 '<div class="flex items-center gap-3 pr-10">' +
                     '<span class="w-10 h-10 rounded-full bg-brass/15 text-brass-deep flex items-center justify-center shrink-0"><i data-lucide="' + ICONOS_SECCION[k] + '" class="w-5 h-5"></i></span>' +
@@ -2605,10 +3312,18 @@
                     cifra('Contactos desde aquí', num(s.clics), '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + (contactos.map(c => (CONTACTOS[c.tipo] ? CONTACTOS[c.tipo][1] : c.tipo) + ': ' + c.total).join(' · ') || 'WhatsApp, llamadas y cómo llegar') + '</span>') +
                     cifra('Escribieron', pctDecimal(s.whatsapp, s.visitas), comparar(s.whatsapp, s.visitas, r.whatsapp, r.visitas)) +
                     cifra('Reservaron', pctDecimal(s.reservas, s.visitas), '<span class="block text-[0.66rem] text-graphite/45 mt-1">' + num(s.reservas) + ' reservas · ' + num(pagadasDe(s)) + ' pagadas</span>' + comparar(s.reservas, s.visitas, r.reservas, r.visitas)) +
+                    cifra('Bajaron hasta aquí', s.llegaron != null ? pct(s.llegaron, pg.medidas || r.visitas) + ' %' : '—', nota(s.llegaron != null ? num(s.llegaron) + ' visitas llegaron a esta altura o más abajo' : 'Aparece al actualizar Supabase')) +
+                    cifra('Terminaron aquí', s.salidas != null ? pct(s.salidas, s.visitas) + ' %' : '—', nota(s.salidas != null ? num(s.salidas) + ' de quienes la vieron cerraron o dejaron la página aquí' : 'Aparece al actualizar Supabase')) +
+                    cifra('Parte del tiempo', totalSeg && s.total_segundos ? parteTxt(s.total_segundos / totalSeg) : '—', nota('De todo el tiempo que pasan en la página')) +
                 '</div>' +
                 '<div class="mt-7"><span class="micro text-graphite/40 block mb-2">Visitas que la vieron, por día</span>' +
                 '<div id="est-modal-dias" class="relative" tabindex="0" aria-label="Visitas por día a esta sección"></div></div>' +
-                '<div class="mt-6 pt-5 border-t border-line"><span class="micro text-graphite/40 block mb-2">De dónde venían quienes la vieron</span><div id="est-modal-fuentes"></div></div>' +
+                '<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6 pt-5 border-t border-line">' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Cuánto tiempo la miran</span><div id="est-modal-tiempos"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">Qué ven después</span><div id="est-modal-siguientes"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">De dónde venían quienes la vieron</span><div id="est-modal-fuentes"></div></div>' +
+                    '<div><span class="micro text-graphite/40 block mb-2">En qué equipos la vieron</span><div id="est-modal-equipos"></div></div>' +
+                '</div>' +
                 '<div class="flex items-center justify-between gap-3 mt-7 pt-5 border-t border-line">' +
                     '<button type="button" class="btn btn-outline btn-sm" onclick="abrirSeccion(\'' + ant + '\')"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> <span class="hidden sm:inline">' + SECCIONES[ant] + '</span><span class="sm:hidden">Anterior</span></button>' +
                     '<button type="button" class="btn btn-outline btn-sm" onclick="abrirSeccion(\'' + sig + '\')"><span class="hidden sm:inline">' + SECCIONES[sig] + '</span><span class="sm:hidden">Siguiente</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>' +
@@ -2618,6 +3333,15 @@
                 tip: p => '<strong>' + num(p.v) + '</strong> visitas vieron ' + SECCIONES[k] + '<br>' + fechaLarga(p.dia)
             });
             barras('est-modal-fuentes', s.fuentes || [], { total: s.visitas, vacio: 'Nadie la vio en este período.' });
+            const tiempos = Array.isArray(s.tiempos) ? s.tiempos : [];
+            barras('est-modal-tiempos', ['Menos de 5 s', '5 a 15 s', '15 a 30 s', '30 s a 1 min', '1 min o más'].map((nombre, j) => ({ nombre, visitas: tiempos[j] || 0 })), {
+                total: s.medidos || sumar(tiempos, v => v), vacio: tiempos.length ? 'Aún no hay tiempos medidos de esta sección.' : 'Aparece al actualizar Supabase.'
+            });
+            barras('est-modal-siguientes', (s.siguientes || []).filter(x => SECCIONES[x.nombre]), {
+                total: s.visitas, nombre: x => SECCIONES[x.nombre], icono: x => ICONOS_SECCION[x.nombre] || 'circle',
+                vacio: s.siguientes ? 'Después de esta sección no vieron otra.' : 'Aparece al actualizar Supabase.'
+            });
+            barras('est-modal-equipos', s.equipos || [], { total: s.visitas, icono: x => ICONOS_EQUIPO[x.nombre] || 'circle', vacio: s.equipos ? 'Nadie la vio en este período.' : 'Aparece al actualizar Supabase.' });
             lucide.createIcons();
         }
 
@@ -3204,6 +3928,25 @@
                     if (datosEstadisticas) tablaFuentes(datosEstadisticas.fuentes || []);
                     return;
                 }
+                const csv = e.target.closest('[data-csv]');
+                if (csv) return exportarCSV(csv.dataset.csv);
+                const filtroV = e.target.closest('[data-filtro-visitas]');
+                if (filtroV) {
+                    filtroVisitas = filtroV.dataset.filtroVisitas;
+                    paginaVisitas = 0;
+                    document.querySelectorAll('#est-visitas-filtros .chip').forEach(c => c.classList.toggle('is-active', c === filtroV));
+                    if (datosEstadisticas) tablaVisitas(datosEstadisticas);
+                    return;
+                }
+                const paginaV = e.target.closest('[data-pagina-visitas]');
+                if (paginaV) {
+                    paginaVisitas += Number(paginaV.dataset.paginaVisitas);
+                    if (datosEstadisticas) tablaVisitas(datosEstadisticas);
+                    document.getElementById('est-tabla-visitas').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    return;
+                }
+                const visita = e.target.closest('[data-visita]');
+                if (visita) return abrirVisita(visita.dataset.visita);
                 const origen = e.target.closest('[data-origen]');
                 if (origen) return elegirOrigen(origen.dataset.origen);
                 const seccion = e.target.closest('[data-seccion]');
@@ -3215,13 +3958,18 @@
             });
             vista.addEventListener('keydown', e => {
                 if (e.key !== 'Enter' && e.key !== ' ') return;
-                const fila = e.target.closest('tr[data-origen], tr[data-articulo], .est-fila[data-origen], .est-fila[data-seccion], .est-fila[data-articulo]');
+                const fila = e.target.closest('tr[data-origen], tr[data-articulo], tr[data-visita], .est-fila[data-origen], .est-fila[data-seccion], .est-fila[data-articulo]');
                 if (!fila) return;
                 e.preventDefault();
                 fila.click();
             });
 
             document.getElementById('est-origen').addEventListener('change', e => elegirOrigen(e.target.value, false));
+            document.getElementById('est-visitas-buscar').addEventListener('input', e => {
+                buscarVisitas = e.target.value;
+                paginaVisitas = 0;
+                if (datosEstadisticas) tablaVisitas(datosEstadisticas);
+            });
 
             document.getElementById('est-periodos').addEventListener('click', e => {
                 const btn = e.target.closest('.chip');
@@ -3241,6 +3989,8 @@
             document.getElementById('modal').addEventListener('click', e => {
                 const art = e.target.closest('.est-fila[data-articulo]');
                 if (art) abrirArticulo(art.dataset.articulo);
+                const vis = e.target.closest('[data-visita]');
+                if (vis && !vis.classList.contains('is-actual')) abrirVisita(vis.dataset.visita);
             });
 
             /* Cada gráfico tiene su versión en tabla */
@@ -3334,16 +4084,24 @@
             const vistasPorSeccion = { inicio: 1, destacados: 0.9, hotel: 0.78, habitaciones: 0.66, servicios: 0.52, eventos: 0.41, planes: 0.38, beneficios: 0.35,
                 restaurante: 0.33, bar: 0.29, galeria: 0.27, resenas: 0.24, informacion: 0.21, reservar: 0.46, faq: 0.14, blog: 0.13, contacto: 0.12 };
             const tiempos = { habitaciones: 48, reservar: 71, galeria: 39, planes: 33, restaurante: 36, hotel: 24 };
-            const secciones = Object.keys(vistasPorSeccion).map(k => {
+            const ordenEj = Object.keys(vistasPorSeccion);
+            const llegaEj = [1, 0.69, 0.6, 0.53, 0.43, 0.36, 0.31, 0.27, 0.24, 0.2, 0.18, 0.15, 0.13, 0.11, 0.08, 0.06, 0.05];
+            const salidaEj = ordenEj.map((k, i) => Math.max(0, (llegaEj[i] - (llegaEj[i + 1] || 0)) * 0.9));
+            const secciones = Object.keys(vistasPorSeccion).map((k, i) => {
                 const v = parte(vistasPorSeccion[k]);
-                return { nombre: k, visitas: v, segundos: tiempos[k] || Math.round(9 + azar() * 14), whatsapp: Math.round(v * 0.08), reservas: Math.round(v * 0.03),
+                const seg = tiempos[k] || Math.round(9 + azar() * 14);
+                return { nombre: k, visitas: v, segundos: seg, whatsapp: Math.round(v * 0.08), reservas: Math.round(v * 0.03), pagadas: Math.round(v * 0.03 * 0.55),
+                    llegaron: parte(llegaEj[i]), salidas: parte(salidaEj[i]), total_segundos: v * seg, medidos: Math.round(v * 0.96),
+                    tiempos: [0.14, 0.24, 0.26, 0.22, 0.1].map(q => Math.round(v * 0.96 * q * (k === 'reservar' || k === 'habitaciones' ? (q > 0.2 ? 1.2 : 0.7) : 1))),
+                    siguientes: ordenEj[i + 1] ? [{ nombre: ordenEj[i + 1], visitas: Math.round(v * 0.62) }, { nombre: 'reservar', visitas: Math.round(v * 0.09) }].filter(x => x.nombre !== k) : [],
+                    equipos: [['Celular', 0.74], ['Computador', 0.22], ['Tablet', 0.04]].map(([nombre, q]) => ({ nombre, visitas: Math.round(v * q) })),
                     entradas: k === 'inicio' ? parte(0.81) : ['habitaciones', 'reservar', 'planes'].includes(k) ? parte(0.06) : 0,
                     clics: Math.round(v * 0.04), serie: base.map(b => Math.round(b.peso * factor * vistasPorSeccion[k] * (0.8 + azar() * 0.4))),
                     fuentes: FUENTES_EJ.slice(0, origen ? 1 : 4).map(([nombre, , p]) => ({ nombre: origen || nombre, visitas: Math.round(v * (origen ? 1 : p)) })) };
             }).sort((a, b) => b.visitas - a.visitas);
             const horas = [2, 1, 1, 0, 0, 1, 3, 6, 9, 12, 13, 14, 15, 14, 13, 13, 15, 18, 22, 26, 24, 17, 9, 4];
             const pesoDia = [10, 9, 10, 11, 18, 20, 14];
-            return {
+            const datos = {
                 desde, hasta, origen: origen || null,
                 resumen: { visitas, visitantes: suma('visitantes'), nuevos: Math.round(suma('visitantes') * 0.71), regresaron: Math.round(suma('visitantes') * 0.29),
                     duracion: 152, interes: suma('interes'), interactuaron: parte(0.57), secciones: 4.6, whatsapp: suma('whatsapp'), reservas: reservasEj,
@@ -3396,8 +4154,70 @@
                 embudo: [['visita', 1], ['reservar', 0.46], ['fechas', 0.21], ['habitacion', 0.14], ['datos', 0.06], ['confirmo', reservasEj / (visitas || 1)],
                          ['pago', suma('pagadas') / (visitas || 1)]]
                     .map(([paso, p]) => ({ paso, visitas: parte(p) })),
-                blog: blogDeEjemplo(base, parte, azar, factor)
+                blog: blogDeEjemplo(base, parte, azar, factor),
+                pagina: {
+                    orden: ordenEj, medidas: visitas, rebote: parte(0.3), llegaron_final: parte(llegaEj[llegaEj.length - 1]),
+                    segundos_total: secciones.reduce((s, x) => s + x.total_segundos, 0), con_salida: visitas,
+                    alcance: ordenEj.map((k, i) => ({ nombre: k, llegaron: parte(llegaEj[i]) })),
+                    salidas: ordenEj.map((k, i) => ({ nombre: k, visitas: parte(salidaEj[i]) })).filter(x => x.visitas).sort((a, b) => b.visitas - a.visitas),
+                    duraciones: [['Menos de 10 s', 0.09], ['10 a 30 s', 0.24], ['30 s a 1 min', 0.21], ['1 a 3 min', 0.27], ['3 a 10 min', 0.15], ['Más de 10 min', 0.04]]
+                        .map(([nombre, p]) => ({ nombre, visitas: parte(p) }))
+                },
+                en_linea: { personas: 3, secciones: [{ nombre: 'habitaciones', personas: 2 }, { nombre: 'reservar', personas: 1 }],
+                            equipos: [{ nombre: 'Celular', personas: 2 }, { nombre: 'Computador', personas: 1 }] }
             };
+            completarEjemploPro(datos, azar);
+            return datos;
+        }
+
+        /* Ejemplo: indicadores del período anterior, grupos, quiénes reservan y la lista de visitas */
+        function completarEjemploPro(d, azar) {
+            const r = d.resumen, a = d.anterior;
+            Object.assign(r, { rebote: Math.round(r.visitas * 0.3), duracion_mediana: 74, recurrentes: Math.round(r.visitas * 0.24), lectores: d.por_dia.reduce((s, p) => s + (p.lectores || 0), 0) });
+            Object.assign(a, { nuevos: Math.round(a.visitantes * 0.7), recurrentes: Math.round(a.visitas * 0.22), duracion_mediana: 69, secciones: 4.3,
+                rebote: Math.round(a.visitas * 0.33), valor_pagadas: Math.round(a.valor * 0.55), lectores: Math.round(a.visitas * 0.17) });
+            d.dispositivos.forEach((x, i) => Object.assign(x, { rebote: Math.round(x.visitas * ([0.33, 0.22, 0.27][i] || 0.3)), secciones: [4.3, 5.4, 4.8][i] || 4.5,
+                whatsapp: Math.round(x.visitas * ([0.07, 0.05, 0.06][i] || 0.05)), pagadas: Math.round(x.reservas * 0.55), valor_pagadas: Math.round(x.reservas * 0.55) * 540000 }));
+            const nuevos = Math.round(r.visitas * 0.76);
+            d.tipo_visitante = [['Nuevos', nuevos, 0.34, 4.2, 128, 0.018], ['Volvieron', r.visitas - nuevos, 0.18, 5.6, 196, 0.041]].map(([nombre, n, rb, sc, du, cv]) => ({
+                nombre, visitas: n, visitantes: Math.round(n * 0.9), interes: Math.round(n * 0.6), reservas: Math.round(n * cv), duracion: du, rebote: Math.round(n * rb), secciones: sc,
+                whatsapp: Math.round(n * 0.07), pagadas: Math.round(n * cv * 0.55), valor_pagadas: Math.round(n * cv * 0.55) * 540000 }));
+            d.conversion = {
+                reservas: r.reservas, pagadas: pagadasDe(r), minutos: 7.4, minutos_mediana: 5.2, primera_visita: Math.round(r.reservas * 0.46), visita_promedio: 2.1,
+                secciones: 7.8, duracion: 512, escribieron: Math.round(r.reservas * 0.32), leyeron_blog: Math.round(r.reservas * 0.18), usaron_asistente: Math.round(r.reservas * 0.12),
+                equipos: [['Celular', 0.62], ['Computador', 0.33], ['Tablet', 0.05]].map(([nombre, p]) => ({ nombre, reservas: Math.round(r.reservas * p) })),
+                secciones_vistas: [['reservar', 1], ['habitaciones', 0.92], ['planes', 0.61], ['hotel', 0.58], ['servicios', 0.47], ['galeria', 0.39]].map(([nombre, p]) => ({ nombre, reservas: Math.round(r.reservas * p) }))
+            };
+            const FUENTES_L = [['Instagram', 'Redes', 'biografia'], ['Google', 'Buscador', null], ['Directo', 'Directo', null], ['WhatsApp', 'Redes', 'mensajes'], ['Facebook', 'Redes', null], ['Google', 'Buscador', null]];
+            const EQUIPOS_L = [['Celular', 'Android', 'Chrome'], ['Celular', 'iOS', 'Safari'], ['Celular', 'iOS', 'Instagram'], ['Computador', 'Windows', 'Chrome'], ['Tablet', 'iOS', 'Safari']];
+            const CIUDADES_L = ['Bogotá', 'Bogotá', 'Bogotá', 'Girardot', 'Fusagasugá', 'Medellín', 'Soacha', 'Bogotá'];
+            const orden = ordenPagina(d);
+            const visitantes = [];
+            let reloj = Date.now() - 4 * 60000;
+            d.visitas_lista = Array.from({ length: 140 }, (_, i) => {
+                reloj -= (5 + azar() * 85) * 60000;
+                const [fuente, medio, campana] = FUENTES_L[Math.floor(azar() * FUENTES_L.length)];
+                const [dispositivo, sistema, navegador] = EQUIPOS_L[Math.floor(azar() * EQUIPOS_L.length)];
+                const repite = visitantes.length > 8 && azar() < 0.22;
+                const visitante = repite ? visitantes[Math.floor(azar() * visitantes.length)] : Array.from({ length: 12 }, () => 'abcdefghjkmnpqrstuvwxyz23456789'[Math.floor(azar() * 31)]).join('');
+                if (!repite) visitantes.push(visitante);
+                const reboto = azar() < 0.28;
+                const secciones = reboto ? 1 : 2 + Math.floor(azar() * azar() * 11);
+                const confirmo = !reboto && secciones > 4 && azar() < 0.12;
+                const entrada = azar() < 0.85 ? 'inicio' : ['habitaciones', 'planes', 'reservar'][Math.floor(azar() * 3)];
+                const ini = Math.max(0, orden.indexOf(entrada));
+                return {
+                    sesion: 'ej' + i + visitante.slice(0, 6), visitante, inicio: new Date(reloj).toISOString(), nuevo: !repite, fuente, medio, campana, referente: fuente === 'Google' ? 'google.com' : null,
+                    entrada, dispositivo, sistema, navegador, ciudad: CIUDADES_L[Math.floor(azar() * CIUDADES_L.length)], pais: azar() < 0.95 ? 'CO' : 'US',
+                    duracion: reboto ? Math.round(4 + azar() * 25) : Math.round(40 + azar() * 380), secciones, interacciones: reboto ? 0 : Math.floor(azar() * 4) + (confirmo ? 5 : 0),
+                    interes: !reboto || azar() < 0.4, escribio: !reboto && azar() < 0.1, confirmo, pago: confirmo && azar() < 0.55, valor: confirmo ? 540000 : 0,
+                    blog: !reboto && azar() < 0.12, asistente: !reboto && azar() < 0.08, reboto, se_fue_en: confirmo ? 'reservar' : orden[Math.min(orden.length - 1, ini + secciones - 1)], visitas_visitante: 1
+                };
+            });
+            const cuenta = {};
+            d.visitas_lista.forEach(v => { cuenta[v.visitante] = (cuenta[v.visitante] || 0) + 1; });
+            d.visitas_lista.forEach(v => { v.visitas_visitante = cuenta[v.visitante]; });
+            d.visitas_total = r.visitas;
         }
 
         /* Blog de ejemplo: lectores, tiempo, hasta dónde leen y qué hacen después */
