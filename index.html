@@ -183,7 +183,7 @@
         .carrusel-nav { display: flex; align-items: center; justify-content: center; gap: clamp(0.75rem, 2vw, 1.5rem); margin-top: clamp(0.75rem, 1.8vh, 1.25rem); }
         .carrusel-nav.is-vacio { display: none; }
         .carrusel-avance { display: flex; align-items: center; gap: 0.85rem; flex: 0 1 9.5rem; min-width: 0; }
-        .carrusel-cuenta { font-size: 0.62rem; letter-spacing: 0.2em; font-weight: 600; white-space: nowrap; color: var(--brass-deep); }
+        .carrusel-cuenta { font-size: 0.6875rem; letter-spacing: 0.2em; font-weight: 600; white-space: nowrap; color: var(--brass-deep); }
         .carrusel-linea { position: relative; flex: 1 1 auto; min-width: 2.5rem; height: 1px; background: rgba(10, 33, 46, 0.16); }
         .carrusel-linea > span { position: absolute; left: 0; top: -0.5px; height: 2px; background: var(--brass); transition: width .5s cubic-bezier(.16, 1, .3, 1); }
         .carrusel-botones { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
@@ -196,7 +196,7 @@
         .carrusel-mas {
             display: inline-flex; align-items: center; gap: 0.75rem; height: 2.75rem; padding: 0 0.35rem 0 1.3rem; flex-shrink: 0;
             border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff;
-            font-size: 0.62rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap;
+            font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap;
             box-shadow: 0 12px 26px -16px rgba(10, 33, 46, 0.75);
             transition: background-color .35s, border-color .35s, color .35s, opacity .3s, box-shadow .35s;
         }
@@ -516,16 +516,16 @@
             line-height: 1.2;
             color: #fff;
         }
-        .beneficios-lista p { margin-top: 0.3rem; font-size: 0.78rem; line-height: 1.5; font-weight: 300; color: rgba(255, 255, 255, 0.58); max-width: 17rem; }
+        .beneficios-lista p { margin-top: 0.3rem; font-size: 0.78rem; line-height: 1.5; font-weight: 300; color: rgba(255, 255, 255, 0.6); max-width: 17rem; }
         .beneficios-acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: clamp(1.25rem, 3.6vh, 2.5rem); }
         .beneficios-acciones .btn { min-width: 11.5rem; padding-block: clamp(0.8rem, 1.9vh, 1.05rem); }
         .beneficios-sello {
             margin-top: clamp(0.75rem, 2vh, 1.25rem);
-            font-size: 0.56rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.24em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.4);
+            color: rgba(255, 255, 255, 0.6);
         }
         /* Esquinas doradas, como en la pantalla de carga */
         .beneficios-esquina { position: absolute; width: 26px; height: 26px; border: 1px solid rgba(201, 160, 99, 0.45); pointer-events: none; }
@@ -587,7 +587,7 @@
                 display: block; position: absolute; z-index: 2;
                 left: clamp(1.75rem, 3.6vh, 2.75rem); bottom: clamp(1.75rem, 3.6vh, 2.75rem);
                 padding: 0.45rem 0.85rem; background: rgba(255, 255, 255, 0.95); color: var(--ink);
-                font-size: 0.56rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
+                font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
             }
         }
 
@@ -734,7 +734,7 @@
             align-items: center;
             gap: 0.9rem;
             font-family: Inter, sans-serif;
-            font-size: 0.6rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.34em;
             text-transform: uppercase;
@@ -758,10 +758,16 @@
         }
 
         .micro {
-            font-size: 0.6rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.26em;
             text-transform: uppercase;
             font-weight: 600;
+        }
+        /* Cifras en tres columnas (Hotel y Galería): en celular, menos aire entre letras para que
+           "Habitaciones" o "Fotografías" quepan en su columna */
+        @media (max-width: 479px) {
+            .grid-cols-3.hairline-t { column-gap: 0.75rem; }
+            .grid-cols-3.hairline-t .micro { letter-spacing: 0.1em; }
         }
 
         /* ---------- Titular del hero ---------- */
@@ -770,7 +776,7 @@
             align-items: center;
             gap: 0.9rem;
             font-family: Inter, sans-serif;
-            font-size: 0.56rem;
+            font-size: 0.6875rem;
             font-weight: 500;
             letter-spacing: 0.34em;
             text-transform: uppercase;
@@ -830,7 +836,7 @@
             gap: 0.65rem;
             padding: 1.05rem 2.1rem;
             font-family: Inter, sans-serif;
-            font-size: 0.66rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.22em;
             text-transform: uppercase;
@@ -850,13 +856,13 @@
         .btn-outline:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
         .btn-outline-light { border-color: rgba(255,255,255,.4); color: #fff; background: transparent; }
         .btn-outline-light:hover { background: #fff; color: var(--ink); border-color: #fff; }
-        .btn-sm { padding: 0.85rem 1.5rem; font-size: 0.6rem; }
+        .btn-sm { padding: 0.85rem 1.5rem; font-size: 0.6875rem; }
 
         .link-arrow {
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
-            font-size: 0.66rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.2em;
             text-transform: uppercase;
@@ -870,7 +876,7 @@
         .boton-mas {
             display: inline-flex; align-items: center; gap: 0.75rem; height: 2.75rem; padding: 0 0.35rem 0 1.3rem;
             border-radius: 999px; border: 1px solid var(--brass);
-            font-size: 0.62rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap;
+            font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap;
             transition: background-color .35s, border-color .35s, color .35s;
         }
         .boton-mas:hover { background: var(--brass); color: var(--ink); }
@@ -1034,7 +1040,7 @@
             align-items: center;
             gap: 0.9rem;
             font-family: Inter, sans-serif;
-            font-size: 0.56rem;
+            font-size: 0.6875rem;
             font-weight: 500;
             letter-spacing: 0.4em;
             text-transform: uppercase;
@@ -1120,11 +1126,11 @@
         .pl-estado {
             margin-top: 1.05rem;
             font-family: Inter, sans-serif;
-            font-size: 0.55rem;
+            font-size: 0.6875rem;
             font-weight: 500;
             letter-spacing: 0.32em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.45);
+            color: rgba(255, 255, 255, 0.6);
         }
         .pl-estado.is-fin { animation: plEstado .3s ease forwards; }
         @keyframes plEstado {
@@ -1157,12 +1163,12 @@
             padding: 0 4.5rem;
             text-align: center;
             font-family: Inter, sans-serif;
-            font-size: 0.5rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.34em;
             text-transform: uppercase;
             white-space: nowrap;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.6);
             opacity: 0;
             animation: plEntra 1.2s cubic-bezier(.16, 1, .3, 1) .7s forwards;
         }
@@ -1193,11 +1199,11 @@
         .bb-field:hover { background: var(--bone); }
         .bb-label {
             display: block;
-            font-size: 0.52rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.26em;
             text-transform: uppercase;
             font-weight: 600;
-            color: rgba(10,33,46,.45);
+            color: rgba(10, 33, 46, 0.7);
             margin-bottom: 0.3rem;
         }
         .bb-value {
@@ -1266,7 +1272,7 @@
             min-width: 0;
             text-transform: uppercase;
         }
-        .field-line input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.35); text-transform: none; }
+        .field-line input[type="text"]::placeholder { color: rgba(255, 255, 255, 0.55); text-transform: none; }
         .field-line input[type="date"] {
             position: absolute;
             inset: 0;
@@ -1311,7 +1317,7 @@
 
         .step-tab {
             text-align: left;
-            color: rgba(32, 41, 46, 0.42);
+            color: rgba(32, 41, 46, 0.6);
             transition: color .45s ease;
         }
         .step-tab:hover { color: var(--ink); }
@@ -1336,7 +1342,7 @@
         }
         .step-num {
             display: block;
-            font-size: 0.56rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.26em;
             font-weight: 600;
             color: var(--brass-deep, #A8834A);
@@ -1353,10 +1359,10 @@
         .room-filter {
             padding: 0.55rem 1.05rem;
             border: 1px solid var(--line);
-            font-size: 0.68rem;
+            font-size: 0.6875rem;
             font-weight: 500;
             letter-spacing: 0.08em;
-            color: rgba(32, 41, 46, 0.6);
+            color: rgba(32, 41, 46, 0.7);
             background: transparent;
             transition: background-color .4s, color .4s, border-color .4s;
         }
@@ -1405,16 +1411,16 @@
             line-height: 1.15;
             color: var(--ink);
         }
-        .hab-ventana-texto { margin-top: 0.45rem; font-size: 0.85rem; line-height: 1.6; color: rgba(32, 41, 46, 0.6); }
+        .hab-ventana-texto { margin-top: 0.45rem; font-size: 0.85rem; line-height: 1.6; color: rgba(32, 41, 46, 0.7); }
         .hab-ventana-opciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: clamp(0.9rem, 2.4vh, 1.5rem); }
         .hab-ventana .room-filter { min-width: 3rem; height: 3rem; padding: 0 1.05rem; border-radius: 999px; background: #fff; font-size: 0.8rem; }
-        .hab-ventana-nota { margin-top: 0.85rem; font-size: 0.8rem; line-height: 1.5; color: rgba(32, 41, 46, 0.65); }
+        .hab-ventana-nota { margin-top: 0.85rem; font-size: 0.8rem; line-height: 1.5; color: rgba(32, 41, 46, 0.7); }
         .hab-ventana-nota:empty { display: none; }
         .hab-ventana-todas {
             margin-top: clamp(0.7rem, 1.8vh, 1rem);
             padding-bottom: 0.2rem;
             border-bottom: 1px solid var(--brass);
-            font-size: 0.6rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.24em;
             text-transform: uppercase;
@@ -1431,7 +1437,7 @@
         .hab-pares[hidden] { display: none; }
         .hab-par { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; justify-content: center; margin-top: 1.5rem; }
         .hab-par-cabeza { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 0.9rem; }
-        .hab-cambiar { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink); border-bottom: 1px solid var(--brass); padding-bottom: 0.1rem; }
+        .hab-cambiar { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink); border-bottom: 1px solid var(--brass); padding-bottom: 0.1rem; }
         .hab-cambiar:hover { color: var(--brass-deep); }
         @media (min-width: 768px) {
             .hab-par { grid-template-columns: repeat(2, minmax(0, 30rem)); column-gap: clamp(1.25rem, 2.5vw, 2.5rem); row-gap: clamp(0.75rem, 2vh, 1.25rem); }
@@ -1459,11 +1465,11 @@
             border-bottom: 1px solid var(--line);
         }
         .spec-row dt {
-            font-size: 0.58rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.24em;
             text-transform: uppercase;
             font-weight: 600;
-            color: rgba(32, 41, 46, 0.42);
+            color: rgba(32, 41, 46, 0.7);
             padding-top: 0.2rem;
         }
         .spec-row dd { font-size: 0.9rem; line-height: 1.6; color: rgba(32, 41, 46, 0.8); }
@@ -1483,7 +1489,7 @@
             width: 100%;
             min-width: 0;
         }
-        .field-line input.rv-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+        .field-line input.rv-input::placeholder { color: rgba(255, 255, 255, 0.55); }
         .field-line select.rv-doc-tipo { width: auto; font-size: 1.2rem; flex-shrink: 0; padding-right: 0.25rem; }
         .rv-num {
             width: 2.6rem;
@@ -1503,7 +1509,7 @@
         .rv-prog-linea { display: block; height: 2px; background: rgba(255, 255, 255, 0.12); margin-bottom: 0.8rem; overflow: hidden; }
         .rv-prog-linea::after { content: ''; display: block; height: 100%; width: 0; background: var(--brass); transition: width .7s cubic-bezier(.16,1,.3,1); }
         .rv-prog.is-ok .rv-prog-linea::after { width: 100%; }
-        .rv-prog-txt { color: rgba(255, 255, 255, 0.4); transition: color .4s; }
+        .rv-prog-txt { color: rgba(255, 255, 255, 0.6); transition: color .4s; }
         .rv-prog.is-ok .rv-prog-txt { color: #fff; }
         .rv-hab { border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.03); transition: border-color .35s, background .35s; }
         .rv-hab:hover { border-color: rgba(255, 255, 255, 0.22); }
@@ -1523,7 +1529,7 @@
         .rv-opcion.is-sel .rv-radio { border-color: var(--brass); }
         .rv-opcion.is-sel .rv-radio::after { content: ''; position: absolute; inset: 3px; border-radius: 9999px; background: var(--brass); }
         .rv-opcion:focus-within { outline: 1px solid rgba(201, 160, 99, 0.6); outline-offset: 2px; }
-        .rv-chip { font-size: 0.56rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.18); padding: 0.3rem 0.55rem; }
+        .rv-chip { font-size: 0.6875rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.18); padding: 0.3rem 0.55rem; }
         /* clip y no hidden: con hidden la factura no se queda fija al bajar por los pasos */
         #reservar { overflow-x: hidden; overflow-x: clip; }
         .rv-paso, #factura { scroll-margin-top: 104px; }
@@ -1556,10 +1562,10 @@
         .fa-doc { position: relative; background: #FBFAF7; color: var(--ink); box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.75); }
         .fa-doc::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, #A8834A, #E3C79A 50%, #A8834A); }
         .fa-tabla { border-collapse: collapse; }
-        .fa-tabla th { font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: rgba(32, 41, 46, 0.45); padding: 0.75rem 0 0.6rem; border-bottom: 1px solid var(--line); }
+        .fa-tabla th { font-size: 0.6875rem; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600; color: rgba(32, 41, 46, 0.7); padding: 0.75rem 0 0.6rem; border-bottom: 1px solid var(--line); }
         .fa-tabla td { padding: 0.85rem 0; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 0.82rem; color: rgba(32, 41, 46, 0.85); }
         .fa-tabla td + td, .fa-tabla th + th { padding-left: 0.75rem; }
-        .fa-sello { position: absolute; right: 1.6rem; top: 7.2rem; transform: rotate(-7deg); border: 2px solid #4E6B4F; color: #4E6B4F; padding: 0.4rem 0.85rem; font-size: 0.6rem; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 700; background: rgba(251, 250, 247, 0.85); }
+        .fa-sello { position: absolute; right: 1.6rem; top: 7.2rem; transform: rotate(-7deg); border: 2px solid #4E6B4F; color: #4E6B4F; padding: 0.4rem 0.85rem; font-size: 0.6875rem; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 700; background: rgba(251, 250, 247, 0.85); }
         .fa-sello.is-proceso { border-color: #A8834A; color: #A8834A; }
 
         .print-root { display: none; }
@@ -1589,18 +1595,18 @@
         .gal-filter {
             padding: 0.55rem 1.15rem;
             border: 1px solid var(--line);
-            font-size: 0.6rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: rgba(32, 41, 46, 0.55);
+            color: rgba(32, 41, 46, 0.7);
             background: transparent;
             transition: background-color .4s, color .4s, border-color .4s;
         }
         .gal-filter:hover { border-color: var(--ink); color: var(--ink); }
         .gal-filter.is-active { background: var(--ink); border-color: var(--ink); color: #fff; }
         .gal-filter span { color: var(--brass); margin-left: 0.5rem; font-weight: 500; }
-        .gal-filter.is-active span { color: rgba(255, 255, 255, 0.5); }
+        .gal-filter.is-active span { color: rgba(255, 255, 255, 0.6); }
 
         .gal-item {
             position: relative;
@@ -1636,7 +1642,7 @@
         .gal-item:hover .gal-cap,
         .gal-item:focus-visible .gal-cap { opacity: 1; }
         .gal-cap-cat {
-            font-size: 0.52rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.26em;
             text-transform: uppercase;
             font-weight: 600;
@@ -1706,7 +1712,7 @@
             border-radius: 9999px;
             background: var(--brass);
             color: var(--ink);
-            font-size: 0.6rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -1787,7 +1793,7 @@
 
         .chat-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.55rem; }
         .chat-action {
-            font-size: 0.58rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -1803,11 +1809,11 @@
         .chat-rel { margin-top: 0.7rem; padding-top: 0.6rem; border-top: 1px solid var(--line); }
         .chat-rel-label {
             display: block;
-            font-size: 0.56rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.18em;
             text-transform: uppercase;
             font-weight: 600;
-            color: rgba(32, 41, 46, 0.4);
+            color: rgba(32, 41, 46, 0.7);
             margin-bottom: 0.45rem;
         }
         .chat-rel-list { display: flex; flex-direction: column; gap: 0.3rem; }
@@ -1851,7 +1857,7 @@
         .chat-chips::-webkit-scrollbar { display: none; }
         .chat-chip {
             white-space: nowrap;
-            font-size: 0.68rem;
+            font-size: 0.6875rem;
             padding: 0.38rem 0.8rem;
             border: 1px solid var(--line);
             background: #fff;
@@ -1905,7 +1911,7 @@
         .chat-back {
             align-self: flex-start;
             margin-top: 0.5rem;
-            font-size: 0.62rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -1936,7 +1942,7 @@
             color: var(--ink);
             padding: 0.45rem 0;
         }
-        #chat-input::placeholder { color: rgba(32, 41, 46, 0.38); }
+        #chat-input::placeholder { color: rgba(32, 41, 46, 0.55); }
         .chat-send {
             width: 38px;
             height: 38px;
@@ -1953,11 +1959,11 @@
         .chat-foot {
             padding: 0.45rem 1rem 0.6rem;
             text-align: center;
-            font-size: 0.53rem;
+            font-size: 0.6875rem;
             letter-spacing: 0.16em;
             text-transform: uppercase;
             font-weight: 600;
-            color: rgba(32, 41, 46, 0.3);
+            color: rgba(32, 41, 46, 0.7);
             background: #fff;
         }
 
@@ -2042,7 +2048,7 @@
             justify-content: center;
             gap: 0.9rem;
             background: linear-gradient(135deg, var(--ink-soft), var(--ink));
-            color: rgba(255, 255, 255, 0.55);
+            color: rgba(255, 255, 255, 0.6);
         }
         .room-ph svg { color: var(--brass); }
 
@@ -2077,7 +2083,7 @@
             transition: border-color .3s;
         }
         .field-box:focus { border-color: var(--ink); }
-        .field-box::placeholder { color: rgba(32, 41, 46, 0.4); }
+        .field-box::placeholder { color: rgba(32, 41, 46, 0.55); }
         textarea.field-box { resize: vertical; min-height: 7.5rem; }
 
         .field-dark {
@@ -2092,7 +2098,7 @@
             transition: border-color .3s;
         }
         .field-dark:focus { border-color: var(--brass); }
-        .field-dark::placeholder { color: rgba(255, 255, 255, 0.45); }
+        .field-dark::placeholder { color: rgba(255, 255, 255, 0.55); }
 
         /* ---------- Barra de acciones en celular ---------- */
         .m-bar {
@@ -2114,7 +2120,7 @@
             justify-content: center;
             gap: 0.3rem;
             padding: 0.7rem 0.25rem;
-            font-size: 0.56rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.16em;
             text-transform: uppercase;
@@ -2166,7 +2172,7 @@
         }
         .rv-paso-icono svg { width: 1.15rem; height: 1.15rem; stroke-width: 1.4; }
         .rv-paso-nombre { margin-top: 0.9rem; font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(1.25rem, 2.8vh, 1.5rem); line-height: 1.2; color: #fff; }
-        .rv-paso-texto { margin-top: 0.3rem; max-width: 13rem; font-size: 0.8rem; line-height: 1.5; font-weight: 300; color: rgba(255, 255, 255, 0.58); }
+        .rv-paso-texto { margin-top: 0.3rem; max-width: 13rem; font-size: 0.8rem; line-height: 1.5; font-weight: 300; color: rgba(255, 255, 255, 0.6); }
         .rv-paso-tarjeta.is-ok .rv-paso-icono { background: var(--brass); border-color: var(--brass); color: var(--ink); }   /* paso ya completado */
         @media (min-width: 768px) {
             .rv-pasos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -2178,12 +2184,12 @@
         }
         .rv-llamado { margin-top: clamp(1.75rem, 5vh, 3rem); }
         .rv-llamado .btn { min-width: 15rem; padding-block: clamp(0.9rem, 2vh, 1.1rem); }
-        .rv-llamado-nota { margin-top: 0.75rem; font-size: 0.75rem; color: rgba(255, 255, 255, 0.5); }
+        .rv-llamado-nota { margin-top: 0.75rem; font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); }
         .rv-incluye {
             display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem 1.75rem; max-width: 40rem;
             margin: clamp(1.1rem, 3vh, 2rem) auto 0; padding-top: clamp(1rem, 2.6vh, 1.75rem); border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .rv-incluye li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.62); }
+        .rv-incluye li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255, 255, 255, 0.62); }
         .rv-incluye svg { width: 0.95rem; height: 0.95rem; color: var(--brass); stroke-width: 1.4; }
         @media (max-width: 767px) {
             .rv-intro-titulo { font-size: 2.2rem; }
@@ -2195,7 +2201,7 @@
             .rv-llamado { margin-top: 1.5rem; }
             .rv-llamado .btn { width: 100%; }
             .rv-incluye { gap: 0.5rem 1.1rem; margin-top: 1rem; padding-top: 0.9rem; }
-            .rv-incluye li { font-size: 0.54rem; letter-spacing: 0.16em; }
+            .rv-incluye li { font-size: 0.6875rem; letter-spacing: 0.16em; }
         }
 
         /* ---------- Sello del Registro Nacional de Turismo (RNT 146726) ----------
@@ -2206,7 +2212,7 @@
            final de la ventana de reserva → filos a los lados, como el cierre de un documento. */
         .sello-rnt { color: #fff; }
         .sello-rnt-estrella { width: 0.8rem; height: 0.8rem; flex-shrink: 0; fill: currentColor; color: var(--brass); }
-        .sello-rnt-titulo { font-size: 0.56rem; font-weight: 600; letter-spacing: 0.26em; line-height: 1.4; text-transform: uppercase; }
+        .sello-rnt-titulo { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.26em; line-height: 1.4; text-transform: uppercase; }
         .sello-rnt-num { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; letter-spacing: 0.04em; line-height: 1; white-space: nowrap; font-variant-numeric: lining-nums; }   /* cifras parejas: es un número oficial */
 
         /* Reservar */
@@ -2221,7 +2227,7 @@
         }
         .sello-rnt--reserva .sello-rnt-estrella { width: 1rem; height: 1rem; }
         .sello-rnt--reserva .sello-rnt-texto { display: flex; flex-direction: column; gap: 0.3rem; }
-        .sello-rnt--reserva .sello-rnt-titulo { color: rgba(255, 255, 255, 0.55); }
+        .sello-rnt--reserva .sello-rnt-titulo { color: rgba(255, 255, 255, 0.6); }
         .sello-rnt--reserva .sello-rnt-num { font-size: 1.65rem; }
         .sello-rnt--reserva .sello-rnt-num span { color: var(--brass); }
         @media (max-width: 400px) {
@@ -2241,7 +2247,7 @@
             border: 1px solid rgba(201, 160, 99, 0.45); border-radius: 999px;
         }
         .sello-rnt--barra .sello-rnt-estrella { box-sizing: content-box; width: 0.7rem; height: 0.7rem; padding: 0.45rem; border-radius: 999px; background: var(--brass); color: var(--ink); }
-        .sello-rnt--barra .sello-rnt-titulo { max-width: 7.5rem; font-size: 0.5rem; letter-spacing: 0.2em; line-height: 1.35; color: rgba(255, 255, 255, 0.5); }
+        .sello-rnt--barra .sello-rnt-titulo { max-width: 11rem; font-size: 0.6875rem; letter-spacing: 0.14em; line-height: 1.3; color: rgba(255, 255, 255, 0.6); }
         .sello-rnt--barra .sello-rnt-num { font-size: 1.1rem; }
         @media (max-width: 480px) {
             .sello-rnt--barra { height: 2.3rem; gap: 0.45rem; padding-right: 0.8rem; }
@@ -2254,7 +2260,7 @@
         .sello-rnt--ventana .sello-rnt-linea { flex: 1 1 0; min-width: 1.5rem; height: 1px; background: linear-gradient(90deg, rgba(201, 160, 99, 0), rgba(201, 160, 99, 0.55)); }
         .sello-rnt--ventana .sello-rnt-linea:last-child { transform: scaleX(-1); }
         .sello-rnt--ventana .sello-rnt-texto { display: flex; align-items: baseline; gap: 0.75rem; }
-        .sello-rnt--ventana .sello-rnt-titulo { color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+        .sello-rnt--ventana .sello-rnt-titulo { color: rgba(255, 255, 255, 0.6); white-space: nowrap; }
         .sello-rnt--ventana .sello-rnt-num { font-size: 1.2rem; color: var(--brass); }
         @media (max-width: 560px) {
             .sello-rnt--ventana .sello-rnt-texto { flex-direction: column; align-items: center; gap: 0.35rem; text-align: center; }
@@ -2287,15 +2293,15 @@
         .blog-tarjeta-boton:hover .blog-foto img { transform: scale(1.04); }
         .blog-categoria {
             position: absolute; top: 0.9rem; left: 0.9rem; padding: 0.35rem 0.7rem; background: rgba(255, 255, 255, 0.95); color: var(--ink);
-            font-size: 0.55rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+            font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
         }
         .blog-cuerpo { display: flex; flex-direction: column; flex: 1; gap: 0.5rem; padding: clamp(1rem, 2.6vh, 1.6rem); }
-        .blog-meta { font-size: 0.56rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--brass); }
+        .blog-meta { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--brass); }
         .blog-tarjeta-titulo { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; font-size: clamp(1.2rem, 2.6vh, 1.4rem); line-height: 1.18; color: #fff; }
         .blog-resumen { font-size: 0.82rem; line-height: 1.6; font-weight: 300; color: rgba(255, 255, 255, 0.6); }
         .blog-leer {
             display: inline-flex; align-items: center; gap: 0.5rem; align-self: flex-start; margin-top: auto; padding: 0.6rem 0 0.2rem;
-            border-bottom: 1px solid var(--brass); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #fff;
+            border-bottom: 1px solid var(--brass); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #fff;
         }
         html.pantallas .blog-foto { aspect-ratio: auto; height: clamp(120px, 24vh, 280px); }
         html.pantallas #blog .carrusel-nav { color: #fff; }
@@ -2330,11 +2336,11 @@
             border: 1px solid rgba(201, 160, 99, 0.5); border-radius: 999px; color: var(--brass);
         }
         .bebidas-icono svg { stroke-width: 1.4; }
-        .bebidas-sigue { font-family: Inter, sans-serif; font-size: 0.66rem; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.4); }
+        .bebidas-sigue { font-family: Inter, sans-serif; font-size: 0.75rem; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.6); }
         .bebidas-columna ul > li + li { margin-top: clamp(0.3rem, 1vh, 0.7rem); }
         .bebidas-pantalla .bebida-fila { display: flex; align-items: center; gap: 0.55rem; font-size: 0.84rem; line-height: 1.35; }
         .bebida-nombre { font-weight: 300; color: rgba(255, 255, 255, 0.86); }
-        .bebida-medida { font-size: 0.7rem; color: rgba(255, 255, 255, 0.4); white-space: nowrap; }
+        .bebida-medida { font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); white-space: nowrap; }
         .bebidas-pantalla .precio-linea { border-bottom-color: rgba(255, 255, 255, 0.16); }
         .bebida-precio { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.08rem; color: var(--brass); white-space: nowrap; }
         /* Botón + bien visible: círculo dorado sólido con halo; al agregar, la cantidad queda en blanco */
@@ -2350,13 +2356,13 @@
         .bebidas-pantalla .bebida-ctrl > span button svg { stroke-width: 2.25; }
         .bebidas-pantalla .bebida-ctrl > span button:hover { background: rgba(201, 160, 99, 0.25); }
         .bebidas-pantalla .carrusel-nav { color: #fff; margin-top: clamp(0.75rem, 2.2vh, 1.5rem); }
-        .bebidas-nota { margin: clamp(0.75rem, 2.4vh, 1.75rem) auto 0; max-width: 46rem; text-align: center; font-size: 0.66rem; line-height: 1.6; color: rgba(255, 255, 255, 0.4); }
+        .bebidas-nota { margin: clamp(0.75rem, 2.4vh, 1.75rem) auto 0; max-width: 46rem; text-align: center; font-size: 0.75rem; line-height: 1.6; color: rgba(255, 255, 255, 0.6); }
         @media (max-width: 767px) {
             .bebidas-pantalla { padding-block: 1.5rem; }
             .bebidas-texto { font-size: 0.8rem; }
             .bebidas-columna { padding-inline: 1rem; }
             .bebidas-pantalla .bebida-fila { font-size: 0.82rem; }
-            .bebidas-nota { font-size: 0.6rem; }
+            .bebidas-nota { font-size: 0.75rem; }
         }
 
         /* ---------- Pedido de Mangolé y carrito de la reserva ---------- */
@@ -2409,7 +2415,7 @@
         /* Cuánto se paga hoy, dentro del carrito */
         .ca-modo { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: #fff; padding: 0.75rem 0.9rem; transition: border-color .3s, background .3s; }
         .ca-modo:hover { border-color: rgba(10, 33, 46, 0.4); }
-        .ca-modo-t { display: block; font-size: 0.7rem; color: rgba(32, 41, 46, 0.6); }
+        .ca-modo-t { display: block; font-size: 0.7rem; color: rgba(32, 41, 46, 0.7); }
         .ca-modo-v { display: block; font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.35rem; line-height: 1.2; color: var(--ink); margin-top: 0.15rem; }
         .ca-modo.is-sel { background: var(--ink); border-color: var(--ink); }
         .ca-modo.is-sel .ca-modo-t { color: rgba(255, 255, 255, 0.6); }
@@ -2463,7 +2469,7 @@
             white-space: nowrap;
             background: var(--ink);
             color: #fff;
-            font-size: 0.58rem;
+            font-size: 0.6875rem;
             font-weight: 600;
             letter-spacing: 0.22em;
             text-transform: uppercase;
@@ -2697,7 +2703,7 @@
                 <a href="blog.html" class="m-link font-display text-[1.7rem] sm:text-4xl leading-tight hover:text-brass transition-colors">Blog</a>
                 <a href="#contacto" class="m-link font-display text-[1.7rem] sm:text-4xl leading-tight hover:text-brass transition-colors">Contacto</a>
             </nav>
-            <div class="flex flex-wrap gap-x-6 gap-y-3 mb-9 micro text-white/50">
+            <div class="flex flex-wrap gap-x-6 gap-y-3 mb-9 micro text-white/60">
                 <a href="#resenas" class="m-link hover:text-white transition-colors">Reseñas</a>
                 <a href="#informacion" class="m-link hover:text-white transition-colors">Antes de tu llegada</a>
                 <a href="#faq" class="m-link hover:text-white transition-colors">Preguntas frecuentes</a>
@@ -2836,10 +2842,10 @@
                     </div>
 
                     <div class="hairline-t px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 bg-bone/70">
-                        <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Reserva directa</span>
-                        <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Wifi y parqueadero gratis</span>
-                        <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Desayuno incluido</span>
-                        <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Impuestos incluidos</span>
+                        <span class="flex items-center gap-1.5 micro text-ink/70"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Reserva directa</span>
+                        <span class="flex items-center gap-1.5 micro text-ink/70"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Wifi y parqueadero gratis</span>
+                        <span class="flex items-center gap-1.5 micro text-ink/70"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Desayuno incluido</span>
+                        <span class="flex items-center gap-1.5 micro text-ink/70"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Impuestos incluidos</span>
                     </div>
                 </div>
             </div>
@@ -2888,13 +2894,13 @@
                         clima cálido cerca de Bogotá. Está en la vereda Escalante de Tena, Cundinamarca, rodeado de
                         montañas, jardines y paisajes que invitan a respirar con calma.
                     </p>
-                    <p class="body-sm text-graphite/65 max-w-xl">
+                    <p class="body-sm text-graphite/70 max-w-xl">
                         Contamos con habitaciones confortables, suites, piscina para adultos, piscina infantil, jacuzzi,
                         sauna, turco, gimnasio, restaurante, bar, mini tejo, cancha polideportiva, salón de entretenimiento
                         y espacios para eventos: el escenario perfecto para una escapada romántica, un fin de semana
                         familiar, un pasadía especial o una celebración íntima.
                     </p>
-                    <p class="body-sm text-graphite/65 max-w-xl mt-4">
+                    <p class="body-sm text-graphite/70 max-w-xl mt-4">
                         Es un lugar amplio, con 15 habitaciones y una cabaña. Así podemos ofrecer una atención
                         personalizada, en la que el cuidado de cada huésped es la prioridad: esa es nuestra vocación boutique.
                     </p>
@@ -2903,15 +2909,15 @@
                         <div class="grid grid-cols-3 gap-5 sm:gap-8 hairline-t pt-8 max-w-xl">
                             <div>
                                 <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2 whitespace-nowrap"><span data-contar="9000">9.000</span> m²</span>
-                                <span class="block micro text-graphite/45">Zona turística</span>
+                                <span class="block micro text-graphite/70">Zona turística</span>
                             </div>
                             <div>
                                 <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2"><span data-contar="16">16</span></span>
-                                <span class="block micro text-graphite/45">Habitaciones y cabaña</span>
+                                <span class="block micro text-graphite/70">Habitaciones y cabaña</span>
                             </div>
                             <div>
                                 <span class="block font-display text-[1.65rem] sm:text-4xl text-ink leading-none mb-2"><span data-contar="2">2</span> h</span>
-                                <span class="block micro text-graphite/45">Desde Bogotá</span>
+                                <span class="block micro text-graphite/70">Desde Bogotá</span>
                             </div>
                         </div>
                     </div>
@@ -2998,7 +3004,7 @@
                     </div>
 
                     <div class="hairline-t pt-6 mt-10 flex items-center justify-between gap-4">
-                        <span class="micro text-graphite/40"><span id="step-current">01</span> <span class="text-graphite/25">/ 04</span></span>
+                        <span class="micro text-graphite/70"><span id="step-current">01</span> <span class="text-graphite/70">/ 04</span></span>
                         <div class="carrusel-botones">
                             <button type="button" onclick="stepBy(-1)" aria-label="Paso anterior" class="carrusel-flecha">
                                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -3076,21 +3082,21 @@
                         <i data-lucide="calendar-days" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                         <div>
                             <h4 class="micro text-ink mb-2">Una tarifa, sin sorpresas</h4>
-                            <p class="body-sm text-graphite/60">Cada habitación tiene un solo valor por noche, desde <span data-tarifa="desde">$250.000</span>. Impuestos y desayuno siempre incluidos.</p>
+                            <p class="body-sm text-graphite/70">Cada habitación tiene un solo valor por noche, desde <span data-tarifa="desde">$250.000</span>. Impuestos y desayuno siempre incluidos.</p>
                         </div>
                     </div>
                     <div class="flex items-start gap-4">
                         <i data-lucide="paw-print" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                         <div>
                             <h4 class="micro text-ink mb-2">Pet Friendly</h4>
-                            <p class="body-sm text-graphite/60">Recibimos mascotas en habitaciones seleccionadas, previa reserva: <span data-tarifa="mascota">$70.000</span> COP por mascota y noche. <a href="acuerdo-pet-friendly.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Ver condiciones</a></p>
+                            <p class="body-sm text-graphite/70">Recibimos mascotas en habitaciones seleccionadas, previa reserva: <span data-tarifa="mascota">$70.000</span> COP por mascota y noche. <a href="acuerdo-pet-friendly.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Ver condiciones</a></p>
                         </div>
                     </div>
                     <div class="flex items-start gap-4">
                         <i data-lucide="users" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                         <div>
                             <h4 class="micro text-ink mb-2">Grupos y eventos</h4>
-                            <p class="body-sm text-graphite/60">Para 5 huéspedes o más combinamos habitaciones. Para celebraciones, conoce nuestros <a href="#eventos" class="text-ink border-b border-brass hover:text-brass transition-colors">salones y eventos</a>.</p>
+                            <p class="body-sm text-graphite/70">Para 5 huéspedes o más combinamos habitaciones. Para celebraciones, conoce nuestros <a href="#eventos" class="text-ink border-b border-brass hover:text-brass transition-colors">salones y eventos</a>.</p>
                         </div>
                     </div>
                 </div>
@@ -3112,22 +3118,22 @@
                     <div class="lg:sticky lg:top-28">
                         <span class="eyebrow mb-6">Servicios</span>
                         <h2 class="display-lg text-ink mb-6">9.000 m² para descansar <em class="italic text-moss">y compartir</em></h2>
-                        <p class="body-sm text-graphite/65 mb-7">
+                        <p class="body-sm text-graphite/70 mb-7">
                             Hotel Cabaleón ofrece una experiencia de descanso, recreación y naturaleza en 9.000 m²
                             de zona turística, rodeada de jardines y con vista privilegiada hacia la Cordillera
                             Oriental de los Andes. Con solo 16 alojamientos, cada huésped recibe una atención personalizada.
                         </p>
-                        <span class="micro text-graphite/40 block mb-3 hairline-t pt-6">Horarios</span>
+                        <span class="micro text-graphite/70 block mb-3 hairline-t pt-6">Horarios</span>
                         <dl class="mb-8 body-sm">
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/60">Piscinas</dt><dd class="text-ink text-right">8:00 a. m. – 5:30 p. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/60">Sauna</dt><dd class="text-ink text-right">10:00 – 10:30 a. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/60">Jacuzzi</dt><dd class="text-ink text-right">10:30 – 11:00 a. m.<br>4:30 – 5:00 p. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/60">Baño turco</dt><dd class="text-ink text-right">4:00 – 4:30 p. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/60">Mini tejo</dt><dd class="text-ink text-right">9:00 a. m. – 5:30 p. m.</dd></div>
+                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Piscinas</dt><dd class="text-ink text-right">8:00 a. m. – 5:30 p. m.</dd></div>
+                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Sauna</dt><dd class="text-ink text-right">10:00 – 10:30 a. m.</dd></div>
+                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Jacuzzi</dt><dd class="text-ink text-right">10:30 – 11:00 a. m.<br>4:30 – 5:00 p. m.</dd></div>
+                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Baño turco</dt><dd class="text-ink text-right">4:00 – 4:30 p. m.</dd></div>
+                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Mini tejo</dt><dd class="text-ink text-right">9:00 a. m. – 5:30 p. m.</dd></div>
                         </dl>
                         <ul class="space-y-3 mb-9">
-                            <li class="flex items-center gap-3 body-sm text-graphite/65"><i data-lucide="cigarette-off" class="w-4 h-4 text-brass shrink-0"></i> Hotel libre de humo</li>
-                            <li class="flex items-center gap-3 body-sm text-graphite/65"><i data-lucide="volume-1" class="w-4 h-4 text-brass shrink-0"></i> Un lugar pensado para el descanso</li>
+                            <li class="flex items-center gap-3 body-sm text-graphite/70"><i data-lucide="cigarette-off" class="w-4 h-4 text-brass shrink-0"></i> Hotel libre de humo</li>
+                            <li class="flex items-center gap-3 body-sm text-graphite/70"><i data-lucide="volume-1" class="w-4 h-4 text-brass shrink-0"></i> Un lugar pensado para el descanso</li>
                         </ul>
                         <a href="#reservar" class="link-arrow text-ink">
                             Reservar ahora <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -3176,73 +3182,73 @@
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="waves" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Piscina para adultos</h3>
-                                <p class="body-sm text-graphite/60">Rodeada de jardines, con la montaña de fondo. De 90 a 170 cm de profundidad.</p>
+                                <p class="body-sm text-graphite/70">Rodeada de jardines, con la montaña de fondo. De 90 a 170 cm de profundidad.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="baby" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Piscina infantil</h3>
-                                <p class="body-sm text-graphite/60">60 cm de profundidad, para los más pequeños y siempre con un adulto.</p>
+                                <p class="body-sm text-graphite/70">60 cm de profundidad, para los más pequeños y siempre con un adulto.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="bath" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Jacuzzi</h3>
-                                <p class="body-sm text-graphite/60">En la piscina principal, con turnos en la mañana y en la tarde.</p>
+                                <p class="body-sm text-graphite/70">En la piscina principal, con turnos en la mañana y en la tarde.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="flame" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Sauna y baño turco</h3>
-                                <p class="body-sm text-graphite/60">Sauna seco de 80 a 90 °C y baño turco de vapor de 50 a 70 °C.</p>
+                                <p class="body-sm text-graphite/70">Sauna seco de 80 a 90 °C y baño turco de vapor de 50 a 70 °C.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="dumbbell" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Gimnasio</h3>
-                                <p class="body-sm text-graphite/60">Para no perder la rutina, aun estando de descanso.</p>
+                                <p class="body-sm text-graphite/70">Para no perder la rutina, aun estando de descanso.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="volleyball" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Cancha polideportiva</h3>
-                                <p class="body-sm text-graphite/60">Para jugar en familia o con amigos.</p>
+                                <p class="body-sm text-graphite/70">Para jugar en familia o con amigos.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="target" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Mini tejo y juego de rana</h3>
-                                <p class="body-sm text-graphite/60">Los juegos de siempre, en clima cálido.</p>
+                                <p class="body-sm text-graphite/70">Los juegos de siempre, en clima cálido.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="circle-dot" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Billar y ping pong</h3>
-                                <p class="body-sm text-graphite/60">En los salones de entretenimiento, para las tardes de juego.</p>
+                                <p class="body-sm text-graphite/70">En los salones de entretenimiento, para las tardes de juego.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="sprout" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Huerta turística</h3>
-                                <p class="body-sm text-graphite/60">Un recorrido por la huerta del hotel.</p>
+                                <p class="body-sm text-graphite/70">Un recorrido por la huerta del hotel.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="binoculars" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Equipos de avistamiento</h3>
-                                <p class="body-sm text-graphite/60">En alquiler, para disfrutar el paisaje y su fauna.</p>
+                                <p class="body-sm text-graphite/70">En alquiler, para disfrutar el paisaje y su fauna.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="shopping-bag" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Tienda de souvenirs</h3>
-                                <p class="body-sm text-graphite/60">Un recuerdo de Cabaleón para llevar a casa.</p>
+                                <p class="body-sm text-graphite/70">Un recuerdo de Cabaleón para llevar a casa.</p>
                             </div>
 
                             <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                                 <i data-lucide="square-parking" class="ico-lujo mb-5"></i>
                                 <h3 class="font-display text-xl text-ink mb-2">Parqueadero gratuito</h3>
-                                <p class="body-sm text-graphite/60">Llegas, parqueas y te olvidas del carro hasta el regreso.</p>
+                                <p class="body-sm text-graphite/70">Llegas, parqueas y te olvidas del carro hasta el regreso.</p>
                             </div>
 
                         </div>
@@ -3304,32 +3310,32 @@
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="party-popper" class="ico-lujo mb-5"></i>
                             <h3 class="font-display text-xl text-ink mb-2">Celebraciones</h3>
-                            <p class="body-sm text-graphite/60">Aniversarios, grados y fechas que merecen un lugar especial.</p>
+                            <p class="body-sm text-graphite/70">Aniversarios, grados y fechas que merecen un lugar especial.</p>
                         </div>
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="cake" class="ico-lujo mb-5"></i>
                             <h3 class="font-display text-xl text-ink mb-2">Cumpleaños</h3>
-                            <p class="body-sm text-graphite/60">Una celebración entre piscina, jardines y buena mesa.</p>
+                            <p class="body-sm text-graphite/70">Una celebración entre piscina, jardines y buena mesa.</p>
                         </div>
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="users" class="ico-lujo mb-5"></i>
                             <h3 class="font-display text-xl text-ink mb-2">Reuniones familiares</h3>
-                            <p class="body-sm text-graphite/60">Para que toda la familia se encuentre, coma y descanse junta.</p>
+                            <p class="body-sm text-graphite/70">Para que toda la familia se encuentre, coma y descanse junta.</p>
                         </div>
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="briefcase" class="ico-lujo mb-5"></i>
                             <h3 class="font-display text-xl text-ink mb-2">Encuentros empresariales</h3>
-                            <p class="body-sm text-graphite/60">Reuniones de trabajo lejos de la oficina, a dos horas de Bogotá.</p>
+                            <p class="body-sm text-graphite/70">Reuniones de trabajo lejos de la oficina, a dos horas de Bogotá.</p>
                         </div>
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="handshake" class="ico-lujo mb-5"></i>
                             <h3 class="font-display text-xl text-ink mb-2">Integraciones</h3>
-                            <p class="body-sm text-graphite/60">Jornadas con cancha, zonas recreativas y piscina.</p>
+                            <p class="body-sm text-graphite/70">Jornadas con cancha, zonas recreativas y piscina.</p>
                         </div>
                         <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
                             <i data-lucide="sparkles" class="ico-lujo mb-5"></i>
                             <h3 class="font-display text-xl text-ink mb-2">Eventos especiales</h3>
-                            <p class="body-sm text-graphite/60">Si lo imaginas, lo conversamos y lo armamos a tu medida.</p>
+                            <p class="body-sm text-graphite/70">Si lo imaginas, lo conversamos y lo armamos a tu medida.</p>
                         </div>
                     </div>
                 </div>
@@ -3429,7 +3435,7 @@
                         platos generosos, sabores familiares y una cocina pensada para acompañar el descanso en
                         clima cálido.
                     </p>
-                    <p class="body-sm text-graphite/65 mb-8">
+                    <p class="body-sm text-graphite/70 mb-8">
                         Ideal para compartir después de la piscina, celebrar una ocasión especial o cerrar el día con
                         una buena comida entre montañas. En Mangolé, cada plato invita a quedarse, conversar y disfrutar
                         el encanto campestre de Cabaleón.
@@ -3473,17 +3479,17 @@
                 <div class="max-w-xl">
                     <span class="eyebrow mb-4">Carta de favoritos · Pide aquí</span>
                     <h3 class="font-display text-3xl sm:text-4xl text-ink mb-3">Inspiración del día</h3>
-                    <p class="body-sm text-graphite/65">
+                    <p class="body-sm text-graphite/70">
                         Agrega tus platos, elige si es para el almuerzo o la cena y envía el pedido por WhatsApp:
                         el equipo de Mangolé te lo confirma con la hora. Los platos marcados incluyen la bebida del día de cortesía.
                     </p>
                 </div>
                 <button type="button" onclick="abrirPedido()" class="btn btn-ink shrink-0 self-start md:self-auto">
-                    <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="#i-cloche"/></svg> Ver mi pedido <span data-pedido-cuenta class="ml-1 min-w-[1.4rem] h-[1.4rem] px-1.5 rounded-full bg-brass text-ink text-[0.65rem] tracking-normal inline-flex items-center justify-center">0</span>
+                    <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="#i-cloche"/></svg> Ver mi pedido <span data-pedido-cuenta class="ml-1 min-w-[1.4rem] h-[1.4rem] px-1.5 rounded-full bg-brass text-ink text-[0.75rem] tracking-normal inline-flex items-center justify-center">0</span>
                 </button>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 carrusel" data-movil="2" data-tableta="3" data-por-vista="5" id="carta-grid"></div>
-            <p class="text-[0.72rem] text-graphite/45 mt-6">Precios en pesos colombianos, sujetos a cambios. Fotografías de referencia. Toca la foto de un plato para ver su afiche.</p>
+            <p class="text-[0.75rem] text-graphite/70 mt-6">Precios en pesos colombianos, sujetos a cambios. Fotografías de referencia. Toca la foto de un plato para ver su afiche.</p>
             </div>
 
             </div>
@@ -3520,7 +3526,7 @@
                         donde el paisaje, el clima cálido y la vista hacia la Cordillera Oriental crean el ambiente
                         perfecto para relajarse.
                     </p>
-                    <p class="body-sm text-graphite/65 mb-8">
+                    <p class="body-sm text-graphite/70 mb-8">
                         Ofrecemos cervezas, tragos, snacks y el encanto dulce de nuestras obleas, pensados para
                         acompañar una tarde sin afán. Entre agua, sol y montaña, Cabalante invita a brindar, conversar y
                         disfrutar el placer sencillo de estar en Cabaleón.
@@ -3568,7 +3574,7 @@
                             los platos de Mangolé en un solo envío. Cócteles de la casa: muy pronto.
                         </p>
                         <button type="button" onclick="abrirPedido()" class="btn btn-outline-light btn-sm">
-                            <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="#i-cloche"/></svg> Ver mi pedido <span data-pedido-cuenta class="ml-1 min-w-[1.4rem] h-[1.4rem] px-1.5 rounded-full bg-brass text-ink text-[0.65rem] tracking-normal inline-flex items-center justify-center">0</span>
+                            <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="#i-cloche"/></svg> Ver mi pedido <span data-pedido-cuenta class="ml-1 min-w-[1.4rem] h-[1.4rem] px-1.5 rounded-full bg-brass text-ink text-[0.75rem] tracking-normal inline-flex items-center justify-center">0</span>
                         </button>
                     </div>
                     <div class="carrusel bebidas-lista" id="bebidas-grid"></div>
@@ -3600,15 +3606,15 @@
                     <div class="grid grid-cols-3 gap-5 sm:gap-8 hairline-t pt-8">
                         <div>
                             <span class="block font-display text-3xl sm:text-4xl text-ink leading-none mb-2" id="gal-total">6</span>
-                            <span class="block micro text-graphite/45">Fotografías</span>
+                            <span class="block micro text-graphite/70">Fotografías</span>
                         </div>
                         <div>
                             <span class="block font-display text-3xl sm:text-4xl text-ink leading-none mb-2" id="gal-cats">3</span>
-                            <span class="block micro text-graphite/45">Categorías</span>
+                            <span class="block micro text-graphite/70">Categorías</span>
                         </div>
                         <div>
                             <span class="block font-display text-3xl sm:text-4xl text-ink leading-none mb-2">4,8</span>
-                            <span class="block micro text-graphite/45">En Google</span>
+                            <span class="block micro text-graphite/70">En Google</span>
                         </div>
                     </div>
                 </div>
@@ -3616,15 +3622,15 @@
 
             <!-- Filtro por categoría: se generan solo las categorías que tienen fotos -->
             <div class="hairline-t hairline-b py-5 mb-10 sm:mb-14 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 reveal">
-                <span class="micro text-graphite/40 shrink-0">Filtrar por categoría</span>
+                <span class="micro text-graphite/70 shrink-0">Filtrar por categoría</span>
                 <div class="flex flex-wrap gap-2" id="gallery-filters"></div>
-                <p class="body-sm text-graphite/50 sm:ml-auto" id="gallery-note"></p>
+                <p class="body-sm text-graphite/70 sm:ml-auto" id="gallery-note"></p>
             </div>
 
             <!-- Las fotografías se generan desde `galeria` (script) -->
             <div class="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-2.5 sm:gap-3 auto-rows-[150px] sm:auto-rows-[200px] lg:auto-rows-[230px] reveal carrusel" data-tableta="3" data-por-vista="4" id="gallery-grid"></div>
 
-            <p id="gallery-empty" class="hidden body-sm text-graphite/50 py-10 text-center">
+            <p id="gallery-empty" class="hidden body-sm text-graphite/70 py-10 text-center">
                 No hay fotografías en esta categoría todavía.
             </p>
             <div class="text-center mt-8" id="gallery-more-wrap">
@@ -3679,7 +3685,7 @@
                     </blockquote>
                     <figcaption class="hairline-light-t pt-6">
                         <span class="block font-display text-lg text-white">Alexi García</span>
-                        <span class="micro text-white/40">Reseña en Google</span>
+                        <span class="micro text-white/60">Reseña en Google</span>
                     </figcaption>
                 </figure>
 
@@ -3697,7 +3703,7 @@
                     </blockquote>
                     <figcaption class="hairline-light-t pt-6">
                         <span class="block font-display text-lg text-white">Diana Alarcón Roa</span>
-                        <span class="micro text-white/40">Reseña en Google</span>
+                        <span class="micro text-white/60">Reseña en Google</span>
                     </figcaption>
                 </figure>
 
@@ -3714,7 +3720,7 @@
                     </blockquote>
                     <figcaption class="hairline-light-t pt-6">
                         <span class="block font-display text-lg text-white">German Manrique</span>
-                        <span class="micro text-white/40">Reseña en Google</span>
+                        <span class="micro text-white/60">Reseña en Google</span>
                     </figcaption>
                 </figure>
 
@@ -3723,7 +3729,7 @@
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 mt-12 reveal">
                 <div class="flex items-center gap-3">
                     <span class="font-display text-4xl text-brass leading-none">4,8</span>
-                    <span class="body-sm text-white/55 leading-tight">Calificación<br>promedio en Google</span>
+                    <span class="body-sm text-white/60 leading-tight">Calificación<br>promedio en Google</span>
                 </div>
                 <a href="https://maps.app.goo.gl/tFjXZFSAjQHFDaHWA" target="_blank" rel="noopener noreferrer" class="boton-mas text-white">
                     Leer todas las reseñas <span class="carrusel-mas-ico"><i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
@@ -3763,7 +3769,7 @@
                             </span>
                             <h3 class="font-display text-2xl text-ink leading-none">Tu tarifa incluye</h3>
                         </div>
-                        <p class="body-sm text-graphite/60 mb-6">Las tarifas son por noche y ya vienen completas.</p>
+                        <p class="body-sm text-graphite/70 mb-6">Las tarifas son por noche y ya vienen completas.</p>
                         <ul class="space-y-3 mb-6">
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span><strong class="font-medium text-graphite">Desayuno</strong> todas las mañanas</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span><strong class="font-medium text-graphite">Impuestos</strong> incluidos en el precio publicado</span></li>
@@ -3772,7 +3778,7 @@
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Aire acondicionado, TV de alta definición y cajilla de seguridad</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Baño privado con ducha</span></li>
                         </ul>
-                        <p class="text-[0.72rem] text-graphite/45 leading-relaxed mt-auto hairline-t pt-5">Los consumos en Restaurante Mangolé, Cabalante Bar y la tienda se pagan aparte.</p>
+                        <p class="text-[0.75rem] text-graphite/70 leading-relaxed mt-auto hairline-t pt-5">Los consumos en Restaurante Mangolé, Cabalante Bar y la tienda se pagan aparte.</p>
                     </div>
 
                     <div class="bg-bone p-7 sm:p-9 flex flex-col hover:bg-white transition-colors duration-500">
@@ -3782,7 +3788,7 @@
                             </span>
                             <h3 class="font-display text-2xl text-ink leading-none">Reserva y pago</h3>
                         </div>
-                        <p class="body-sm text-graphite/60 mb-6">Reservas directas, sin intermediarios.</p>
+                        <p class="body-sm text-graphite/70 mb-6">Reservas directas, sin intermediarios.</p>
                         <ul class="space-y-3 mb-6">
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Eliges fechas y habitaciones directamente en la web</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Ves tu factura al instante, con impuestos incluidos</span></li>
@@ -3790,7 +3796,7 @@
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>El saldo se paga al llegar, en efectivo o con tarjeta</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Si cambian tus planes, escríbenos lo antes posible</span></li>
                         </ul>
-                        <p class="text-[0.72rem] text-graphite/45 leading-relaxed mt-auto hairline-t pt-5">Tu estadía se rige por el <a href="contrato-hospedaje.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Contrato de hospedaje</a> de Hotel Cabaleón.</p>
+                        <p class="text-[0.75rem] text-graphite/70 leading-relaxed mt-auto hairline-t pt-5">Tu estadía se rige por el <a href="contrato-hospedaje.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Contrato de hospedaje</a> de Hotel Cabaleón.</p>
                     </div>
 
                     <div class="bg-bone p-7 sm:p-9 flex flex-col hover:bg-white transition-colors duration-500">
@@ -3800,7 +3806,7 @@
                             </span>
                             <h3 class="font-display text-2xl text-ink leading-none">Llegada y horarios</h3>
                         </div>
-                        <p class="body-sm text-graphite/60 mb-6">El último tramo del camino es sencillo, pero conviene tenerlo claro antes de salir.</p>
+                        <p class="body-sm text-graphite/70 mb-6">El último tramo del camino es sencillo, pero conviene tenerlo claro antes de salir.</p>
                         <ul class="space-y-3 mb-6">
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span><strong class="font-medium text-graphite">Check-in</strong> desde las 3:00 p. m.</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span><strong class="font-medium text-graphite">Check-out</strong> hasta las 2:00 p. m.; después puedes seguir en las zonas comunes hasta las 4:00 p. m.</span></li>
@@ -3809,7 +3815,7 @@
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Parqueadero gratuito en el hotel</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Centros urbanos cercanos: <strong class="font-medium text-graphite">La Gran Vía</strong> (25 min) y <strong class="font-medium text-graphite">La Mesa</strong> (40 min)</span></li>
                         </ul>
-                        <p class="text-[0.72rem] text-graphite/45 leading-relaxed mt-auto hairline-t pt-5">Al confirmar tu reserva te enviamos el pin exacto por WhatsApp. La primera vez, mejor llegar con luz de día. <a href="guia-bienvenida.jpg" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Ver la guía de bienvenida</a></p>
+                        <p class="text-[0.75rem] text-graphite/70 leading-relaxed mt-auto hairline-t pt-5">Al confirmar tu reserva te enviamos el pin exacto por WhatsApp. La primera vez, mejor llegar con luz de día. <a href="guia-bienvenida.jpg" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Ver la guía de bienvenida</a></p>
                     </div>
 
                     <div class="bg-bone p-7 sm:p-9 flex flex-col hover:bg-white transition-colors duration-500">
@@ -3819,7 +3825,7 @@
                             </span>
                             <h3 class="font-display text-2xl text-ink leading-none">Qué llevar</h3>
                         </div>
-                        <p class="body-sm text-graphite/60 mb-6">Clima cálido de día y fresco al caer la tarde. Con esto tienes el fin de semana resuelto.</p>
+                        <p class="body-sm text-graphite/70 mb-6">Clima cálido de día y fresco al caer la tarde. Con esto tienes el fin de semana resuelto.</p>
                         <ul class="space-y-3 mb-6">
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span><strong class="font-medium text-graphite">Vestido de baño</strong> y toalla para la piscina</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Ropa ligera para el día (entre 24 °C y 28 °C)</span></li>
@@ -3827,7 +3833,7 @@
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Calzado cómodo si piensas caminar por la zona</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Repelente, bloqueador solar y gorra</span></li>
                         </ul>
-                        <p class="text-[0.72rem] text-graphite/45 leading-relaxed mt-auto hairline-t pt-5">Ropa de cama y toallas de baño las ponemos nosotros.</p>
+                        <p class="text-[0.75rem] text-graphite/70 leading-relaxed mt-auto hairline-t pt-5">Ropa de cama y toallas de baño las ponemos nosotros.</p>
                     </div>
 
                     <div class="bg-bone p-7 sm:p-9 flex flex-col hover:bg-white transition-colors duration-500">
@@ -3837,7 +3843,7 @@
                             </span>
                             <h3 class="font-display text-2xl text-ink leading-none">Normas de la casa</h3>
                         </div>
-                        <p class="body-sm text-graphite/60 mb-6">Para que todos disfruten de una estadía tranquila y segura.</p>
+                        <p class="body-sm text-graphite/70 mb-6">Para que todos disfruten de una estadía tranquila y segura.</p>
                         <ul class="space-y-3 mb-6">
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Piscinas abiertas de <strong class="font-medium text-graphite">8:00 a. m. a 5:30 p. m.</strong>; menores de 12 años siempre con un adulto</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Profundidades: piscina infantil 60 cm; piscina para adultos de 90 a 170 cm</span></li>
@@ -3846,7 +3852,7 @@
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>No se cuelgan ropa ni toallas en balcones y ventanas</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Zona rural: el centro de salud más cercano está a unos 45 minutos</span></li>
                         </ul>
-                        <p class="text-[0.72rem] text-graphite/45 leading-relaxed mt-auto hairline-t pt-5">Consulta el <a href="reglamento-piscina.jpg" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Reglamento de la piscina</a> y el <a href="contrato-hospedaje.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Contrato de hospedaje</a>.</p>
+                        <p class="text-[0.75rem] text-graphite/70 leading-relaxed mt-auto hairline-t pt-5">Consulta el <a href="reglamento-piscina.jpg" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Reglamento de la piscina</a> y el <a href="contrato-hospedaje.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Contrato de hospedaje</a>.</p>
                     </div>
 
                     <div class="bg-bone p-7 sm:p-9 flex flex-col hover:bg-white transition-colors duration-500">
@@ -3856,7 +3862,7 @@
                             </span>
                             <h3 class="font-display text-2xl text-ink leading-none">Pet Friendly</h3>
                         </div>
-                        <p class="body-sm text-graphite/60 mb-6">Tu mascota es bienvenida en habitaciones seleccionadas, previa reserva y según disponibilidad.</p>
+                        <p class="body-sm text-graphite/70 mb-6">Tu mascota es bienvenida en habitaciones seleccionadas, previa reserva y según disponibilidad.</p>
                         <ul class="space-y-3 mb-6">
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span><strong class="font-medium text-graphite" data-tarifa="mascota">$70.000</strong> COP por mascota por noche</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Incluye colchoneta, recipientes para agua y alimento y bolsas para desechos</span></li>
@@ -3864,7 +3870,7 @@
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>No ingresan a la piscina, al restaurante ni a las camas</span></li>
                             <li class="flex items-start gap-3 body-sm text-graphite/70"><i data-lucide="check" class="w-3.5 h-3.5 text-brass shrink-0 mt-1.5"></i><span>Se firma el Acuerdo de responsabilidad Pet Friendly</span></li>
                         </ul>
-                        <p class="text-[0.72rem] text-graphite/45 leading-relaxed mt-auto hairline-t pt-5"><a href="acuerdo-pet-friendly.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Leer la política Pet Friendly</a></p>
+                        <p class="text-[0.75rem] text-graphite/70 leading-relaxed mt-auto hairline-t pt-5"><a href="acuerdo-pet-friendly.pdf" target="_blank" rel="noopener" class="text-ink border-b border-brass hover:text-brass transition-colors">Leer la política Pet Friendly</a></p>
                     </div>
 
                 </div>
@@ -3883,42 +3889,42 @@
                         <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="guia-bienvenida.jpg" alt="Guía de bienvenida" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
                         <div class="p-3 sm:p-4">
                             <span class="block font-display text-lg text-ink leading-tight mb-1">Guía de bienvenida</span>
-                            <span class="block micro leading-relaxed text-graphite/45">Horarios y recomendaciones</span>
+                            <span class="block micro leading-relaxed text-graphite/70">Horarios y recomendaciones</span>
                         </div>
                     </a>
                     <a href="reglas-piscina.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
                         <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="reglamento-piscina.jpg" alt="Reglamento de la piscina" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
                         <div class="p-3 sm:p-4">
                             <span class="block font-display text-lg text-ink leading-tight mb-1">Reglamento de la piscina</span>
-                            <span class="block micro leading-relaxed text-graphite/45">Normas y profundidades</span>
+                            <span class="block micro leading-relaxed text-graphite/70">Normas y profundidades</span>
                         </div>
                     </a>
                     <a href="sauna-y-turcos.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
                         <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="sauna-y-turcos.jpg" alt="Tu espacio de bienestar" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
                         <div class="p-3 sm:p-4">
                             <span class="block font-display text-lg text-ink leading-tight mb-1">Tu espacio de bienestar</span>
-                            <span class="block micro leading-relaxed text-graphite/45">Sauna, turco y jacuzzi</span>
+                            <span class="block micro leading-relaxed text-graphite/70">Sauna, turco y jacuzzi</span>
                         </div>
                     </a>
                     <a href="cabalante-menu.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
                         <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="cabalante-menu.jpg" alt="Carta de Cabalante" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
                         <div class="p-3 sm:p-4">
                             <span class="block font-display text-lg text-ink leading-tight mb-1">Carta de Cabalante</span>
-                            <span class="block micro leading-relaxed text-graphite/45">Bebidas y precios</span>
+                            <span class="block micro leading-relaxed text-graphite/70">Bebidas y precios</span>
                         </div>
                     </a>
                     <a href="flyer1.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
                         <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="flyer1.jpg" alt="Pasadía Premium" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
                         <div class="p-3 sm:p-4">
                             <span class="block font-display text-lg text-ink leading-tight mb-1">Pasadía Premium</span>
-                            <span class="block micro leading-relaxed text-graphite/45">Volante de apertura</span>
+                            <span class="block micro leading-relaxed text-graphite/70">Volante de apertura</span>
                         </div>
                     </a>
                     <a href="experiencias.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
                         <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="experiencias.jpg" alt="Folleto del hotel" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
                         <div class="p-3 sm:p-4">
                             <span class="block font-display text-lg text-ink leading-tight mb-1">Folleto del hotel</span>
-                            <span class="block micro leading-relaxed text-graphite/45">Experiencias y habitaciones</span>
+                            <span class="block micro leading-relaxed text-graphite/70">Experiencias y habitaciones</span>
                         </div>
                     </a>
                 </div>
@@ -3929,21 +3935,21 @@
                     <i data-lucide="baby" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                     <div>
                         <h4 class="micro text-ink mb-2">Viajas con niños</h4>
-                        <p class="body-sm text-graphite/60">Cuéntanos las edades al reservar para asignarte la habitación adecuada. Hay piscina infantil para los más pequeños.</p>
+                        <p class="body-sm text-graphite/70">Cuéntanos las edades al reservar para asignarte la habitación adecuada. Hay piscina infantil para los más pequeños.</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-4">
                     <i data-lucide="accessibility" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                     <div>
                         <h4 class="micro text-ink mb-2">Accesibilidad</h4>
-                        <p class="body-sm text-graphite/60">Contamos con acceso para personas con discapacidad. Cuéntanos tu necesidad al reservar y te asignamos la mejor opción.</p>
+                        <p class="body-sm text-graphite/70">Contamos con acceso para personas con discapacidad. Cuéntanos tu necesidad al reservar y te asignamos la mejor opción.</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-4">
                     <i data-lucide="users" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                     <div>
                         <h4 class="micro text-ink mb-2">Vienen en grupo</h4>
-                        <p class="body-sm text-graphite/60">Para 5 huéspedes o más combinamos habitaciones. Escríbenos y armamos la mejor opción para todos.</p>
+                        <p class="body-sm text-graphite/70">Para 5 huéspedes o más combinamos habitaciones. Escríbenos y armamos la mejor opción para todos.</p>
                     </div>
                 </div>
             </div>
@@ -4108,7 +4114,7 @@
                         </div>
                     </div>
                     <div id="rv-habitaciones" class="space-y-3"></div>
-                    <p id="rv-hab-msg" class="flex items-start gap-2 text-[0.8rem] text-white/55 mt-5"><i data-lucide="users" class="w-4 h-4 text-brass shrink-0 mt-px"></i><span id="rv-hab-msg-txt"></span></p>
+                    <p id="rv-hab-msg" class="flex items-start gap-2 text-[0.8rem] text-white/60 mt-5"><i data-lucide="users" class="w-4 h-4 text-brass shrink-0 mt-px"></i><span id="rv-hab-msg-txt"></span></p>
                 </div>
 
                 <!-- Factura proforma en vivo -->
@@ -4123,21 +4129,21 @@
                                 </div>
                             </div>
                             <div class="flex flex-wrap items-end justify-between gap-x-5 gap-y-2 mt-5">
-                                <p class="text-[0.66rem] leading-relaxed text-graphite/55">
+                                <p class="text-[0.75rem] leading-relaxed text-graphite/70">
                                     Hotel Cabaleón · RNT 146726 · 311 888 4430<br>
                                     Ramal de Escalante, Vereda Escalante, Tena, Cundinamarca
                                 </p>
-                                <span id="fa-fecha" class="text-[0.68rem] text-graphite/55"></span>
+                                <span id="fa-fecha" class="text-[0.75rem] text-graphite/70"></span>
                             </div>
                         </div>
 
                         <div class="px-6 sm:px-8 py-5 grid grid-cols-2 gap-5 border-b border-line">
                             <div class="min-w-0">
-                                <span class="micro text-graphite/45 block mb-1.5">Facturar a</span>
+                                <span class="micro text-graphite/70 block mb-1.5">Facturar a</span>
                                 <p id="fa-cliente" class="text-[0.8rem] text-ink leading-snug break-words"></p>
                             </div>
                             <div class="min-w-0">
-                                <span class="micro text-graphite/45 block mb-1.5">Estadía</span>
+                                <span class="micro text-graphite/70 block mb-1.5">Estadía</span>
                                 <p id="fa-estadia" class="text-[0.8rem] text-ink leading-snug"></p>
                             </div>
                         </div>
@@ -4149,7 +4155,7 @@
                                 </thead>
                                 <tbody id="fa-lineas"></tbody>
                             </table>
-                            <p id="fa-vacia" class="text-[0.8rem] text-graphite/50 py-8 text-center">Elige al menos una habitación para ver el detalle de tu reserva.</p>
+                            <p id="fa-vacia" class="text-[0.8rem] text-graphite/70 py-8 text-center">Elige al menos una habitación para ver el detalle de tu reserva.</p>
                         </div>
 
                         <div class="px-6 sm:px-8 pt-5 pb-7">
@@ -4164,14 +4170,14 @@
                                     <span id="fa-hoy" class="font-display text-2xl sm:text-[1.7rem]">$0</span>
                                 </div>
                                 <div class="text-right">
-                                    <span class="micro text-white/50 block mb-1.5">Saldo al llegar</span>
+                                    <span class="micro text-white/60 block mb-1.5">Saldo al llegar</span>
                                     <span id="fa-saldo" class="font-display text-2xl sm:text-[1.7rem] text-white/80">$0</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="px-6 sm:px-8 py-5 border-t border-line bg-sand/40">
-                            <p class="text-[0.64rem] leading-relaxed text-graphite/55">
+                            <p class="text-[0.75rem] leading-relaxed text-graphite/70">
                                 Valores en pesos colombianos con impuestos incluidos. Desayuno incluido. Check-in desde las 3:00 p. m.
                                 y check-out hasta las 2:00 p. m. La estadía se rige por el contrato de hospedaje de Hotel Cabaleón.
                                 Documento proforma: no reemplaza la factura electrónica de venta.
@@ -4179,7 +4185,7 @@
                         </div>
                         <span id="fa-sello" class="fa-sello hidden"></span>
                     </div>
-                    <button type="button" onclick="imprimirFactura()" class="mt-4 w-full flex items-center justify-center gap-2 micro text-white/55 hover:text-brass transition-colors py-2">
+                    <button type="button" onclick="imprimirFactura()" class="mt-4 w-full flex items-center justify-center gap-2 micro text-white/60 hover:text-brass transition-colors py-2">
                         <i data-lucide="printer" class="w-4 h-4"></i> Descargar o imprimir factura
                     </button>
                 </aside>
@@ -4239,7 +4245,7 @@
                             <h3 class="font-display text-2xl sm:text-3xl text-white leading-none">Método de pago</h3>
                         </div>
                     </div>
-                    <span class="micro text-white/45 block mb-4">¿Cuánto pagas hoy?</span>
+                    <span class="micro text-white/60 block mb-4">¿Cuánto pagas hoy?</span>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-9">
                         <label class="rv-opcion is-sel" data-grupo="modalidad">
                             <input type="radio" name="modalidad" value="anticipo" checked>
@@ -4247,7 +4253,7 @@
                             <span class="min-w-0">
                                 <span class="block text-white text-[0.9rem] font-medium">Anticipo del 50 %</span>
                                 <span id="op-anticipo" class="block font-display text-2xl text-brass mt-1">$0</span>
-                                <span class="block text-[0.72rem] text-white/50 mt-1">El saldo se paga al llegar</span>
+                                <span class="block text-[0.75rem] text-white/60 mt-1">El saldo se paga al llegar</span>
                             </span>
                         </label>
                         <label class="rv-opcion" data-grupo="modalidad">
@@ -4256,12 +4262,12 @@
                             <span class="min-w-0">
                                 <span class="block text-white text-[0.9rem] font-medium">Pago total</span>
                                 <span id="op-total" class="block font-display text-2xl text-brass mt-1">$0</span>
-                                <span class="block text-[0.72rem] text-white/50 mt-1">Llegas sin pagos pendientes</span>
+                                <span class="block text-[0.75rem] text-white/60 mt-1">Llegas sin pagos pendientes</span>
                             </span>
                         </label>
                     </div>
 
-                    <span class="micro text-white/45 block mb-4">Medio de pago</span>
+                    <span class="micro text-white/60 block mb-4">Medio de pago</span>
                     <div class="space-y-3 mb-9">
                         <label class="rv-opcion" data-grupo="medio" id="medio-bold">
                             <input type="radio" name="medio" value="bold">
@@ -4269,9 +4275,9 @@
                             <span class="flex-1 min-w-0">
                                 <span class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                                     <span class="text-white text-[0.9rem] font-medium">Pago en línea</span>
-                                    <span class="flex items-center gap-1.5 micro text-white/45"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-brass"></i> Procesado por Bold</span>
+                                    <span class="flex items-center gap-1.5 micro text-white/60"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-brass"></i> Procesado por Bold</span>
                                 </span>
-                                <span class="block text-[0.75rem] text-white/55 mt-1.5 leading-relaxed">Tu reserva queda confirmada en cuanto se aprueba el pago.</span>
+                                <span class="block text-[0.75rem] text-white/60 mt-1.5 leading-relaxed">Tu reserva queda confirmada en cuanto se aprueba el pago.</span>
                                 <span class="flex flex-wrap gap-2 mt-3">
                                     <span class="rv-chip">Tarjeta de crédito</span>
                                     <span class="rv-chip">Tarjeta débito</span>
@@ -4285,9 +4291,9 @@
                             <span class="flex-1 min-w-0">
                                 <span class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                                     <span class="text-white text-[0.9rem] font-medium">Pago asistido</span>
-                                    <span class="flex items-center gap-1.5 micro text-white/45"><svg class="w-3.5 h-3.5 text-brass" aria-hidden="true"><use href="#i-whatsapp"/></svg> Por WhatsApp</span>
+                                    <span class="flex items-center gap-1.5 micro text-white/60"><svg class="w-3.5 h-3.5 text-brass" aria-hidden="true"><use href="#i-whatsapp"/></svg> Por WhatsApp</span>
                                 </span>
-                                <span class="block text-[0.75rem] text-white/55 mt-1.5 leading-relaxed">Envías tu factura al hotel y te indicamos cómo realizar el pago. La reserva se confirma con el pago.</span>
+                                <span class="block text-[0.75rem] text-white/60 mt-1.5 leading-relaxed">Envías tu factura al hotel y te indicamos cómo realizar el pago. La reserva se confirma con el pago.</span>
                             </span>
                         </label>
                     </div>
@@ -4298,8 +4304,8 @@
                         <span data-ico="whatsapp" class="hidden"><svg class="w-4 h-4" aria-hidden="true"><use href="#i-whatsapp"/></svg></span>
                         <span id="rv-boton-txt">Confirmar reserva</span>
                     </button>
-                    <p id="rv-nota-pago" class="text-center text-[0.74rem] text-white/45 mt-4 leading-relaxed"></p>
-                    <p class="text-center text-[0.78rem] text-white/45 mt-8 hairline-light-t pt-6">
+                    <p id="rv-nota-pago" class="text-center text-[0.75rem] text-white/60 mt-4 leading-relaxed"></p>
+                    <p class="text-center text-[0.78rem] text-white/60 mt-8 hairline-light-t pt-6">
                         ¿Viajas en grupo grande o tienes una pregunta?
                         <a href="https://wa.me/573118884430" target="_blank" rel="noopener noreferrer" class="text-brass border-b border-brass/40 hover:border-brass whitespace-nowrap">Escríbenos por WhatsApp</a>
                     </p>
@@ -4316,7 +4322,7 @@
                 <div class="lg:col-span-4 reveal pantalla-movil">
                     <span class="eyebrow mb-6">Antes de venir</span>
                     <h2 class="display-lg text-ink mb-6">Preguntas frecuentes</h2>
-                    <p class="body-sm text-graphite/60 mb-8">
+                    <p class="body-sm text-graphite/70 mb-8">
                         Aquí resolvemos lo más consultado. Si necesitas el detalle práctico de la estadía,
                         revisa <a href="#informacion" class="text-ink border-b border-brass hover:text-brass transition-colors">Antes de tu llegada</a>.
                     </p>
@@ -4333,7 +4339,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 Desde la sección de reservas de esta página: eliges fechas y habitaciones, ves tu factura al
                                 instante y confirmas pagando el anticipo del 50 % o el total<span data-bold="si" class="hidden"> en línea con Bold
                                 (tarjeta de crédito o débito, PSE y más)</span>. El saldo se paga al llegar al hotel, en efectivo o con tarjeta.
@@ -4348,7 +4354,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 Depende de la habitación: desde <span data-tarifa="desde">$250.000</span> hasta
                                 <span data-tarifa="hasta">$290.000</span> por noche, el mismo valor cualquier día de la semana.
                                 Todas incluyen impuestos y desayuno. En <a href="#habitaciones" class="text-ink border-b border-brass hover:text-brass transition-colors">Habitaciones</a>
@@ -4363,7 +4369,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 El check-in es desde las 3:00 p. m. y el check-out hasta las 2:00 p. m. Después de entregar
                                 la habitación puedes seguir disfrutando de las zonas comunes hasta las 4:00 p. m.
                             </p>
@@ -4376,7 +4382,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 Hay piscina para adultos, piscina infantil, jacuzzi, sauna, baño turco y gimnasio; cancha
                                 polideportiva, mini tejo, juego de rana, billar y ping pong; huerta turística, alquiler de
                                 equipos de avistamiento y tienda de souvenirs. Todo en 9.000 m² de jardines con vista a la
@@ -4391,7 +4397,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 Sí. Además del desayuno incluido, el Restaurante Mangolé ofrece una carta de favoritos:
                                 churrasco, mojarra frita, costillas BBQ y pechuga gratinada, y Cabalante Bar, junto a la piscina, ofrece
                                 cervezas, tragos, cocteles, snacks y obleas. Los consumos se pagan aparte.
@@ -4405,7 +4411,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 Sí. Somos Pet Friendly en habitaciones seleccionadas, previa reserva, por
                                 <span data-tarifa="mascota">$70.000</span> COP por mascota por noche. La mascota debe tener
                                 vacunas al día y no puede ingresar a la piscina, al restaurante ni a las camas. Al llegar se
@@ -4420,7 +4426,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 Sí. El pasadía es un día en Cabaleón sin alojamiento. Escríbenos con la fecha y cuántas
                                 personas serían, y te contamos qué incluye, el valor y la disponibilidad.
                             </p>
@@ -4433,7 +4439,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 Estamos en la vereda Escalante de Tena, a unas 2 horas de Bogotá saliendo por la Calle 13 o
                                 por la vía Mondoñedo. El último tramo antes de la llegada es una vía veredal. Te enviamos el pin
                                 exacto al confirmar tu reserva. Los centros urbanos más cercanos son La Gran Vía (25 minutos) y
@@ -4448,7 +4454,7 @@
                             <i data-lucide="plus" class="faq-sign w-5 h-5 text-brass shrink-0 mt-1 transition-transform duration-500"></i>
                         </button>
                         <div class="faq-panel">
-                            <p class="body-sm text-graphite/65 pb-7 max-w-2xl">
+                            <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
                                 El clima es cálido durante el día (entre 24 °C y 28 °C), ideal para la piscina, y fresco
                                 en la noche. Te recomendamos ropa ligera, vestido de baño y un saco liviano para la tarde.
                             </p>
@@ -4577,19 +4583,19 @@
                         </a>
                     </div>
 
-                    <!-- Redes sociales: reemplazar cada # por el enlace real del hotel -->
-                    <span class="micro text-graphite/40 block mb-4 redes-contacto">Síguenos</span>
+                    <!-- Redes sociales del hotel -->
+                    <span class="micro text-graphite/70 block mb-4 redes-contacto">Síguenos</span>
                     <div class="flex gap-3 text-ink redes-contacto">
-                        <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.instagram.com/cabaleonhoteltena/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                         </a>
-                        <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.facebook.com/p/Hotel-Cabale%C3%B3n-61590948779933/" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8.5V6.8c0-.8.5-1.3 1.4-1.3H17V2.2C16.6 2.1 15.4 2 14.1 2 11.3 2 9.5 3.7 9.5 6.6v1.9H6.7v3.7h2.8V22H14v-9.8h2.9l.5-3.7H14z"/></svg>
                         </a>
-                        <a href="#" aria-label="TikTok" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.tiktok.com/@hotelcabaleon" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
                         </a>
-                        <a href="#" aria-label="YouTube" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.youtube.com/channel/UCIRMiAbiIO9L_ZY6kxFHxnQ" target="_blank" rel="noopener noreferrer" aria-label="YouTube de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-line flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.8 15.1V8.9l5.8 3.1-5.8 3.1z"/></svg>
                         </a>
                     </div>
@@ -4641,24 +4647,24 @@
 
                 <div class="lg:col-span-4">
                     <img src="logo-blanco.png" alt="Hotel Cabaleón" class="h-28 sm:h-32 w-auto mb-8">
-                    <p class="body-sm text-white/55 max-w-sm mb-8">
+                    <p class="body-sm text-white/60 max-w-sm mb-8">
                         Complejo turístico campestre en la vereda Escalante de Tena, Cundinamarca, a dos horas de
                         Bogotá: 15 habitaciones y una cabaña, con atención personalizada. Descanso, piscina y naturaleza
                         entre montañas.
                     </p>
                     <div class="mb-8"><p class="sello-rnt sello-rnt--pie"><span class="sello-rnt-titulo"><svg class="sello-rnt-estrella" aria-hidden="true"><use href="#i-estrella"/></svg> Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726</span></p></div>
-                    <!-- Redes sociales: reemplazar cada # por el enlace real del hotel -->
+                    <!-- Redes sociales del hotel -->
                     <div class="flex gap-3">
-                        <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.instagram.com/cabaleonhoteltena/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                         </a>
-                        <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.facebook.com/p/Hotel-Cabale%C3%B3n-61590948779933/" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8.5V6.8c0-.8.5-1.3 1.4-1.3H17V2.2C16.6 2.1 15.4 2 14.1 2 11.3 2 9.5 3.7 9.5 6.6v1.9H6.7v3.7h2.8V22H14v-9.8h2.9l.5-3.7H14z"/></svg>
                         </a>
-                        <a href="#" aria-label="TikTok" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.tiktok.com/@hotelcabaleon" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
                         </a>
-                        <a href="#" aria-label="YouTube" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
+                        <a href="https://www.youtube.com/channel/UCIRMiAbiIO9L_ZY6kxFHxnQ" target="_blank" rel="noopener noreferrer" aria-label="YouTube de Hotel Cabaleón" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.8 15.1V8.9l5.8 3.1-5.8 3.1z"/></svg>
                         </a>
                         <a href="https://maps.app.goo.gl/tFjXZFSAjQHFDaHWA" target="_blank" rel="noopener noreferrer" aria-label="Ver en Google Maps" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
@@ -4698,15 +4704,15 @@
                     <h3 class="micro text-brass mb-6">Hotel Cabaleón</h3>
                     <ul class="space-y-5 body-sm text-white/60">
                         <li>
-                            <span class="block micro text-white/35 mb-1.5">Teléfono y WhatsApp</span>
+                            <span class="block micro text-white/60 mb-1.5">Teléfono y WhatsApp</span>
                             <a href="https://wa.me/573118884430" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">311 888 4430</a>
                         </li>
                         <li>
-                            <span class="block micro text-white/35 mb-1.5">Correo</span>
+                            <span class="block micro text-white/60 mb-1.5">Correo</span>
                             <a href="mailto:informacion@hotelcabaleon.com" class="hover:text-white transition-colors break-all">informacion@hotelcabaleon.com</a>
                         </li>
                         <li>
-                            <span class="block micro text-white/35 mb-1.5">Dirección</span>
+                            <span class="block micro text-white/60 mb-1.5">Dirección</span>
                             <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Hotel%20Cabale%C3%B3n%2C%20Vereda%20Escalante%2C%20Tena%2C%20Cundinamarca" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Hotel Cabaleón, Ramal de Escalante, Vereda Escalante, Tena, Cundinamarca</a>
                         </li>
                     </ul>
@@ -4715,11 +4721,11 @@
             </div>
 
             <div class="hairline-light-t py-7 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-                <div class="text-[0.68rem] text-white/35 tracking-wide leading-relaxed">
+                <div class="text-[0.75rem] text-white/60 tracking-wide leading-relaxed">
                     <p>&copy; 2026 Hotel Cabaleón · RNT 146726 · Tena, Cundinamarca. Todos los derechos reservados.</p>
                     <p>Hotel Cabaleón rechaza la explotación y el abuso sexual de niños, niñas y adolescentes (Ley 1336 de 2009).</p>
                 </div>
-                <div class="flex flex-wrap justify-center gap-6 micro text-white/35">
+                <div class="flex flex-wrap justify-center gap-6 micro text-white/60">
                     <a href="admin.html" class="hover:text-brass transition-colors">Acceso propietario</a>
                 </div>
             </div>
@@ -4745,10 +4751,10 @@
             <div class="md:overflow-y-auto p-7 sm:p-10">
                 <span id="rm-tipo" class="micro text-brass-deep block mb-3"></span>
                 <h3 id="rm-nombre" class="display-md text-ink mb-4"></h3>
-                <div id="rm-meta" class="flex flex-wrap items-center gap-x-5 gap-y-2 micro text-graphite/45 mb-6"></div>
+                <div id="rm-meta" class="flex flex-wrap items-center gap-x-5 gap-y-2 micro text-graphite/70 mb-6"></div>
                 <div id="rm-desc" class="space-y-3 body-sm text-graphite/70 mb-8"></div>
 
-                <span class="micro text-graphite/40 block mb-2">Ficha técnica</span>
+                <span class="micro text-graphite/70 block mb-2">Ficha técnica</span>
                 <dl class="mb-8">
                     <div class="spec-row"><dt>Capacidad</dt><dd id="rm-cap"></dd></div>
                     <div class="spec-row"><dt>Tamaño</dt><dd id="rm-m2"></dd></div>
@@ -4757,10 +4763,10 @@
                     <div class="spec-row"><dt>Ideal para</dt><dd id="rm-ideal"></dd></div>
                 </dl>
 
-                <span class="micro text-graphite/40 block mb-4">Comodidades</span>
+                <span class="micro text-graphite/70 block mb-4">Comodidades</span>
                 <ul id="rm-comodidades" class="grid grid-cols-1 xs:grid-cols-2 gap-y-2.5 gap-x-4 mb-8"></ul>
 
-                <span class="micro text-graphite/40 block mb-4">Servicios incluidos</span>
+                <span class="micro text-graphite/70 block mb-4">Servicios incluidos</span>
                 <ul class="grid grid-cols-1 xs:grid-cols-2 gap-y-2.5 gap-x-4 mb-9">
                     <li class="flex items-center gap-2.5 body-sm text-graphite/70"><i data-lucide="coffee" class="w-3.5 h-3.5 text-brass shrink-0"></i> Desayuno</li>
                     <li class="flex items-center gap-2.5 body-sm text-graphite/70"><i data-lucide="waves" class="w-3.5 h-3.5 text-brass shrink-0"></i> Piscinas y zonas verdes</li>
@@ -4772,15 +4778,15 @@
                 <div class="hairline-t pt-7">
                     <div class="grid grid-cols-2 gap-6 mb-2">
                         <div>
-                            <span id="rm-finde-label" class="micro text-graphite/40 block mb-1.5">Fin de semana y festivos</span>
+                            <span id="rm-finde-label" class="micro text-graphite/70 block mb-1.5">Fin de semana y festivos</span>
                             <span id="rm-finde" class="font-display text-3xl sm:text-4xl text-ink"></span>
                         </div>
                         <div id="rm-semana-caja">
-                            <span class="micro text-graphite/40 block mb-1.5">Domingo a jueves</span>
+                            <span class="micro text-graphite/70 block mb-1.5">Domingo a jueves</span>
                             <span id="rm-semana" class="font-display text-3xl sm:text-4xl text-ink"></span>
                         </div>
                     </div>
-                    <p class="text-[0.7rem] text-graphite/45 mb-7">COP por noche · Impuestos y desayuno incluidos · Anticipo del 50 % para confirmar</p>
+                    <p class="text-[0.75rem] text-graphite/70 mb-7">COP por noche · Impuestos y desayuno incluidos · Anticipo del 50 % para confirmar</p>
 
                     <div class="grid grid-cols-1 xs:grid-cols-2 gap-3 mb-6">
                         <button type="button" id="rm-consultar" class="btn btn-outline text-ink"><svg class="w-4 h-4" aria-hidden="true"><use href="#i-whatsapp"/></svg> Preguntar</button>
@@ -4789,7 +4795,7 @@
 
                     <div class="flex items-center justify-between gap-4 hairline-t pt-5">
                         <button type="button" onclick="stepRoom(-1)" class="link-arrow text-ink"><i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Anterior</button>
-                        <button type="button" onclick="closeRoom()" class="micro text-graphite/50 hover:text-ink transition-colors">Volver a la lista</button>
+                        <button type="button" onclick="closeRoom()" class="micro text-graphite/70 hover:text-ink transition-colors">Volver a la lista</button>
                         <button type="button" onclick="stepRoom(1)" class="link-arrow text-ink">Siguiente <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
                     </div>
                 </div>
@@ -4813,7 +4819,7 @@
             <figcaption class="text-center mt-5">
                 <span id="lightbox-cat" class="block micro text-brass mb-2"></span>
                 <span id="lightbox-caption" class="font-display text-xl sm:text-2xl text-white/90"></span>
-                <span id="lightbox-count" class="block micro text-white/35 mt-2"></span>
+                <span id="lightbox-count" class="block micro text-white/60 mt-2"></span>
                 <a id="lightbox-original" href="#" target="_blank" rel="noopener" class="hidden micro text-brass mt-3 border-b border-brass/50 hover:text-white transition-colors">Ver foto original ↗</a>
             </figcaption>
             <div id="lightbox-thumbs" class="reels hidden sm:flex items-center gap-2 mt-6 overflow-x-auto py-1"></div>
@@ -4863,10 +4869,10 @@
     <button type="button" id="pedido-flotante" class="is-hidden bg-ink text-white shadow-[0_18px_40px_-16px_rgba(10,33,46,0.75)] flex items-center gap-4 pl-5 pr-6 py-3" onclick="abrirPedido()" aria-label="Ver mi pedido">
         <span class="relative shrink-0">
             <svg class="w-6 h-6 text-brass" aria-hidden="true"><use href="#i-cloche"/></svg>
-            <span class="absolute -top-2 -right-3 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-brass text-ink text-[0.6rem] font-semibold flex items-center justify-center" data-pedido-cuenta>0</span>
+            <span class="absolute -top-2 -right-3 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-brass text-ink text-[0.75rem] font-semibold flex items-center justify-center" data-pedido-cuenta>0</span>
         </span>
         <span class="flex flex-col items-start leading-tight text-left min-w-0">
-            <span class="micro text-white/55 truncate">Tu pedido</span>
+            <span class="micro text-white/60 truncate">Tu pedido</span>
             <span class="font-display text-lg" id="pedido-total-flot">$0</span>
         </span>
         <span class="ml-auto micro text-brass pl-3">Ver</span>
@@ -4886,15 +4892,15 @@
 
         <div class="flex-1 overflow-y-auto px-6 py-4">
             <ul id="pedido-lista" class="divide-y divide-line"></ul>
-            <p id="pedido-vacio" class="body-sm text-graphite/55 py-8 text-center">Aún no has agregado nada.<br>Elige platos de Mangolé o bebidas de Cabalante.</p>
+            <p id="pedido-vacio" class="body-sm text-graphite/70 py-8 text-center">Aún no has agregado nada.<br>Elige platos de Mangolé o bebidas de Cabalante.</p>
 
             <div class="flex items-baseline justify-between hairline-t pt-4 mt-2 mb-6">
-                <span class="micro text-graphite/50">Total</span>
+                <span class="micro text-graphite/70">Total</span>
                 <span id="pedido-total" class="font-display text-3xl text-ink">$0</span>
             </div>
 
             <form id="pedido-form" class="space-y-3" novalidate onsubmit="return false;">
-                <span class="micro text-graphite/45 block">Datos del pedido</span>
+                <span class="micro text-graphite/70 block">Datos del pedido</span>
                 <input id="pd-nombre" class="field-box" placeholder="Tu nombre" autocomplete="name" maxlength="80" aria-label="Tu nombre">
                 <div class="grid grid-cols-2 gap-3">
                     <select id="pd-dia" class="field-box" aria-label="Día"></select>
@@ -4914,11 +4920,11 @@
                 </div>
                 <input id="pd-habitacion" class="field-box" placeholder="Habitación (si estás hospedado)" maxlength="20" aria-label="Habitación">
                 <textarea id="pd-notas" class="field-box" style="min-height: 4.5rem" placeholder="Notas: alergias, término de la carne…" maxlength="300" aria-label="Notas del pedido"></textarea>
-                <label id="pd-edad-wrap" class="hidden items-start gap-3 text-[0.75rem] text-graphite/65 leading-relaxed cursor-pointer">
+                <label id="pd-edad-wrap" class="hidden items-start gap-3 text-[0.75rem] text-graphite/70 leading-relaxed cursor-pointer">
                     <input id="pd-edad" type="checkbox" class="mt-1 shrink-0 accent-[#0A212E]">
                     <span>Confirmo que soy mayor de edad. Las bebidas alcohólicas solo se venden a mayores de 18 años.</span>
                 </label>
-                <p class="text-[0.7rem] text-graphite/45 leading-relaxed">Mangolé: almuerzo de 12:30 a 3:00 p. m. y cena de 6:00 a 7:30 p. m. · Cabalante Bar: de 9:30 a. m. a 5:30 p. m.</p>
+                <p class="text-[0.75rem] text-graphite/70 leading-relaxed">Mangolé: almuerzo de 12:30 a 3:00 p. m. y cena de 6:00 a 7:30 p. m. · Cabalante Bar: de 9:30 a. m. a 5:30 p. m.</p>
                 <p id="pd-msg" class="hidden text-[0.8rem] text-[#A03C3C]" role="alert"></p>
             </form>
         </div>
@@ -4926,8 +4932,8 @@
         <div class="px-6 py-5 border-t border-line bg-white">
             <button type="button" onclick="enviarPedido()" class="btn btn-ink w-full"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-4 h-4" viewBox="0 0 16 16"><path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/></svg> Enviar pedido por WhatsApp</button>
             <div class="flex items-center justify-between gap-3 mt-3">
-                <p class="text-[0.7rem] text-graphite/45">Te confirmamos el pedido, la hora y la forma de pago.</p>
-                <button type="button" onclick="vaciarPedido()" class="text-[0.7rem] text-graphite/50 underline hover:text-ink shrink-0">Vaciar</button>
+                <p class="text-[0.75rem] text-graphite/70">Te confirmamos el pedido, la hora y la forma de pago.</p>
+                <button type="button" onclick="vaciarPedido()" class="text-[0.75rem] text-graphite/70 underline hover:text-ink shrink-0">Vaciar</button>
             </div>
         </div>
     </aside>
@@ -4938,13 +4944,13 @@
     <button type="button" id="reserva-flotante" class="is-hidden text-white flex items-center gap-4 pl-5 pr-6 py-3" onclick="abrirCarrito()" aria-label="Ver tu reserva">
         <span class="relative shrink-0">
             <svg class="w-6 h-6 text-brass" aria-hidden="true"><use href="#i-llave"/></svg>
-            <span id="rf-cuenta" class="absolute -top-2 -right-3 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-brass text-ink text-[0.6rem] font-semibold flex items-center justify-center">0</span>
+            <span id="rf-cuenta" class="absolute -top-2 -right-3 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-brass text-ink text-[0.75rem] font-semibold flex items-center justify-center">0</span>
         </span>
         <span class="flex flex-col items-start leading-tight text-left min-w-0">
-            <span class="micro text-white/55">Tu reserva</span>
+            <span class="micro text-white/60">Tu reserva</span>
             <span class="flex items-baseline gap-2 whitespace-nowrap">
                 <span id="rf-total" class="font-display text-lg">$0</span>
-                <span id="rf-noches" class="text-[0.68rem] text-white/50"></span>
+                <span id="rf-noches" class="text-[0.75rem] text-white/60"></span>
             </span>
         </span>
         <span class="ml-auto micro text-brass pl-3">Ver</span>
@@ -4965,7 +4971,7 @@
         <div class="flex-1 overflow-y-auto px-6 py-5">
             <div id="ca-estadia" class="bg-white border border-line px-4 py-4"></div>
             <ul id="ca-lista" class="divide-y divide-line mt-1"></ul>
-            <p id="ca-vacio" class="hidden body-sm text-graphite/55 py-8 text-center">Aún no has elegido habitación.<br>Agrégala en el paso 02 y aquí verás el total de tu estadía.</p>
+            <p id="ca-vacio" class="hidden body-sm text-graphite/70 py-8 text-center">Aún no has elegido habitación.<br>Agrégala en el paso 02 y aquí verás el total de tu estadía.</p>
             <p id="ca-aviso" class="hidden items-start gap-2 text-[0.78rem] text-[#8A5A2B] border border-[#C9A063]/50 bg-[#C9A063]/10 px-4 py-3 mt-2" role="status"></p>
 
             <div id="ca-cuentas">
@@ -4974,7 +4980,7 @@
                     <span class="micro text-ink">Total estadía</span>
                     <span id="ca-total" class="font-display text-3xl text-ink">$0</span>
                 </div>
-                <span class="micro text-graphite/45 block mt-7 mb-3">¿Cuánto pagas hoy?</span>
+                <span class="micro text-graphite/70 block mt-7 mb-3">¿Cuánto pagas hoy?</span>
                 <div class="grid grid-cols-2 gap-2">
                     <button type="button" class="ca-modo" data-modalidad="anticipo" onclick="elegirModalidad('anticipo')">
                         <span class="ca-modo-t" id="ca-anticipo-txt">Anticipo</span>
@@ -4985,15 +4991,15 @@
                         <span class="ca-modo-v" id="ca-pago-total">$0</span>
                     </button>
                 </div>
-                <p id="ca-saldo" class="text-[0.74rem] text-graphite/55 mt-3"></p>
+                <p id="ca-saldo" class="text-[0.75rem] text-graphite/70 mt-3"></p>
             </div>
         </div>
 
         <div class="px-6 py-5 border-t border-line bg-white">
             <button type="button" onclick="continuarReserva()" class="btn btn-ink w-full"><span id="ca-continuar">Continuar con la reserva</span> <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
             <div class="flex items-center justify-between gap-3 mt-3">
-                <p id="ca-nota" class="flex items-center gap-1.5 text-[0.7rem] text-graphite/50"></p>
-                <button type="button" onclick="vaciarReserva()" class="text-[0.7rem] text-graphite/50 underline hover:text-ink shrink-0">Vaciar</button>
+                <p id="ca-nota" class="flex items-center gap-1.5 text-[0.75rem] text-graphite/70"></p>
+                <button type="button" onclick="vaciarReserva()" class="text-[0.75rem] text-graphite/70 underline hover:text-ink shrink-0">Vaciar</button>
             </div>
         </div>
     </aside>
@@ -5007,12 +5013,12 @@
             </span>
             <div class="min-w-0 flex-1">
                 <span class="block font-display text-lg leading-none">Asistente Cabaleón</span>
-                <span class="flex items-center gap-1.5 text-[0.62rem] text-white/45 mt-1">
+                <span class="flex items-center gap-1.5 text-[0.75rem] text-white/60 mt-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-moss"></span> Respuestas al instante
                 </span>
             </div>
             <button type="button" onclick="mostrarMenu(true)" aria-label="Ver todos los temas"
-                    class="h-8 px-2.5 flex items-center gap-1.5 text-[0.6rem] font-semibold tracking-[0.14em] uppercase text-white/70 border border-white/20 hover:bg-white/10 hover:text-white transition-colors shrink-0">
+                    class="h-8 px-2.5 flex items-center gap-1.5 text-[0.6875rem] font-semibold tracking-[0.14em] uppercase text-white/70 border border-white/20 hover:bg-white/10 hover:text-white transition-colors shrink-0">
                 <i data-lucide="list" class="w-3.5 h-3.5"></i> Temas
             </button>
             <button type="button" onclick="toggleChat(false)" aria-label="Cerrar el asistente"
@@ -5076,6 +5082,12 @@
       "checkoutTime": "14:00",
       "petsAllowed": true,
       "hasMap": "https://maps.app.goo.gl/tFjXZFSAjQHFDaHWA",
+      "sameAs": [
+        "https://www.instagram.com/cabaleonhoteltena/",
+        "https://www.facebook.com/p/Hotel-Cabale%C3%B3n-61590948779933/",
+        "https://www.tiktok.com/@hotelcabaleon",
+        "https://www.youtube.com/channel/UCIRMiAbiIO9L_ZY6kxFHxnQ"
+      ],
       "amenityFeature": [
         { "@type": "LocationFeatureSpecification", "name": "Piscina para adultos", "value": true },
         { "@type": "LocationFeatureSpecification", "name": "Piscina infantil", "value": true },
@@ -5411,7 +5423,7 @@
                     '<div class="min-w-0">' +
                         '<span class="micro text-brass block mb-1.5">' + h.tipo + '</span>' +
                         '<h4 class="font-display text-xl sm:text-2xl text-white leading-tight">' + h.nombre + '</h4>' +
-                        '<p class="text-[0.72rem] text-white/45 mt-1">Hasta ' + h.capacidad + ' huéspedes · ' + h.camasCorto + ' · ' + h.m2 + ' m²</p>' +
+                        '<p class="text-[0.75rem] text-white/60 mt-1">Hasta ' + h.capacidad + ' huéspedes · ' + h.camasCorto + ' · ' + h.m2 + ' m²</p>' +
                         '<p class="text-[0.76rem] mt-2" data-hab-precio></p>' +
                     '</div>' +
                     '<div class="col-span-2 sm:col-span-1 flex items-center justify-between sm:flex-col sm:items-end gap-3 sm:gap-2 border-t border-white/10 sm:border-0 pt-3 sm:pt-0">' +
@@ -5420,7 +5432,7 @@
                             '<span data-hab-cant aria-live="polite">0</span>' +
                             '<button type="button" onclick="cambiarHabitacion(\'' + k + '\', 1)" aria-label="Agregar ' + h.nombre + '" data-mas>' + icono('plus', 'w-3.5 h-3.5') + '</button>' +
                         '</div>' +
-                        '<span class="text-[0.7rem] text-white/50 sm:order-2 sm:text-right sm:min-h-[1.05rem]" data-hab-nota></span>' +
+                        '<span class="text-[0.75rem] text-white/60 sm:order-2 sm:text-right sm:min-h-[1.05rem]" data-hab-nota></span>' +
                     '</div>' +
                 '</div>';
             }).join('');
@@ -5442,7 +5454,7 @@
                 fila.querySelector('[data-mas]').disabled = n >= max;
                 fila.querySelector('[data-hab-precio]').innerHTML =
                     '<span class="font-display text-lg text-white">' + COP(porHabitacion) + '</span>' +
-                    ' <span class="text-white/45">· ' + plural(noches, 'noche', 'noches') +
+                    ' <span class="text-white/60">· ' + plural(noches, 'noche', 'noches') +
                     (tarifaUnica(k) ? ' · ' + COP(t.semana) + ' la noche' : ' · ' + tipoNoches) + '</span>';
                 fila.querySelector('[data-hab-nota]').textContent = n ? 'Subtotal ' + COP(n * porHabitacion)
                     : !max ? 'Sin cupo en estas fechas'
@@ -5526,25 +5538,25 @@
             cliente.innerHTML = t.nombre
                 ? '<strong class="font-medium">' + escaparHtml(t.nombre) + '</strong>' +
                   (t.documento ? '<br>' + t.tipoDocumento + ' ' + escaparHtml(t.documento) : '') +
-                  (t.correo ? '<br><span class="text-graphite/60">' + escaparHtml(t.correo) + '</span>' : '')
-                : '<span class="text-graphite/45">Completa tus datos en el paso 3</span>';
+                  (t.correo ? '<br><span class="text-graphite/70">' + escaparHtml(t.correo) + '</span>' : '')
+                : '<span class="text-graphite/70">Completa tus datos en el paso 3</span>';
 
             const noches = nightsBetween();
             const mascotas = parseInt(booking.pets, 10);
             document.getElementById('fa-estadia').innerHTML =
                 formatShort(booking.checkin) + ' → ' + formatShort(booking.checkout) + '<br>' +
-                '<span class="text-graphite/60">' + plural(noches, 'noche', 'noches') + ' · ' + plural(parseInt(booking.guests, 10), 'huésped', 'huéspedes') +
+                '<span class="text-graphite/70">' + plural(noches, 'noche', 'noches') + ' · ' + plural(parseInt(booking.guests, 10), 'huésped', 'huéspedes') +
                 (mascotas ? ' · ' + plural(mascotas, 'mascota', 'mascotas') : '') + '</span>';
 
             document.getElementById('fa-vacia').classList.toggle('hidden', !!est);
             document.getElementById('fa-lineas').innerHTML = est ? est.lineas.map(l =>
                 '<tr><td><span class="block font-medium text-ink">' + l.desc + '</span>' +
-                '<span class="block text-[0.68rem] text-graphite/50 mt-0.5">' + l.det + '</span></td>' +
+                '<span class="block text-[0.75rem] text-graphite/70 mt-0.5">' + l.det + '</span></td>' +
                 '<td class="text-center">' + l.cant + '</td>' +
                 '<td class="text-right whitespace-nowrap">' + (l.valor < 0 ? '−' + COP(-l.valor) : COP(l.valor)) + '</td></tr>'
             ).join('') : '';
 
-            const fila = (dt, dd, clase) => '<div class="flex justify-between gap-4' + (clase ? ' ' + clase : '') + '"><dt class="text-graphite/55">' + dt + '</dt><dd class="text-ink">' + dd + '</dd></div>';
+            const fila = (dt, dd, clase) => '<div class="flex justify-between gap-4' + (clase ? ' ' + clase : '') + '"><dt class="text-graphite/70">' + dt + '</dt><dd class="text-ink">' + dd + '</dd></div>';
             document.getElementById('fa-totales').innerHTML = est
                 ? fila('Alojamiento · ' + plural(est.cuartos, 'habitación', 'habitaciones'), COP(est.alojamiento)) +
                   (est.descuento ? fila('Descuento', '−' + COP(est.descuento)) : '') +
@@ -5819,13 +5831,13 @@
 
             document.getElementById('ca-estadia').innerHTML =
                 '<div class="grid grid-cols-2 gap-4">' +
-                    '<div><span class="micro text-graphite/45 block mb-1.5">Llegada</span><span class="font-display text-xl text-ink leading-tight">' + formatLong(booking.checkin) + '</span></div>' +
-                    '<div><span class="micro text-graphite/45 block mb-1.5">Salida</span><span class="font-display text-xl text-ink leading-tight">' + formatLong(booking.checkout) + '</span></div>' +
+                    '<div><span class="micro text-graphite/70 block mb-1.5">Llegada</span><span class="font-display text-xl text-ink leading-tight">' + formatLong(booking.checkin) + '</span></div>' +
+                    '<div><span class="micro text-graphite/70 block mb-1.5">Salida</span><span class="font-display text-xl text-ink leading-tight">' + formatLong(booking.checkout) + '</span></div>' +
                 '</div>' +
                 '<div class="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-line">' +
-                    '<span class="text-[0.74rem] text-graphite/60">' + plural(noches, 'noche', 'noches') + ' · ' + plural(huespedes, 'huésped', 'huéspedes') +
+                    '<span class="text-[0.75rem] text-graphite/70">' + plural(noches, 'noche', 'noches') + ' · ' + plural(huespedes, 'huésped', 'huéspedes') +
                         (pets ? ' · ' + plural(pets, 'mascota', 'mascotas') : '') + '</span>' +
-                    '<button type="button" onclick="irAPaso(\'paso-fechas\')" class="text-[0.7rem] text-ink underline hover:text-brass-deep shrink-0">Cambiar</button>' +
+                    '<button type="button" onclick="irAPaso(\'paso-fechas\')" class="text-[0.75rem] text-ink underline hover:text-brass-deep shrink-0">Cambiar</button>' +
                 '</div>';
 
             const detalleNoches = [
@@ -5835,7 +5847,7 @@
             const otraLinea = (ic, titulo, det, valor) =>
                 '<li class="py-3.5 flex items-center gap-3">' +
                     '<span class="w-16 flex justify-center shrink-0">' + icono(ic, 'w-4 h-4 text-brass-deep') + '</span>' +
-                    '<div class="flex-1 min-w-0"><p class="text-[0.85rem] text-ink">' + titulo + '</p><p class="text-[0.7rem] text-graphite/50">' + det + '</p></div>' +
+                    '<div class="flex-1 min-w-0"><p class="text-[0.85rem] text-ink">' + titulo + '</p><p class="text-[0.75rem] text-graphite/70">' + det + '</p></div>' +
                     '<span class="font-display text-lg text-ink whitespace-nowrap">' + valor + '</span>' +
                 '</li>';
 
@@ -5851,7 +5863,7 @@
                         '<img src="' + miniatura(h.fotos[0]) + '" alt="" class="w-16 h-16 object-cover shrink-0">' +
                         '<div class="flex-1 min-w-0">' +
                             '<p class="font-display text-lg text-ink leading-tight">' + h.nombre + '</p>' +
-                            '<p class="text-[0.7rem] text-graphite/50 mt-0.5 mb-2.5">' + detalle + '</p>' +
+                            '<p class="text-[0.75rem] text-graphite/70 mt-0.5 mb-2.5">' + detalle + '</p>' +
                             '<div class="flex items-center gap-3">' +
                                 '<div class="inline-flex items-center border border-line bg-white">' +
                                     '<button type="button" onclick="cambiarHabitacion(\'' + k + '\', -1)" aria-label="Quitar ' + h.nombre + '" class="w-8 h-8 flex items-center justify-center text-ink hover:bg-bone">' + icono('minus', 'w-3 h-3') + '</button>' +
@@ -5859,7 +5871,7 @@
                                     '<button type="button" onclick="cambiarHabitacion(\'' + k + '\', 1)" aria-label="Agregar ' + h.nombre + '" class="w-8 h-8 flex items-center justify-center text-ink hover:bg-bone disabled:opacity-30 disabled:cursor-not-allowed"' +
                                         (n >= maxHabitaciones(k) ? ' disabled' : '') + '>' + icono('plus', 'w-3 h-3') + '</button>' +
                                 '</div>' +
-                                '<button type="button" onclick="cambiarHabitacion(\'' + k + '\', -' + n + ')" class="text-[0.68rem] text-graphite/50 underline hover:text-ink">Quitar</button>' +
+                                '<button type="button" onclick="cambiarHabitacion(\'' + k + '\', -' + n + ')" class="text-[0.75rem] text-graphite/70 underline hover:text-ink">Quitar</button>' +
                             '</div>' +
                         '</div>' +
                         '<span class="font-display text-lg text-ink whitespace-nowrap">' + COP(n * porHabitacion) + '</span>' +
@@ -5880,7 +5892,7 @@
             document.getElementById('ca-cuentas').classList.toggle('hidden', !est);
 
             if (est) {
-                const fila = (dt, dd) => '<div class="flex justify-between gap-4"><dt class="text-graphite/55">' + dt + '</dt><dd class="text-ink">' + dd + '</dd></div>';
+                const fila = (dt, dd) => '<div class="flex justify-between gap-4"><dt class="text-graphite/70">' + dt + '</dt><dd class="text-ink">' + dd + '</dd></div>';
                 document.getElementById('ca-totales').innerHTML =
                     fila('Alojamiento · ' + plural(est.cuartos, 'habitación', 'habitaciones'), COP(est.alojamiento)) +
                     (est.descuento ? fila('Descuento', '−' + COP(est.descuento)) : '') +
@@ -6775,7 +6787,7 @@
                 (estado === 'aprobado' ? 'Enviar confirmación por WhatsApp' : 'Escribir por WhatsApp') + '</button>';
             const factura = '<button type="button" onclick="verFacturaPagada()" class="btn btn-outline text-ink w-full"><i data-lucide="receipt-text" class="w-4 h-4"></i> Ver e imprimir factura</button>';
             const reintentar = '<button type="button" onclick="reintentarPago()" class="btn btn-ink w-full"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Intentar de nuevo</button>';
-            const cerrar = '<button type="button" onclick="cerrarPago()" class="text-[0.75rem] text-graphite/55 underline hover:text-ink py-1">Cerrar</button>';
+            const cerrar = '<button type="button" onclick="cerrarPago()" class="text-[0.75rem] text-graphite/70 underline hover:text-ink py-1">Cerrar</button>';
             document.getElementById('pr-acciones').innerHTML =
                 (estado === 'rechazado' && pago.habitaciones ? reintentar : '') + wa +
                 (estado === 'aprobado' && pago.habitaciones ? factura : '') + cerrar;
@@ -7038,7 +7050,7 @@
             grid.innerHTML = pares.map((par, p) =>
                 '<div class="hab-par' + (par.length === 1 ? ' es-unica' : '') + '">' +
                     '<div class="hab-par-cabeza">' +
-                        '<span class="micro text-graphite/45">' + quienes + ' · ' +
+                        '<span class="micro text-graphite/70">' + quienes + ' · ' +
                             (claves.length === 1 ? '1 habitación' : (p * 2 + 1) + (par.length > 1 ? '–' + (p * 2 + 2) : '') + ' de ' + claves.length) + '</span>' +
                         '<button type="button" class="hab-cambiar" onclick="volverAVentanaHab()">Cambiar</button>' +
                     '</div>' +
@@ -7060,24 +7072,24 @@
                 '<div class="p-6 sm:p-8 flex flex-col flex-grow">' +
                     '<span class="micro text-brass-deep mb-3">' + h.tipo + '</span>' +
                     '<h3 class="display-md text-ink mb-4">' + h.nombre + '</h3>' +
-                    '<div class="flex flex-wrap items-center gap-x-5 gap-y-2 micro text-graphite/45 mb-5">' +
+                    '<div class="flex flex-wrap items-center gap-x-5 gap-y-2 micro text-graphite/70 mb-5">' +
                         '<span class="flex items-center gap-1.5">' + icono('users', 'w-3.5 h-3.5') + ' ' + h.capacidad + ' huéspedes</span>' +
                         '<span class="flex items-center gap-1.5">' + icono('maximize', 'w-3.5 h-3.5') + ' ' + h.m2 + ' m²</span>' +
                         '<span class="flex items-center gap-1.5">' + icono('bed-double', 'w-3.5 h-3.5') + ' ' + h.camasCorto + '</span>' +
                         iconosEnTodas() +
                     '</div>' +
-                    '<p class="body-sm text-graphite/65 mb-7">' + h.resumen + '</p>' +
+                    '<p class="body-sm text-graphite/70 mb-7">' + h.resumen + '</p>' +
                     '<ul class="grid grid-cols-1 xs:grid-cols-2 gap-y-2.5 gap-x-4 mb-7 hairline-t pt-6">' + h.destacados.map(itemIcono).join('') + '</ul>' +
                     '<div class="hairline-t pt-6 mt-auto">' +
                         '<div class="flex items-end justify-between gap-4 mb-1.5">' +
-                            '<span class="micro text-graphite/40">' + (tarifaUnica(key) ? 'Tarifa por noche' : 'Fin de semana y festivos') + '</span>' +
+                            '<span class="micro text-graphite/70">' + (tarifaUnica(key) ? 'Tarifa por noche' : 'Fin de semana y festivos') + '</span>' +
                             '<span class="micro text-moss">' + h.etiqueta + '</span>' +
                         '</div>' +
                         '<div class="flex items-baseline gap-2 mb-1">' +
                             '<span class="font-display text-3xl text-ink">' + COP(t.finde) + '</span>' +
-                            '<span class="body-sm text-graphite/50">COP / noche</span>' +
+                            '<span class="body-sm text-graphite/70">COP / noche</span>' +
                         '</div>' +
-                        '<p class="text-[0.72rem] text-graphite/50 mb-6">' +
+                        '<p class="text-[0.75rem] text-graphite/70 mb-6">' +
                             (tarifaUnica(key) ? '' : 'Domingo a jueves <strong class="font-medium text-graphite/75">' + COP(t.semana) + '</strong> · ') +
                             'Impuestos y desayuno incluidos</p>' +
                         '<div class="grid grid-cols-2 gap-3">' +
@@ -7357,14 +7369,14 @@
                             '<span class="micro text-moss text-right">' + p.tipo + '</span>' +
                         '</div>' +
                         '<h3 class="font-display text-2xl text-ink mb-1.5">' + p.nombre + '</h3>' +
-                        '<p class="micro text-graphite/45 mb-6">' + p.detalle + '</p>' +
+                        '<p class="micro text-graphite/70 mb-6">' + p.detalle + '</p>' +
                         '<ul class="space-y-2.5 mb-8">' + p.incluye.map(x =>
                             '<li class="flex items-start gap-2.5 body-sm text-graphite/70">' + icono('check', 'w-3.5 h-3.5 text-brass shrink-0 mt-1.5') + '<span>' + x + '</span></li>').join('') +
                         '</ul>' +
                         '<div class="mt-auto hairline-t pt-5">' +
                             (p.precio
-                                ? '<p class="font-display text-3xl text-ink leading-none mb-1.5">' + COP(p.precio) + '</p><p class="text-[0.72rem] text-graphite/50 mb-4">' + (p.nota || '') + '</p>'
-                                : '<p class="text-[0.72rem] text-graphite/50 mb-4">Valor según fechas y número de personas</p>') +
+                                ? '<p class="font-display text-3xl text-ink leading-none mb-1.5">' + COP(p.precio) + '</p><p class="text-[0.75rem] text-graphite/70 mb-4">' + (p.nota || '') + '</p>'
+                                : '<p class="text-[0.75rem] text-graphite/70 mb-4">Valor según fechas y número de personas</p>') +
                             '<button type="button" onclick="cotizarPlan(\'' + p.id + '\')" class="btn btn-ink w-full">' + icono('message-circle', 'w-4 h-4') + (p.precio ? ' Reservar' : ' Cotizar plan') + '</button>' +
                         '</div>' +
                     '</div>' +
@@ -7392,13 +7404,13 @@
                     '<div class="relative">' +
                         '<a href="' + aficheDe(p.foto) + '" target="_blank" rel="noopener" class="group/afiche block relative overflow-hidden" aria-label="Ver el afiche de ' + p.nombre + '">' +
                             '<img src="plato-' + p.foto + '.jpg" alt="' + p.nombre + '" class="w-full aspect-[4/3] object-cover group-hover/afiche:scale-[1.04] transition-transform duration-700" loading="lazy">' +
-                            '<span class="absolute bottom-2 right-2 bg-ink/85 text-white text-[0.56rem] font-semibold uppercase tracking-[0.14em] px-2 py-1 opacity-0 group-hover/afiche:opacity-100 transition-opacity">Ver afiche</span>' +
+                            '<span class="absolute bottom-2 right-2 bg-ink/85 text-white text-[0.6875rem] font-semibold uppercase tracking-[0.14em] px-2 py-1 opacity-0 group-hover/afiche:opacity-100 transition-opacity">Ver afiche</span>' +
                         '</a>' +
-                        (p.bebida ? '<span class="absolute top-2 left-2 bg-white/95 text-moss text-[0.58rem] font-semibold uppercase tracking-[0.14em] px-2 py-1">+ Bebida del día</span>' : '') +
+                        (p.bebida ? '<span class="absolute top-2 left-2 bg-white/95 text-moss text-[0.6875rem] font-semibold uppercase tracking-[0.14em] px-2 py-1">+ Bebida del día</span>' : '') +
                     '</div>' +
                     '<div class="p-4 sm:p-5 flex flex-col flex-grow">' +
                         '<h4 class="font-display text-lg sm:text-xl text-ink leading-snug mb-1.5">' + p.nombre + '</h4>' +
-                        (p.desc ? '<p class="text-[0.75rem] leading-relaxed text-graphite/60 mb-3">' + p.desc + '</p>' : '') +
+                        (p.desc ? '<p class="text-[0.75rem] leading-relaxed text-graphite/70 mb-3">' + p.desc + '</p>' : '') +
                         '<span class="mt-auto font-display text-xl sm:text-2xl text-brass-deep">' + COP(p.precio) + '</span>' +
                         '<div class="plato-ctrl mt-3" data-plato="' + p.foto + '"></div>' +
                     '</div>' +
@@ -7482,7 +7494,7 @@
         function controlPlato(id) {
             const n = pedido[id] || 0;
             if (!n) {
-                return '<button type="button" onclick="cambiarCantidad(\'' + id + '\', 1)" class="w-full h-10 border border-ink/80 text-ink text-[0.62rem] font-semibold uppercase tracking-[0.16em] flex items-center justify-center gap-2 hover:bg-ink hover:text-white transition-colors">' +
+                return '<button type="button" onclick="cambiarCantidad(\'' + id + '\', 1)" class="w-full h-10 border border-ink/80 text-ink text-[0.6875rem] font-semibold uppercase tracking-[0.16em] flex items-center justify-center gap-2 hover:bg-ink hover:text-white transition-colors">' +
                        icono('plus', 'w-3.5 h-3.5') + ' Agregar</button>';
             }
             return '<div class="w-full h-10 bg-ink text-white grid grid-cols-[2.5rem_1fr_2.5rem] items-center">' +
@@ -7533,7 +7545,7 @@
                         : '<span class="w-14 h-14 bg-sand flex items-center justify-center shrink-0">' + icono(x.p.icono, 'w-5 h-5 text-brass-deep') + '</span>') +
                     '<div class="flex-1 min-w-0">' +
                         '<p class="font-display text-lg text-ink leading-tight">' + x.p.nombre + '</p>' +
-                        '<p class="text-[0.72rem] text-graphite/50 mb-2">' + COP(x.p.precio) + ' c/u' + (x.p.bebida ? ' · incluye bebida del día' : '') + '</p>' +
+                        '<p class="text-[0.75rem] text-graphite/70 mb-2">' + COP(x.p.precio) + ' c/u' + (x.p.bebida ? ' · incluye bebida del día' : '') + '</p>' +
                         '<div class="inline-flex items-center border border-line bg-white">' +
                             '<button type="button" onclick="cambiarCantidad(\'' + x.id + '\', -1)" aria-label="Quitar uno" class="w-8 h-8 flex items-center justify-center text-ink hover:bg-bone">' + icono('minus', 'w-3 h-3') + '</button>' +
                             '<span class="w-8 text-center text-sm text-ink">' + x.n + '</span>' +
