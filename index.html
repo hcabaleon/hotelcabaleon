@@ -7385,7 +7385,7 @@
                     if (!b) return;
                     const { ancho, vista, total, actual } = grupos();
                     const destino = Math.min(total - 1, Math.max(0, actual + Number(b.dataset.dir)));
-                    c.scrollTo({ left: Math.min(c.scrollWidth - c.clientWidth, destino * vista * ancho), behavior: 'smooth' });
+                    deslizarTira(c, destino * vista * ancho);
                 });
                 let espera;
                 c.addEventListener('scroll', () => { clearTimeout(espera); espera = setTimeout(pintar, 60); }, { passive: true });
@@ -7393,6 +7393,31 @@
                 new MutationObserver(pintar).observe(c, { childList: true });
                 pintar();
             });
+        }
+
+        /* Desliza una tira (carrusel o clips) hasta `izquierda`, con suavidad.
+           Safari (iPhone y Mac) a veces no mueve, o devuelve al inicio, una tira con ajuste por
+           tarjeta (scroll-snap) cuando se desliza desde un botón: el ajuste se apaga mientras se
+           desliza y vuelve al llegar. El destino siempre es el comienzo de una tarjeta (o el final). */
+        function deslizarTira(tira, izquierda) {
+            const destino = Math.round(Math.max(0, Math.min(tira.scrollWidth - tira.clientWidth, izquierda)));
+            if (tira._finDeslizar) tira._finDeslizar();
+            const llego = () => { if (Math.abs(tira.scrollLeft - destino) <= 2) fin(); };
+            const fin = () => {
+                clearTimeout(tope);
+                tira.removeEventListener('scroll', llego);
+                tira.style.scrollSnapType = '';
+                tira._finDeslizar = null;
+                tira._destino = null;
+            };
+            const tope = setTimeout(fin, 1200);
+            tira._finDeslizar = fin;
+            tira._destino = destino;   // un segundo clic sigue desde aquí, no desde la mitad del camino
+            tira.style.scrollSnapType = 'none';
+            tira.addEventListener('scroll', llego, { passive: true });
+            if (menosMovimiento || !('scrollBehavior' in document.documentElement.style)) tira.scrollLeft = destino;
+            else tira.scrollTo({ left: destino, behavior: 'smooth' });
+            llego();
         }
 
         /* Afiches y clips: sus botones se apagan en los extremos de la tira */
@@ -8072,9 +8097,25 @@
             }
         }
 
+        /* "Ver más" de los clips: lleva al primer clip que no se ve completo (el grupo siguiente);
+           la flecha de volver, al grupo anterior. Siempre al comienzo de un clip. */
         function moverClips(dir) {
             const reels = document.getElementById('reels');
-            reels.scrollBy({ left: dir * reels.clientWidth * 0.8, behavior: 'smooth' });
+            const clips = [...reels.children];
+            if (!clips.length) return;
+            const base = clips[0].offsetLeft;
+            const inicios = clips.map(c => c.offsetLeft - base);
+            const actual = reels._destino ?? reels.scrollLeft, ancho = reels.clientWidth;
+            let destino;
+            if (dir > 0) {
+                const i = clips.findIndex((c, k) => inicios[k] + c.offsetWidth > actual + ancho + 2);
+                destino = i < 0 ? reels.scrollWidth : inicios[i];
+                if (destino <= actual + 2) destino = inicios.find(x => x > actual + 2) ?? reels.scrollWidth;
+            } else {
+                destino = inicios.find(x => x >= actual - ancho - 2) ?? 0;
+                if (destino >= actual - 2) destino = [...inicios].reverse().find(x => x < actual - 2) ?? 0;
+            }
+            deslizarTira(reels, destino);
         }
 
         function paintLightbox() {
