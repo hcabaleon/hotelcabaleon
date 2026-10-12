@@ -38,7 +38,7 @@
 
     /* De dónde llegó la visita (misma lógica que index.html) */
     const FUENTES_POR_SITIO = [
-        [/(^|\.)google\./, 'Google', 'Buscador'], [/(^|\.)bing\.com$/, 'Bing', 'Buscador'],
+        [/^maps\.google\./, 'Google Maps', 'Perfil del negocio'], [/(^|\.)google\./, 'Google', 'Buscador'], [/(^|\.)bing\.com$/, 'Bing', 'Buscador'],
         [/(^|\.)(duckduckgo\.com|yahoo\.com|ecosia\.org)$/, 'Otros buscadores', 'Buscador'],
         [/(^|\.)instagram\.com$/, 'Instagram', 'Redes'], [/(^|\.)(facebook\.com|fb\.com|fb\.me|messenger\.com)$/, 'Facebook', 'Redes'],
         [/(^|\.)(whatsapp\.com|wa\.me)$/, 'WhatsApp', 'Redes'], [/(^|\.)tiktok\.com$/, 'TikTok', 'Redes'],
@@ -47,7 +47,8 @@
     ];
     const FUENTES_UTM = {
         google: 'Google', facebook: 'Facebook', fb: 'Facebook', instagram: 'Instagram', ig: 'Instagram',
-        whatsapp: 'WhatsApp', wa: 'WhatsApp', tiktok: 'TikTok', youtube: 'YouTube', email: 'Correo', correo: 'Correo', qr: 'Código QR'
+        whatsapp: 'WhatsApp', wa: 'WhatsApp', tiktok: 'TikTok', youtube: 'YouTube', yt: 'YouTube', email: 'Correo', correo: 'Correo', qr: 'Código QR',
+        google_maps: 'Google Maps', maps: 'Google Maps', gmaps: 'Google Maps'
     };
     const MEDIOS_UTM = {
         cpc: 'Pagado', ppc: 'Pagado', paid: 'Pagado', pagado: 'Pagado', ads: 'Pagado', social: 'Redes', redes: 'Redes',

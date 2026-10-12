@@ -371,6 +371,14 @@
             display: flex; align-items: center; gap: 0.6rem; max-width: calc(100vw - 2rem);
         }
         #toast.is-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+        /* Enlaces listos para las redes */
+        .enl-fila { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; }
+        .enl-fila > div { flex: 1 1 auto; }
+        .enl-nombre { display: block; font-weight: 600; font-size: 0.875rem; color: var(--ink); }
+        .enl-donde { display: block; font-size: 0.8rem; color: rgba(32, 41, 46, 0.7); margin-top: 0.15rem; }
+        .enl-url { display: block; margin-top: 0.35rem; font-size: 0.75rem; color: var(--ink); word-break: break-all; }
+        @media (max-width: 639px) { .enl-fila { flex-direction: column; align-items: stretch; } }
     </style>
 </head>
 <body>
@@ -1066,9 +1074,20 @@
                         <!-- ENLACES -->
                         <div class="est-panel" data-est-panel="enlaces" role="tabpanel">
                             <figure class="card p-5 sm:p-6 mb-6">
+                                <figcaption class="mb-4">
+                                    <span class="est-titulo">Enlaces listos para tus redes</span>
+                                    <span class="block text-[0.8rem] text-graphite/70 mt-1 max-w-3xl leading-relaxed">
+                                        Copia el de cada red y pégalo donde dice. Todos llevan a la página del hotel y, en "De dónde llegan"
+                                        y en "Resultados de tus enlaces", verás cuántas visitas, mensajes y reservas trae cada uno.
+                                    </span>
+                                </figcaption>
+                                <ul class="divide-y divide-line border-y border-line" id="enl-listos"></ul>
+                            </figure>
+                            <figure class="card p-5 sm:p-6 mb-6">
                                 <figcaption class="mb-5">
                                     <span class="est-titulo">Crea un enlace con seguimiento</span>
-                                    <span class="block text-[0.76rem] text-graphite/55 mt-1 max-w-3xl leading-relaxed">
+                                    <span class="block text-[0.8rem] text-graphite/70 mt-1 max-w-3xl leading-relaxed">
+                                        Para una campaña especial (por ejemplo, una promoción de temporada), elige dónde lo vas a publicar y ponle nombre.
                                         Usa un enlace distinto en cada lugar donde compartas la página: la biografía de Instagram, los estados de WhatsApp,
                                         el perfil de Google o un volante con código QR. Así, en "De dónde llegan" verás cuántas visitas y reservas trae cada uno.
                                     </span>
@@ -2300,18 +2319,22 @@
         const pagadasDe = x => (x.pagadas != null ? x.pagadas : x.pagos || 0);
         const pendientesDe = x => (x.pendientes != null ? x.pendientes : Math.max(0, (x.reservas || 0) - pagadasDe(x)));
         const valorPagadoDe = x => (x.valor_pagadas != null ? x.valor_pagadas : x.valor || 0);
-        /* [id, texto, utm_source, utm_medium, campaña por defecto]. Los nombres coinciden con los de index.html */
+        /* [id, texto, utm_source, utm_medium, campaña por defecto, dónde pegarlo].
+           Los nombres de las fuentes coinciden con FUENTES_UTM de index.html y blog.js */
         const LUGARES_ENLACE = [
-            ['instagram-bio', 'Instagram · biografía', 'instagram', 'social', 'biografia'],
-            ['instagram', 'Instagram · historias y publicaciones', 'instagram', 'social', 'publicaciones'],
-            ['facebook', 'Facebook', 'facebook', 'social', 'publicaciones'],
-            ['whatsapp', 'WhatsApp · estados y mensajes', 'whatsapp', 'social', 'mensajes'],
-            ['google', 'Google · perfil del negocio', 'google', 'perfil', 'perfil'],
-            ['tiktok', 'TikTok', 'tiktok', 'social', 'perfil'],
-            ['qr', 'Volante o código QR', 'qr', 'impreso', 'volante'],
-            ['correo', 'Correo a clientes', 'email', 'correo', 'boletin'],
-            ['anuncio', 'Anuncio pagado en redes', 'facebook', 'cpc', 'anuncio']
+            ['google-maps', 'Google Maps · perfil del negocio', 'google_maps', 'perfil', 'perfil', 'En tu Perfil de Empresa de Google: Editar perfil › Contacto › Sitio web.'],
+            ['instagram-bio', 'Instagram · biografía', 'instagram', 'social', 'biografia', 'Instagram › Editar perfil › Enlaces.'],
+            ['instagram', 'Instagram · historias y publicaciones', 'instagram', 'social', 'publicaciones', 'En el sticker de enlace de las historias o en mensajes directos.'],
+            ['facebook', 'Facebook · página', 'facebook', 'social', 'perfil', 'En el campo Sitio web de la página y en tus publicaciones.'],
+            ['tiktok', 'TikTok', 'tiktok', 'social', 'perfil', 'TikTok › Editar perfil › Sitio web.'],
+            ['youtube', 'YouTube', 'youtube', 'social', 'canal', 'En los vínculos del canal y en la descripción de los videos.'],
+            ['whatsapp', 'WhatsApp · estados y mensajes', 'whatsapp', 'social', 'mensajes', 'En estados, mensajes y el perfil de WhatsApp Business.'],
+            ['qr', 'Volante o código QR', 'qr', 'impreso', 'volante', 'Conviértelo en código QR para volantes, la carta o la recepción.'],
+            ['correo', 'Correo a clientes', 'email', 'correo', 'boletin', 'En la firma y en los correos a clientes.'],
+            ['anuncio', 'Anuncio pagado en redes', 'facebook', 'cpc', 'anuncio', 'Como enlace de destino del anuncio.']
         ];
+        /* Los enlaces siempre llevan a la página publicada, aunque el panel se abra desde otra dirección */
+        const SITIO_PUBLICO = 'https://hotelcabaleon.com/';
 
         const num = n => Math.round(Number(n) || 0).toLocaleString('es-CO');
         const pct = (a, b) => (b ? Math.round(100 * (a || 0) / b) : 0);
@@ -4025,6 +4048,7 @@
             lugar.addEventListener('change', pintarEnlace);
             document.getElementById('enl-campana').addEventListener('input', pintarEnlace);
             pintarEnlace();
+            pintarEnlacesListos();
 
             /* Vuelve a la última pestaña abierta en esta sesión */
             try {
@@ -4036,8 +4060,26 @@
         function enlaceConSeguimiento() {
             const l = LUGARES_ENLACE.find(x => x[0] === document.getElementById('enl-lugar').value) || LUGARES_ENLACE[0];
             const campana = normalizar(document.getElementById('enl-campana').value).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || l[4];
-            const base = location.origin + location.pathname.replace(/admin\.html$/i, '');
-            return base + '?utm_source=' + l[2] + '&utm_medium=' + l[3] + '&utm_campaign=' + campana;
+            return enlaceDe(l, campana);
+        }
+        function enlaceDe(l, campana) {
+            const base = /(^|\.)hotelcabaleon\.com$/.test(location.hostname) ? location.origin + '/' : SITIO_PUBLICO;
+            return base + '?utm_source=' + l[2] + '&utm_medium=' + l[3] + '&utm_campaign=' + (campana || l[4]);
+        }
+        /* Lista de enlaces listos: uno por red, con dónde pegarlo y su botón de copiar */
+        function pintarEnlacesListos() {
+            document.getElementById('enl-listos').innerHTML = LUGARES_ENLACE.map(l =>
+                '<li class="enl-fila">' +
+                    '<div class="min-w-0"><span class="enl-nombre">' + l[1] + '</span><span class="enl-donde">' + l[5] + '</span>' +
+                    '<code class="enl-url">' + enlaceDe(l).replace(/&/g, '&amp;') + '</code></div>' +
+                    '<button type="button" class="btn btn-outline btn-sm shrink-0" data-enlace="' + enlaceDe(l).replace(/&/g, '&amp;') + '" data-nombre="' + l[1] + '" onclick="copiarTexto(this.dataset.enlace, this.dataset.nombre)"><i data-lucide="copy" class="w-4 h-4"></i> Copiar</button>' +
+                '</li>').join('');
+            if (window.lucide) lucide.createIcons();
+        }
+        function copiarTexto(url, nombre) {
+            (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+                .then(() => toast('Enlace de ' + nombre + ' copiado. Pégalo en ese lugar.'))
+                .catch(() => { window.prompt('Copia el enlace (Ctrl+C):', url); });
         }
         function pintarEnlace() { document.getElementById('enl-url').textContent = enlaceConSeguimiento(); }
         function copiarEnlace() {
