@@ -115,6 +115,8 @@ h1, h2, h3, p, ul, ol, figure, blockquote { margin: 0; }
 .tabla-envoltura { overflow-x: auto; }
 
 /* Cita / consejo */
+.articulo .fuentes { margin-top: 1.75rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.875rem; line-height: 1.6; color: rgba(32, 41, 46, 0.7); }
+.articulo .fuentes a { color: inherit; }
 .consejo { padding: 1.3rem 1.5rem; border: 1px solid rgba(201, 160, 99, 0.45); background: #fff; font-size: 0.97rem; }
 .consejo strong { color: var(--brass-deep); }
 

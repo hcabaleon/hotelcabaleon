@@ -292,15 +292,39 @@
         html.pantallas #bar .bebidas-pantalla { padding-block: clamp(0.75rem, 2.4vh, 2.5rem); }
 
         /* ---------- Servicios ---------- */
-        html.pantallas #servicios .lg\:sticky { position: static; }
-        html.pantallas #servicios dl.mb-8 { margin-bottom: clamp(0.75rem, 2vh, 2rem); }
-        html.pantallas #servicios dl > div { padding-block: clamp(0.35rem, 0.9vh, 0.625rem); }
         html.pantallas #servicios ul.mb-9 { margin-bottom: clamp(0.75rem, 2vh, 2.25rem); }
         html.pantallas #servicios p.mb-7 { margin-bottom: clamp(0.75rem, 2vh, 1.75rem); }
-        html.pantallas #fotos-servicios img { aspect-ratio: auto; height: clamp(150px, 22vh, 280px); }
-        html.pantallas #lista-servicios p { font-size: 0.8rem; line-height: 1.55; }
-        html.pantallas #lista-servicios > div { padding: clamp(1rem, 2.4vh, 2rem); }
-        html.pantallas #lista-servicios .ico-lujo { margin-bottom: 0.75rem; }
+        /* Cada servicio con su foto: tarjetas crema separadas por filos de 1 px (bordes, para que una fila
+           incompleta no deje casillas grises), el ícono en su círculo dorado montado sobre la foto */
+        .servicios-cuadricula {
+            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense;
+            margin-top: clamp(1.75rem, 4vh, 3rem); border-top: 1px solid var(--line); border-left: 1px solid var(--line);
+        }
+        @media (min-width: 640px) { .servicios-cuadricula { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (min-width: 1024px) { .servicios-cuadricula { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+        .servicio { display: flex; flex-direction: column; background: var(--bone); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); transition: background-color .5s; }
+        .servicio:hover { background: #fff; }
+        .servicio--ancho { grid-column: span 2; }
+        .servicio-foto { aspect-ratio: 4 / 3; overflow: hidden; background: var(--sand); }
+        .servicio--ancho .servicio-foto { aspect-ratio: 8 / 3; }
+        /* Tableta (3 columnas): solo la primera va a doble ancho, así 14 servicios llenan 5 filas */
+        @media (min-width: 640px) and (max-width: 1023px) {
+            .servicio--ancho:not(:first-child) { grid-column: auto; }
+            .servicio--ancho:not(:first-child) .servicio-foto { aspect-ratio: 4 / 3; }
+        }
+        .servicio-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s cubic-bezier(.16, 1, .3, 1); }
+        .servicio:hover .servicio-foto img { transform: scale(1.05); }
+        .servicio-foto--icono {
+            display: flex; align-items: center; justify-content: center; color: var(--brass);
+            background: radial-gradient(120% 100% at 50% 30%, #17333F 0%, #0A212E 60%, #061620 100%);
+        }
+        .servicio-foto--icono svg { stroke-width: 1; }
+        .servicio-cuerpo { position: relative; padding: 2.1rem clamp(1rem, 1.6vw, 1.5rem) 1.5rem; }
+        .servicio-cuerpo svg.ico-lujo { position: absolute; top: 0; left: clamp(1rem, 1.6vw, 1.5rem); transform: translateY(-50%); width: 2.75rem; height: 2.75rem; padding: 0.68rem; }
+        @media (max-width: 639px) {
+            .servicio-cuerpo { padding: 1.9rem 0.9rem 1.1rem; }
+            .servicio-cuerpo h3 { font-size: 1.1rem; line-height: 1.25; }
+        }
 
         /* ---------- Eventos ---------- */
         html.pantallas #eventos .grid.mt-10 { margin-top: clamp(1rem, 3vh, 2.5rem); }
@@ -322,16 +346,104 @@
         html.pantallas #fotos-mangole img:not(:first-child) { aspect-ratio: auto; height: clamp(110px, 21vh, 260px); }
         html.pantallas #carta-grid img { aspect-ratio: auto !important; height: clamp(110px, 19vh, 240px); }
         html.pantallas #restaurante .pantalla .mb-8 { margin-bottom: clamp(0.6rem, 1.8vh, 2rem); }
-        html.pantallas #restaurante .text-\[0\.72rem\].mt-6 { margin-top: clamp(0.4rem, 1vh, 1.5rem); }
-        /* Afiches de a dos, centrados y tan altos como permita la pantalla */
-        html.pantallas #afiches {
-            --alto-afiche: clamp(200px, calc(100svh - var(--alto-nav) - var(--alto-mbar) - 13rem), 640px);
-            width: calc(var(--alto-afiche) * 9 / 8 + 0.75rem); max-width: 100%; margin-inline: auto;
+        html.pantallas #restaurante .text-\[0\.75rem\].mt-6 { margin-top: clamp(0.4rem, 1vh, 1.5rem); }
+        /* Pide y prepara tu experiencia (computador): encabezado, platos, botones y nota caben juntos en la
+           pantalla, sin usar la rueda. El bloque toma el alto de la pantalla (entre 31 y 42 rem) y la foto de
+           los platos se queda con lo que sobra; con subgrid, todas las fotos miden lo mismo y el texto de
+           todas las tarjetas, lo que pide la más larga */
+        @media (min-width: 1024px) {
+            html.pantallas #restaurante .carta-pantalla { padding-block: clamp(0.5rem, 1.4vh, 1.5rem); }
+            html.pantallas #restaurante .carta-pantalla .carta-fijo {
+                display: flex; flex-direction: column;
+                height: clamp(31rem, calc(100svh - var(--alto-nav) - var(--alto-mbar) - 2 * clamp(0.5rem, 1.4vh, 1.5rem)), 42rem);
+            }
+            /* row-gap en 0: el carrusel pone gap: 1rem !important y ese espacio entre la fila de la foto y la del
+               texto hacía que la tira se moviera 26 px hacia arriba y abajo con la rueda */
+            html.pantallas .carta-pantalla #carta-grid { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(88px, 1fr) auto; row-gap: 0 !important; overflow-y: hidden; }
+            html.pantallas .carta-pantalla #carta-grid > article { grid-row: span 2; display: grid; grid-template-rows: subgrid; }
+            html.pantallas .carta-pantalla #carta-grid > article > .relative,
+            html.pantallas .carta-pantalla #carta-grid > article > .relative > a { min-height: 0; height: 100%; }
+            html.pantallas #restaurante .carta-pantalla .mb-8 { margin-bottom: clamp(0.6rem, 1.6vh, 1.5rem); }
+            html.pantallas .carta-pantalla h3 { font-size: clamp(1.6rem, 4vh, 2.25rem); margin-bottom: 0.4rem; }
+            html.pantallas .carta-pantalla .body-sm { line-height: 1.6; }
+            html.pantallas .carta-pantalla #carta-grid img { height: 100%; }
+            html.pantallas .carta-pantalla #carta-grid .p-4 { padding: clamp(0.75rem, 1.6vh, 1.1rem) clamp(0.85rem, 1.1vw, 1.15rem); }
+            html.pantallas .carta-pantalla #carta-grid h4 { font-size: clamp(1.05rem, 2.6vh, 1.25rem); line-height: 1.25; }
+            html.pantallas .carta-pantalla .carrusel-nav { margin-top: clamp(0.5rem, 1.2vh, 1rem); }
+            html.pantallas #restaurante .carta-pantalla .text-\[0\.75rem\].mt-6 { margin-top: clamp(0.4rem, 1vh, 1rem); }
         }
-        html.pantallas #afiches .reel { width: calc((100% - 0.75rem) / 2); }
-        html.pantallas #afiches .reel img { aspect-ratio: 9 / 16; height: auto; }
-        html.pantallas #restaurante .afiches-cabeza { flex-direction: column; align-items: center; text-align: center; gap: 0.8rem; margin-bottom: clamp(0.75rem, 2.2vh, 1.5rem); }
-        html.pantallas #restaurante .afiches-cabeza .eyebrow { justify-content: center; margin-bottom: clamp(0.4rem, 1.2vh, 1rem); }
+        /* Precio y "Agregar" de cada plato: en una fila si caben; si no (celular), el botón baja a su propia línea */
+        .plato-fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; }
+        .plato-fila .plato-ctrl { flex: 1 1 6.5rem; min-width: 0; }
+        /* Afiches de Mangolé y Guías y folletos: tres imágenes en abanico como vista previa y el botón que abre el visor */
+        .visor-bloque {
+            display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 2rem; text-align: center;
+            margin-top: clamp(2.5rem, 7vh, 5rem); padding-block: clamp(2.5rem, 7vh, 4.5rem); border-top: 1px solid var(--line);
+        }
+        .visor-bloque .eyebrow { justify-content: center; }
+        @media (min-width: 768px) {
+            .visor-bloque { grid-template-columns: auto minmax(0, 30rem); justify-content: center; align-items: center; gap: clamp(2.5rem, 6vw, 5rem); text-align: left; }
+            .visor-bloque .eyebrow { justify-content: flex-start; }
+            .visor-bloque .eyebrow.is-centered::after { display: none; }   /* alineada a la izquierda: una sola línea */
+        }
+        .visor-pila { position: relative; width: 15rem; height: 13.5rem; cursor: pointer; }
+        .visor-pila img {
+            position: absolute; top: 0; left: 50%; width: 7.2rem; aspect-ratio: 9 / 16; object-fit: cover; border: 4px solid #fff;
+            box-shadow: 0 22px 40px -22px rgba(10, 33, 46, 0.55); transition: transform .6s cubic-bezier(.16, 1, .3, 1);
+        }
+        .visor-pila img:nth-child(1) { transform: translateX(-112%) translateY(0.9rem) rotate(-9deg); }
+        .visor-pila img:nth-child(2) { transform: translateX(-50%); z-index: 2; }
+        .visor-pila img:nth-child(3) { transform: translateX(12%) translateY(0.9rem) rotate(9deg); }
+        .visor-pila:hover img:nth-child(1) { transform: translateX(-122%) translateY(0.7rem) rotate(-12deg); }
+        .visor-pila:hover img:nth-child(3) { transform: translateX(22%) translateY(0.7rem) rotate(12deg); }
+        .visor-pila--guias { height: 12rem; }
+        .visor-pila--guias img { width: 8.2rem; aspect-ratio: 3 / 4; object-position: top; }
+        /* Guías y folletos: después de las tarjetas, con su alto natural; las notas van debajo */
+        .guias-bloque { padding-bottom: clamp(2.5rem, 7vh, 4.5rem); }
+        .guias-bloque .visor-bloque { margin-top: clamp(2.5rem, 7vh, 5rem); }
+        .guias-bloque .notas-info, html.pantallas #informacion .guias-bloque .notas-info { margin-top: 0; }
+
+        /* Visor de afiches: el afiche tan alto como permita la pantalla; abajo el plato, su precio y "Agregar" */
+        #visor-afiches {
+            position: fixed; inset: 0; z-index: 150; display: flex; flex-direction: column;
+            background: rgba(6, 22, 32, 0.985); color: #fff; transition: opacity .4s ease, visibility .4s ease;
+        }
+        #visor-afiches.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        #visor-afiches:not(.is-hidden) { transition: opacity .4s ease; }   /* al abrir se ve de inmediato (y puede recibir el foco); al cerrar se desvanece */
+        .va-cabeza { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem clamp(1rem, 4vw, 2.5rem); }
+        .va-etiqueta { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--brass); }
+        .va-cerrar {
+            width: 2.75rem; height: 2.75rem; flex-shrink: 0; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.25); color: #fff;
+            display: inline-flex; align-items: center; justify-content: center; transition: background-color .3s, color .3s;
+        }
+        .va-cerrar:hover { background: #fff; color: var(--ink); }
+        .va-escena { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0 1rem; touch-action: pan-y; }
+        .va-img { width: auto; height: auto; max-width: 100%; max-height: 100%; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8); transition: opacity .25s ease; }
+        .va-img.cambiando { opacity: 0; }
+        .va-pie { display: flex; align-items: center; justify-content: center; gap: clamp(0.75rem, 3vw, 2rem); padding: 0.9rem clamp(1rem, 4vw, 2.5rem) 1.1rem; }
+        .va-info { flex: 0 1 26rem; min-width: 0; text-align: center; }
+        .va-nombre { font-family: "Cormorant Garamond", Georgia, serif; font-size: clamp(1.3rem, 2.6vh, 1.65rem); line-height: 1.2; color: #fff; }
+        .va-datos { display: flex; align-items: baseline; justify-content: center; gap: 0.9rem; margin-top: 0.2rem; }
+        .va-precio { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.3rem; color: var(--brass); }
+        .va-cuenta { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.2em; color: rgba(255, 255, 255, 0.7); }
+        .va-sub { font-size: 0.875rem; color: rgba(255, 255, 255, 0.78); }
+        #visor-afiches [hidden] { display: none; }
+        .va-ctrl { width: min(100%, 13rem); margin: 0.6rem auto 0; }
+        .va-ctrl > button { border-color: var(--brass); color: #fff; }
+        .va-ctrl > button:hover { background: var(--brass); color: var(--ink); }
+        .va-ctrl > div { background: #fff; color: var(--ink); }
+        .va-ctrl > div button:hover { background: rgba(201, 160, 99, 0.25); }
+        .va-flecha {
+            width: 3.25rem; height: 3.25rem; flex-shrink: 0; border-radius: 999px; border: 1px solid var(--brass); color: #fff;
+            display: inline-flex; align-items: center; justify-content: center; transition: background-color .3s, color .3s, border-color .3s;
+        }
+        .va-flecha:hover { background: var(--brass); color: var(--ink); }
+        /* Computador: las flechas a los lados del afiche, a media altura */
+        @media (min-width: 768px) {
+            .va-flecha { position: absolute; top: 50%; transform: translateY(-50%); }
+            .va-ant { left: clamp(1rem, 4vw, 3rem); }
+            .va-sig { right: clamp(1rem, 4vw, 3rem); }
+        }
 
         /* ---------- Cabalante Bar ---------- */
         html.pantallas #bar .pantalla > .grid.mb-14 { margin-bottom: 0; }
@@ -345,12 +457,7 @@
         }
 
         /* ---------- Galería ---------- */
-        html.pantallas #gallery-grid { grid-auto-rows: clamp(220px, 46vh, 520px) !important; }
-        html.pantallas #gallery-grid > * { grid-column: auto !important; grid-row: auto !important; }
-        html.pantallas #gallery-more-wrap, html.pantallas #gallery-note { display: none !important; }   /* aquí ya salen todas las fotos */
         html.pantallas #galeria .galeria-fijo > .grid.mb-10 { margin-bottom: clamp(0.75rem, 2.4vh, 2rem); }
-        html.pantallas #galeria .hairline-t.hairline-b { padding-block: clamp(0.5rem, 1.4vh, 1.25rem); margin-bottom: clamp(0.75rem, 2.4vh, 2.5rem); }
-        html.pantallas #gallery-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
         html.pantallas #reels video { aspect-ratio: auto; height: clamp(260px, 62vh, 640px); }
         @media (min-width: 1024px) { html.pantallas #reels .reel { width: auto; } }
 
@@ -359,7 +466,7 @@
         html.pantallas #resenas figure { padding: clamp(1.25rem, 3.4vh, 2.5rem); }
         html.pantallas #resenas .mt-12 { margin-top: clamp(1rem, 3vh, 3rem); }
         /* Listas con filos de 1 px entre tarjetas: el carrusel conserva el filo */
-        html.pantallas #lista-servicios, html.pantallas #tarjetas-info, html.pantallas #lista-resenas { gap: 1px !important; }
+        html.pantallas #tarjetas-info, html.pantallas #lista-resenas { gap: 1px !important; }
 
         /* ---------- Antes de tu llegada ---------- */
         html.pantallas #informacion .info-fijo > div:first-child { margin-bottom: clamp(0.75rem, 2vh, 3rem); }
@@ -368,18 +475,6 @@
         html.pantallas #tarjetas-info ul { row-gap: 0; }
         html.pantallas #tarjetas-info ul.space-y-3 > * + * { margin-top: clamp(0.3rem, 0.9vh, 0.75rem); }
         html.pantallas #tarjetas-info .hairline-t.pt-5 { padding-top: clamp(0.5rem, 1.4vh, 1.25rem); }
-        /* Guías y folletos: una por desplazamiento, la imagen completa (sin recortes) y centrada */
-        html.pantallas .guias-fijo > .reveal:first-child { text-align: center; }
-        html.pantallas .guias-fijo > .reveal:first-child > .eyebrow { justify-content: center; margin-bottom: clamp(0.4rem, 1.2vh, 1rem); }
-        html.pantallas .guias-fijo > .reveal:first-child > h3 { margin-bottom: clamp(0.6rem, 2vh, 1.5rem); }
-        html.pantallas #guias-info { --carrusel-ancho: 100%; gap: 0 !important; --alto-guia: clamp(200px, calc(100svh - var(--alto-nav) - var(--alto-mbar) - 15rem), 760px); }
-        html.pantallas #guias-info > a { display: flex; flex-direction: column; align-items: center; background: transparent; border: 0; }
-        html.pantallas #guias-info .aspect-\[3\/4\] { aspect-ratio: auto; width: 100%; height: var(--alto-guia); display: flex; justify-content: center; background: transparent; overflow: visible; }
-        html.pantallas #guias-info img {
-            width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; align-self: center;
-            border: 1px solid var(--line); box-shadow: 0 24px 50px -30px rgba(10, 33, 46, 0.45); background: #fff;
-        }
-        html.pantallas #guias-info .p-3 { text-align: center; padding: clamp(0.5rem, 1.4vh, 1rem) 0 0; }
         html.pantallas #informacion .notas-info { margin-top: clamp(1rem, 3vh, 3.5rem); padding-top: clamp(0.75rem, 2.2vh, 2.5rem); }
 
         /* ---------- Preguntas frecuentes ---------- */
@@ -408,18 +503,6 @@
         html.pantallas .room-card ul.mb-7 { margin-bottom: clamp(0.6rem, 1.8vh, 1.75rem); padding-top: clamp(0.6rem, 1.6vh, 1.5rem); }
         html.pantallas .room-card .hairline-t.pt-6 { padding-top: clamp(0.6rem, 1.6vh, 1.5rem); }
         html.pantallas .room-card .mb-6 { margin-bottom: clamp(0.6rem, 1.6vh, 1.5rem); }
-        /* Cada pareja de habitaciones es una pantalla (en celular, cada tarjeta) */
-        @media (min-width: 768px) {
-            html.pantallas .hab-par {
-                scroll-margin-top: var(--alto-nav);
-                min-height: calc(100vh - var(--alto-nav) - var(--alto-mbar)); min-height: calc(100svh - var(--alto-nav) - var(--alto-mbar));
-                align-content: center; padding-block: clamp(0.75rem, 2.2vh, 2.5rem);
-            }
-        }
-        @media (max-width: 767px) {
-            html.pantallas .hab-par { padding-bottom: 1.25rem; }
-            html.pantallas .hab-par > .room-card { scroll-margin-top: calc(var(--alto-nav) + 0.75rem); }
-        }
 
         /* ---------- Planes: encabezado y tarjetas centrados ---------- */
         #planes .planes-encabezado { max-width: 46rem; margin: 0 auto 3rem; text-align: center; }
@@ -639,7 +722,6 @@
             html.pantallas .room-card .grid.grid-cols-2 .btn { padding-inline: 0.75rem; letter-spacing: 0.16em; white-space: nowrap; }
             html.pantallas #restaurante .pantalla .md\:flex-row { gap: 1rem; margin-bottom: 1.25rem; }
             html.pantallas #carta-grid .p-4 { padding: 0.75rem 0.8rem 0.85rem; }
-            html.pantallas #carta-grid .plato-ctrl { margin-top: 0.6rem; }
             html.pantallas #carta-grid h4 { font-size: 1.05rem; line-height: 1.25; }
             html.pantallas #restaurante .pantalla h3.text-3xl { font-size: 1.75rem; }
             html.pantallas #informacion .info-fijo > div:first-child { gap: 0.75rem; }
@@ -647,10 +729,6 @@
 
         /* ---------- Tabletas (768 a 1023 px de ancho) ---------- */
         @media (max-width: 1023px) {
-            html.pantallas #gallery-grid { grid-auto-rows: clamp(200px, 42vh, 480px) !important; }
-        }
-        @media (min-width: 768px) and (max-width: 1023px) {
-            html.pantallas #tarjetas-info { --carrusel-ancho: calc((100% - 1rem) / 2); }
         }
 
         /* ---------- Pantallas angostas y bajas (1024 a 1279 px de ancho) ---------- */
@@ -670,14 +748,12 @@
         @media (max-height: 920px) {
             html.pantallas .room-card .img-zoom > :first-child { height: clamp(110px, 17vh, 200px); }
             html.pantallas #carta-grid img { height: clamp(100px, 15vh, 200px); }
-            html.pantallas #gallery-grid { grid-auto-rows: clamp(200px, 40vh, 480px) !important; }
             html.pantallas #contacto .aspect-\[4\/3\] { height: clamp(240px, 52vh, 560px); }
             /* Portada: título, texto y espacios más compactos para que quepa con la barra de reserva */
             html.pantallas #inicio .hero-title { font-size: clamp(2.6rem, 8.4vh, 5rem); margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
             html.pantallas #inicio .hero-eyebrow, html.pantallas #inicio .hero-rule { margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
             html.pantallas #inicio .hero-lead { font-size: 0.9rem; line-height: 1.6; margin-bottom: clamp(0.75rem, 2.2vh, 2rem); }
             html.pantallas #inicio .shell.pt-28 { padding-top: calc(var(--alto-nav) + 2.5rem); }
-            html.pantallas #tarjetas-info ul li { font-size: 0.8rem; line-height: 1.5; }
             html.pantallas #contacto dl > div { padding-block: 0.45rem; }
         }
 
@@ -705,7 +781,6 @@
 
             /* Fotos con su proporción natural */
             html.pantallas .room-card .img-zoom > :first-child { aspect-ratio: 16 / 10 !important; height: auto; }
-            html.pantallas #fotos-servicios img { aspect-ratio: 4 / 5; height: auto; }
             html.pantallas #eventos .grid.mt-10 img { aspect-ratio: 4 / 5; height: auto; }
             html.pantallas #fotos-mangole img:first-child { aspect-ratio: 16 / 10; height: auto; }
             html.pantallas #fotos-mangole img:not(:first-child) { aspect-ratio: 4 / 3; height: auto; }
@@ -713,9 +788,6 @@
             html.pantallas #plans-grid img { aspect-ratio: 16 / 10 !important; height: auto; }
             html.pantallas #plans-grid article > div { padding: 1.5rem 1.4rem !important; }
             html.pantallas #blog .blog-foto { aspect-ratio: 16 / 10; height: auto; }
-            html.pantallas #gallery-grid { grid-auto-rows: min(105vw, 30rem) !important; }
-            html.pantallas #guias-info { --alto-guia: min(125vw, 36rem); }
-            html.pantallas #afiches { width: 100%; }
             html.pantallas #contacto .aspect-\[4\/3\] { height: min(100vw, 30rem); }
             html.pantallas #informacion .notas-info { margin-top: 2.25rem; padding-top: 2rem; }
             html.pantallas #informacion .pantalla h3.mb-8 { margin-bottom: 1.25rem; }
@@ -755,6 +827,11 @@
             background: currentColor;
             opacity: 0.65;
             flex-shrink: 0;
+        }
+        /* Celular: menos aire en las etiquetas para que las largas ("Carta de bebidas · Pide aquí") quepan en una línea */
+        @media (max-width: 480px) {
+            .eyebrow { letter-spacing: 0.24em; gap: 0.55rem; }
+            .eyebrow::before, .eyebrow.is-centered::after { width: 18px; }
         }
 
         .micro {
@@ -1317,7 +1394,7 @@
 
         .step-tab {
             text-align: left;
-            color: rgba(32, 41, 46, 0.6);
+            color: rgba(32, 41, 46, 0.65);
             transition: color .45s ease;
         }
         .step-tab:hover { color: var(--ink); }
@@ -1414,8 +1491,7 @@
         .hab-ventana-texto { margin-top: 0.45rem; font-size: 0.85rem; line-height: 1.6; color: rgba(32, 41, 46, 0.7); }
         .hab-ventana-opciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: clamp(0.9rem, 2.4vh, 1.5rem); }
         .hab-ventana .room-filter { min-width: 3rem; height: 3rem; padding: 0 1.05rem; border-radius: 999px; background: #fff; font-size: 0.8rem; }
-        .hab-ventana-nota { margin-top: 0.85rem; font-size: 0.8rem; line-height: 1.5; color: rgba(32, 41, 46, 0.7); }
-        .hab-ventana-nota:empty { display: none; }
+        .hab-ventana .room-filter.is-active { background: var(--ink); border-color: var(--ink); color: #fff; }
         .hab-ventana-todas {
             margin-top: clamp(0.7rem, 1.8vh, 1rem);
             padding-bottom: 0.2rem;
@@ -1433,14 +1509,51 @@
             .hab-ventana .room-filter { min-width: 2.65rem; height: 2.65rem; padding: 0 0.75rem; font-size: 0.75rem; }
         }
 
+        /* Habitaciones elegidas: ocupan el lugar de la ventana. Arriba, "Volver" (píldora con filo
+           dorado, la misma línea del "Ver más" de los carruseles) y el resumen de lo elegido */
+        .hab-ventana, .hab-lista { scroll-margin-top: calc(var(--alto-nav) + 1rem); }
+        .hab-lista { width: min(100%, 62.5rem); margin: clamp(1.25rem, 4vh, 3rem) auto 0; text-align: center; }
+        .hab-lista[hidden] { display: none; }
+        .hab-lista-barra {
+            display: flex; align-items: center; justify-content: space-between; gap: 0.75rem 1.25rem; flex-wrap: wrap;
+            padding-bottom: clamp(0.85rem, 2vh, 1.25rem); border-bottom: 1px solid var(--line);
+            animation: habEntra .7s cubic-bezier(.16, 1, .3, 1) both;
+        }
+        .hab-volver {
+            display: inline-flex; align-items: center; gap: 0.75rem; height: 2.75rem; padding: 0 1.3rem 0 0.35rem; flex-shrink: 0;
+            border-radius: 999px; border: 1px solid var(--brass); background: transparent; color: var(--ink);
+            font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap;
+            transition: background-color .35s, border-color .35s, color .35s;
+        }
+        .hab-volver-ico {
+            width: 2rem; height: 2rem; border-radius: 999px; border: 1px solid var(--brass); color: var(--brass-deep);
+            display: inline-flex; align-items: center; justify-content: center; transition: border-color .35s, color .35s;
+        }
+        .hab-volver:hover { background: var(--ink); border-color: var(--ink); color: #fff; }
+        .hab-volver:hover .hab-volver-ico { color: var(--brass); }
+        .hab-lista-resumen { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(32, 41, 46, 0.7); text-align: right; }
+        .hab-lista-nota { margin-top: 1rem; font-size: 0.85rem; line-height: 1.6; color: rgba(32, 41, 46, 0.7); }
+        .hab-lista-otra { margin-top: clamp(1.75rem, 4vh, 2.75rem); }
+        /* Celular: el resumen va a la derecha de "Volver", en dos líneas cortas */
+        @media (max-width: 639px) {
+            .hab-lista-barra { flex-wrap: nowrap; }
+            .hab-lista-resumen { min-width: 0; line-height: 1.6; letter-spacing: 0.16em; }
+            .hab-lista-resumen > span { display: block; }
+            .hab-lista-resumen > .hab-lista-sep { display: none; }
+        }
+        @media (max-width: 480px) {
+            .hab-volver { height: 2.5rem; gap: 0.6rem; padding-right: 1rem; }
+            .hab-volver-ico { width: 1.8rem; height: 1.8rem; }
+            .hab-lista-resumen { letter-spacing: 0.12em; }
+        }
+
         /* Habitaciones de dos en dos, centradas */
-        .hab-pares[hidden] { display: none; }
-        .hab-par { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; justify-content: center; margin-top: 1.5rem; }
-        .hab-par-cabeza { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 0.9rem; }
+        .hab-par { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; justify-content: center; margin-top: clamp(1.25rem, 3vh, 2rem); }
         .hab-cambiar { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink); border-bottom: 1px solid var(--brass); padding-bottom: 0.1rem; }
         .hab-cambiar:hover { color: var(--brass-deep); }
         @media (min-width: 768px) {
             .hab-par { grid-template-columns: repeat(2, minmax(0, 30rem)); column-gap: clamp(1.25rem, 2.5vw, 2.5rem); row-gap: clamp(0.75rem, 2vh, 1.25rem); }
+            .hab-par + .hab-par { margin-top: clamp(1.25rem, 2.5vw, 2.5rem); }
             .hab-par.es-unica { grid-template-columns: minmax(0, 30rem); }
         }
         /* Tarjeta con la información centrada */
@@ -1591,7 +1704,27 @@
         #pr-detalle .spec-row:last-child { border-bottom: 0; }
         #room-modal.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-        /* ---------- Galería ---------- */
+        /* ---------- Galería: categorías a la vista, mosaico con nombres visibles y "Ver más fotos" ---------- */
+        .gal-barra { display: flex; align-items: center; gap: 0.75rem 1.5rem; flex-wrap: wrap; padding-block: clamp(0.85rem, 2vh, 1.25rem); border-block: 1px solid var(--line); }
+        .gal-barra-titulo { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.35rem; line-height: 1.2; color: var(--ink); flex-shrink: 0; }
+        .gal-filtros { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .gal-nota { margin: clamp(0.85rem, 2vh, 1.25rem) 0; font-size: 0.875rem; line-height: 1.6; color: rgba(32, 41, 46, 0.7); }
+        .gal-mosaico { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense; grid-auto-rows: 150px; gap: 0.6rem; }
+        @media (min-width: 640px) { .gal-mosaico { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 180px; gap: 0.75rem; } }
+        @media (min-width: 1024px) { .gal-mosaico { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(165px, 25vh, 245px); } }
+        .gal-mosaico .gal-grande { grid-column: span 2; grid-row: span 2; }
+        .gal-mosaico .gal-ancho { grid-column: span 2; }
+        .gal-mosaico .gal-alto { grid-row: span 2; }
+        .gal-mosaico .gal-sencilla { grid-column: auto; grid-row: auto; }   /* la ponen así para tapar huecos al final */
+        .gal-acciones { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.75rem 1.5rem; margin-top: clamp(1.25rem, 3vh, 2rem); }
+        .gal-acciones.hidden, #gallery-more[hidden] { display: none; }
+        .gal-quedan { font-size: 0.8125rem; color: rgba(32, 41, 46, 0.7); }
+        .gal-quedan:empty { display: none; }
+        @media (max-width: 639px) {
+            .gal-barra { flex-direction: column; align-items: flex-start; }
+            .gal-filtros { gap: 0.4rem; }
+            .gal-acciones { flex-direction: column; }
+        }
         .gal-filter {
             padding: 0.55rem 1.15rem;
             border: 1px solid var(--line);
@@ -1634,13 +1767,15 @@
             flex-direction: column;
             justify-content: flex-end;
             gap: 0.4rem;
-            padding: 1.15rem 1.25rem;
-            background: linear-gradient(to top, rgba(10, 33, 46, 0.82) 0%, rgba(10, 33, 46, 0.15) 45%, rgba(10, 33, 46, 0) 70%);
-            opacity: 0;
-            transition: opacity .5s ease;
+            padding: 1rem 1.1rem;
+            text-align: left;
+            background: linear-gradient(to top, rgba(10, 33, 46, 0.8) 0%, rgba(10, 33, 46, 0.32) 34%, rgba(10, 33, 46, 0) 58%);
         }
-        .gal-item:hover .gal-cap,
-        .gal-item:focus-visible .gal-cap { opacity: 1; }
+        @media (max-width: 639px) {
+            .gal-cap { padding: 0.6rem 0.7rem; gap: 0.2rem; }
+            .gal-cap-cat { font-size: 0.6875rem; letter-spacing: 0.16em; }
+            .gal-item .gal-cap-title { font-size: 0.98rem; }
+        }
         .gal-cap-cat {
             font-size: 0.6875rem;
             letter-spacing: 0.26em;
@@ -2278,6 +2413,9 @@
         .blog-cabeza .eyebrow { justify-content: center; margin-bottom: clamp(0.5rem, 1.6vh, 1.1rem); }
         .blog-titulo { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; font-size: clamp(2.3rem, min(1.6rem + 2.4vw, 6.2vh), 3.75rem); line-height: 1.05; }
         .blog-texto { margin-top: clamp(0.4rem, 1.2vh, 0.75rem); font-size: 0.9rem; font-weight: 300; color: rgba(255, 255, 255, 0.6); }
+        .blog-cuadricula { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+        @media (min-width: 768px) { .blog-cuadricula { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 1100px) { .blog-cuadricula { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
         .blog-tarjeta { height: 100%; }
         .blog-tarjeta-boton { text-decoration: none; color: inherit; }
         .blog-todos { margin-top: clamp(1rem, 3vh, 1.75rem); text-align: center; }
@@ -2304,7 +2442,16 @@
             border-bottom: 1px solid var(--brass); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #fff;
         }
         html.pantallas .blog-foto { aspect-ratio: auto; height: clamp(120px, 24vh, 280px); }
-        html.pantallas #blog .carrusel-nav { color: #fff; }
+        /* Celular: tarjetas en horizontal (foto a la izquierda) para que los ocho artículos no alarguen tanto la sección */
+        @media (max-width: 767px) {
+            .blog-cuadricula { gap: 0.75rem; }
+            .blog-tarjeta-boton { flex-direction: row; }
+            #blog .blog-tarjeta-boton .blog-foto, html.pantallas #blog .blog-tarjeta-boton .blog-foto { flex: 0 0 38%; align-self: stretch; aspect-ratio: auto; height: auto; min-height: 9rem; }
+            .blog-categoria { top: 0.5rem; left: 0.5rem; right: 0.5rem; width: fit-content; padding: 0.25rem 0.45rem; letter-spacing: 0.12em; }
+            .blog-cuerpo { padding: 0.85rem 0.9rem 0.9rem; gap: 0.35rem; }
+            .blog-tarjeta-titulo { font-size: 1.12rem; }
+            .blog-leer { padding-top: 0.35rem; }
+        }
         /* ---------- Carta de bebidas de Cabalante: banda azul noche, minimal ----------
            Encabezado centrado; cada categoría es una columna separada por filos dorados, con la bebida,
            su medida, una línea de puntos y el precio en la tipografía de los títulos. */
@@ -2318,31 +2465,35 @@
         .bebidas-cabeza { max-width: 44rem; margin: 0 auto clamp(1.25rem, 4vh, 3rem); text-align: center; }
         .bebidas-cabeza .eyebrow { justify-content: center; margin-bottom: clamp(0.5rem, 1.6vh, 1.1rem); }
         .bebidas-titulo { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; font-size: clamp(1.9rem, min(1.5rem + 1.8vw, 5.4vh), 3rem); line-height: 1.1; color: #fff; }
-        .bebidas-texto { margin: clamp(0.5rem, 1.4vh, 0.9rem) auto 0; max-width: 36rem; font-size: 0.86rem; line-height: 1.6; font-weight: 300; color: rgba(255, 255, 255, 0.6); }
+        .bebidas-texto { margin: clamp(0.5rem, 1.4vh, 0.9rem) auto 0; max-width: 38rem; font-size: 0.95rem; line-height: 1.6; font-weight: 400; color: rgba(255, 255, 255, 0.78); }
         .bebidas-texto strong { font-weight: 500; color: var(--brass); }
         .bebidas-cabeza .btn { margin-top: clamp(0.75rem, 2.2vh, 1.4rem); }
-        /* Columnas: una por categoría, separadas por filos dorados */
-        #bebidas-grid { gap: 0 !important; --carrusel-ancho: 100%; }
-        @media (min-width: 768px) { #bebidas-grid { --carrusel-ancho: 50%; } }
-        @media (min-width: 1100px) { #bebidas-grid { --carrusel-ancho: calc(100% / 3); } }
-        .bebidas-columna { padding: 0.25rem clamp(1rem, 2.2vw, 2.25rem); border-left: 1px solid rgba(201, 160, 99, 0.22); }
-        #bebidas-grid { border-right: 1px solid rgba(201, 160, 99, 0.22); }   /* filo del borde derecho, siempre visible */
+        /* Todas las categorías a la vista, sin "Ver más": en computador, dos columnas equilibradas (por ejemplo
+           Cervezas y Sin alcohol | Licores) separadas por un filo dorado; en celular y tableta, una debajo de otra */
+        #bebidas-grid { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 70rem; margin-inline: auto; }
+        .bebidas-columna + .bebidas-columna { margin-top: 1.75rem; padding-top: 1.75rem; border-top: 1px solid rgba(201, 160, 99, 0.22); }
+        @media (min-width: 640px) and (max-width: 1023px) { #bebidas-grid { max-width: 36rem; } }
+        @media (min-width: 1024px) {
+            #bebidas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .bebidas-columna { padding: 0.25rem clamp(1.25rem, 3.5vw, 3.25rem); }
+            .bebidas-columna + .bebidas-columna { margin-top: 0; padding-top: 0.25rem; border-top: 0; border-left: 1px solid rgba(201, 160, 99, 0.22); }
+        }
+        .bebidas-grupo + .bebidas-grupo { margin-top: clamp(1.4rem, 3.4vh, 2.25rem); }
         .bebidas-categoria {
             display: flex; align-items: center; gap: 0.75rem; margin-bottom: clamp(0.6rem, 1.8vh, 1.25rem);
-            font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; font-size: clamp(1.35rem, 3vh, 1.65rem); color: #fff;
+            font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; font-size: clamp(1.5rem, 3.2vh, 1.85rem); color: #fff;
         }
         .bebidas-icono {
             display: inline-flex; align-items: center; justify-content: center; width: 2.1rem; height: 2.1rem; flex-shrink: 0;
             border: 1px solid rgba(201, 160, 99, 0.5); border-radius: 999px; color: var(--brass);
         }
         .bebidas-icono svg { stroke-width: 1.4; }
-        .bebidas-sigue { font-family: Inter, sans-serif; font-size: 0.75rem; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.6); }
-        .bebidas-columna ul > li + li { margin-top: clamp(0.3rem, 1vh, 0.7rem); }
-        .bebidas-pantalla .bebida-fila { display: flex; align-items: center; gap: 0.55rem; font-size: 0.84rem; line-height: 1.35; }
-        .bebida-nombre { font-weight: 300; color: rgba(255, 255, 255, 0.86); }
-        .bebida-medida { font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); white-space: nowrap; }
-        .bebidas-pantalla .precio-linea { border-bottom-color: rgba(255, 255, 255, 0.16); }
-        .bebida-precio { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.08rem; color: var(--brass); white-space: nowrap; }
+        .bebidas-columna ul > li + li { margin-top: clamp(0.45rem, 1.1vh, 0.75rem); }
+        .bebidas-pantalla .bebida-fila { display: flex; align-items: center; gap: 0.65rem; font-size: 1rem; line-height: 1.4; }
+        .bebida-nombre { font-weight: 400; color: rgba(255, 255, 255, 0.95); }
+        .bebida-medida { font-size: 0.8125rem; color: rgba(255, 255, 255, 0.7); white-space: nowrap; }
+        .bebidas-pantalla .precio-linea { border-bottom-color: rgba(255, 255, 255, 0.24); }
+        .bebida-precio { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.3rem; font-weight: 500; color: var(--brass); white-space: nowrap; }
         /* Botón + bien visible: círculo dorado sólido con halo; al agregar, la cantidad queda en blanco */
         .bebidas-pantalla .bebida-ctrl > button {
             width: 2.15rem; height: 2.15rem; border-color: var(--brass); background: var(--brass); color: var(--ink);
@@ -2355,13 +2506,11 @@
         .bebidas-pantalla .bebida-ctrl > span button { height: 2.15rem; }
         .bebidas-pantalla .bebida-ctrl > span button svg { stroke-width: 2.25; }
         .bebidas-pantalla .bebida-ctrl > span button:hover { background: rgba(201, 160, 99, 0.25); }
-        .bebidas-pantalla .carrusel-nav { color: #fff; margin-top: clamp(0.75rem, 2.2vh, 1.5rem); }
-        .bebidas-nota { margin: clamp(0.75rem, 2.4vh, 1.75rem) auto 0; max-width: 46rem; text-align: center; font-size: 0.75rem; line-height: 1.6; color: rgba(255, 255, 255, 0.6); }
+        .bebidas-nota { margin: clamp(1.25rem, 3vh, 2.25rem) auto 0; max-width: 46rem; text-align: center; font-size: 0.75rem; line-height: 1.6; color: rgba(255, 255, 255, 0.7); }
         @media (max-width: 767px) {
             .bebidas-pantalla { padding-block: 1.5rem; }
-            .bebidas-texto { font-size: 0.8rem; }
-            .bebidas-columna { padding-inline: 1rem; }
-            .bebidas-pantalla .bebida-fila { font-size: 0.82rem; }
+            .bebidas-texto { font-size: 0.9rem; }
+            .bebidas-pantalla .bebida-fila { font-size: 0.95rem; }
             .bebidas-nota { font-size: 0.75rem; }
         }
 
@@ -3073,8 +3222,22 @@
                         <button type="button" class="room-filter" data-guests="4" aria-pressed="false">4</button>
                         <button type="button" class="room-filter" data-guests="5" aria-pressed="false">5 o más</button>
                     </div>
-                    <p class="hab-ventana-nota" id="room-filter-note" aria-live="polite"></p>
                     <button type="button" class="hab-ventana-todas" id="room-filter-todas">Ver todas las habitaciones</button>
+                </div>
+
+                <!-- Habitaciones elegidas: aparecen en el mismo lugar de la ventana, sin mover la página.
+                     "Volver" trae otra vez la ventana para elegir otro número de personas.
+                     Las tarjetas se generan desde `habitaciones` y `TARIFAS`, de dos en dos -->
+                <div class="hab-lista" id="hab-lista" hidden>
+                    <div class="hab-lista-barra">
+                        <button type="button" class="hab-volver" onclick="volverAVentanaHab()" aria-label="Volver a elegir cuántas personas se van a quedar">
+                            <span class="hab-volver-ico" aria-hidden="true"><i data-lucide="arrow-left" class="w-4 h-4"></i></span> Volver
+                        </button>
+                        <p class="hab-lista-resumen" id="hab-lista-resumen" aria-live="polite"></p>
+                    </div>
+                    <p class="hab-lista-nota" id="hab-lista-nota" hidden></p>
+                    <div id="rooms-grid" class="hab-pares"></div>
+                    <button type="button" class="hab-cambiar hab-lista-otra" onclick="volverAVentanaHab()">Elegir otro número de personas</button>
                 </div>
                 <!-- Notas de tarifa -->
                 <div class="hab-notas grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 hairline-t pt-10 reveal">
@@ -3102,174 +3265,171 @@
                 </div>
             </div>
 
-            <!-- Habitaciones de dos en dos (una pantalla por pareja; en celular, una por pantalla).
-                 Se generan desde `habitaciones` y `TARIFAS` después de elegir cuántas personas se quedan -->
-            <div id="rooms-grid" class="hab-pares" hidden></div>
-
         </div>
     </section>
 
     <!-- ============================= SERVICIOS ============================= -->
-    <section id="servicios" class="section con-pantallas-movil">
+    <section id="servicios" class="section">
         <div class="shell">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 servicios-fijo">
-
-                <div class="lg:col-span-4 reveal pantalla-movil">
-                    <div class="lg:sticky lg:top-28">
-                        <span class="eyebrow mb-6">Servicios</span>
-                        <h2 class="display-lg text-ink mb-6">9.000 m² para descansar <em class="italic text-moss">y compartir</em></h2>
-                        <p class="body-sm text-graphite/70 mb-7">
-                            Hotel Cabaleón ofrece una experiencia de descanso, recreación y naturaleza en 9.000 m²
-                            de zona turística, rodeada de jardines y con vista privilegiada hacia la Cordillera
-                            Oriental de los Andes. Con solo 16 alojamientos, cada huésped recibe una atención personalizada.
-                        </p>
-                        <span class="micro text-graphite/70 block mb-3 hairline-t pt-6">Horarios</span>
-                        <dl class="mb-8 body-sm">
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Piscinas</dt><dd class="text-ink text-right">8:00 a. m. – 5:30 p. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Sauna</dt><dd class="text-ink text-right">10:00 – 10:30 a. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Jacuzzi</dt><dd class="text-ink text-right">10:30 – 11:00 a. m.<br>4:30 – 5:00 p. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Baño turco</dt><dd class="text-ink text-right">4:00 – 4:30 p. m.</dd></div>
-                            <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Mini tejo</dt><dd class="text-ink text-right">9:00 a. m. – 5:30 p. m.</dd></div>
-                        </dl>
-                        <ul class="space-y-3 mb-9">
-                            <li class="flex items-center gap-3 body-sm text-graphite/70"><i data-lucide="cigarette-off" class="w-4 h-4 text-brass shrink-0"></i> Hotel libre de humo</li>
-                            <li class="flex items-center gap-3 body-sm text-graphite/70"><i data-lucide="volume-1" class="w-4 h-4 text-brass shrink-0"></i> Un lugar pensado para el descanso</li>
-                        </ul>
-                        <a href="#reservar" class="link-arrow text-ink">
-                            Reservar ahora <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </a>
-                    </div>
+            <!-- Cabecera: el texto a la izquierda y los horarios a la derecha -->
+            <div class="servicios-cabeza grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start reveal">
+                <div class="lg:col-span-7">
+                    <span class="eyebrow mb-6">Servicios</span>
+                    <h2 class="display-lg text-ink mb-6">9.000 m² para descansar <em class="italic text-moss">y compartir</em></h2>
+                    <p class="body-sm text-graphite/70 mb-7 max-w-2xl">
+                        Hotel Cabaleón ofrece una experiencia de descanso, recreación y naturaleza en 9.000 m²
+                        de zona turística, rodeada de jardines y con vista privilegiada hacia la Cordillera
+                        Oriental de los Andes. Con solo 16 alojamientos, cada huésped recibe una atención personalizada.
+                    </p>
+                    <ul class="space-y-3 mb-9">
+                        <li class="flex items-center gap-3 body-sm text-graphite/70"><i data-lucide="cigarette-off" class="w-4 h-4 text-brass shrink-0"></i> Hotel libre de humo</li>
+                        <li class="flex items-center gap-3 body-sm text-graphite/70"><i data-lucide="volume-1" class="w-4 h-4 text-brass shrink-0"></i> Un lugar pensado para el descanso</li>
+                    </ul>
+                    <a href="#reservar" class="link-arrow text-ink">
+                        Reservar ahora <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
-
-                <div class="lg:col-span-8 reveal d1 pantalla-movil servicios-objetos">
-                    <div class="servicios-objetos-fijo">
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 carrusel" data-movil="2" data-tableta="3" data-por-vista="4" id="fotos-servicios">
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-piscina-nadadores-sm.jpg" alt="Huéspedes en la piscina para adultos" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Piscinas</figcaption>
-                            </figure>
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-bano-turco-sm.jpg" alt="Familia en el baño turco" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Baño turco</figcaption>
-                            </figure>
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-sauna-sm.jpg" alt="Pareja en el sauna" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Sauna</figcaption>
-                            </figure>
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-gimnasio-huespedes-sm.jpg" alt="Huéspedes en el gimnasio" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Gimnasio</figcaption>
-                            </figure>
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-cancha-futbol-sm.jpg" alt="Partido en la cancha polideportiva" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Cancha</figcaption>
-                            </figure>
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-salon-juegos-sm.jpg" alt="Salón de juegos con billar y ping pong" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Billar y ping pong</figcaption>
-                            </figure>
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-mini-tejo-sm.jpg" alt="Huéspedes jugando mini tejo" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Mini tejo</figcaption>
-                            </figure>
-                            <figure class="relative overflow-hidden">
-                                <img src="foto-ninos-sendero-sm.jpg" alt="Niños jugando en los senderos del hotel" class="w-full aspect-[4/5] object-cover" loading="lazy">
-                                <figcaption class="absolute bottom-2 left-2 bg-white/95 text-ink micro px-2.5 py-1">Zonas verdes</figcaption>
-                            </figure>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-line border border-line carrusel mt-4" data-movil="2" data-tableta="3" data-por-vista="4" id="lista-servicios">
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="waves" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Piscina para adultos</h3>
-                                <p class="body-sm text-graphite/70">Rodeada de jardines, con la montaña de fondo. De 90 a 170 cm de profundidad.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="baby" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Piscina infantil</h3>
-                                <p class="body-sm text-graphite/70">60 cm de profundidad, para los más pequeños y siempre con un adulto.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="bath" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Jacuzzi</h3>
-                                <p class="body-sm text-graphite/70">En la piscina principal, con turnos en la mañana y en la tarde.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="flame" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Sauna y baño turco</h3>
-                                <p class="body-sm text-graphite/70">Sauna seco de 80 a 90 °C y baño turco de vapor de 50 a 70 °C.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="dumbbell" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Gimnasio</h3>
-                                <p class="body-sm text-graphite/70">Para no perder la rutina, aun estando de descanso.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="volleyball" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Cancha polideportiva</h3>
-                                <p class="body-sm text-graphite/70">Para jugar en familia o con amigos.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="target" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Mini tejo y juego de rana</h3>
-                                <p class="body-sm text-graphite/70">Los juegos de siempre, en clima cálido.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="circle-dot" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Billar y ping pong</h3>
-                                <p class="body-sm text-graphite/70">En los salones de entretenimiento, para las tardes de juego.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="sprout" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Huerta turística</h3>
-                                <p class="body-sm text-graphite/70">Un recorrido por la huerta del hotel.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="binoculars" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Equipos de avistamiento</h3>
-                                <p class="body-sm text-graphite/70">En alquiler, para disfrutar el paisaje y su fauna.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="shopping-bag" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Tienda de souvenirs</h3>
-                                <p class="body-sm text-graphite/70">Un recuerdo de Cabaleón para llevar a casa.</p>
-                            </div>
-
-                            <div class="bg-bone p-7 sm:p-8 hover:bg-white transition-colors duration-500">
-                                <i data-lucide="square-parking" class="ico-lujo mb-5"></i>
-                                <h3 class="font-display text-xl text-ink mb-2">Parqueadero gratuito</h3>
-                                <p class="body-sm text-graphite/70">Llegas, parqueas y te olvidas del carro hasta el regreso.</p>
-                            </div>
-
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-px bg-line border border-line mt-4 atajos-servicios">
-                            <a href="#restaurante" class="group bg-bone p-6 sm:p-7 hover:bg-white transition-colors duration-500 flex items-center justify-between gap-4">
-                                <span class="flex items-center gap-3"><i data-lucide="utensils-crossed" class="w-4 h-4 text-brass shrink-0"></i><span class="font-display text-lg text-ink">Restaurante Mangolé</span></span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-ink/40 group-hover:text-ink transition-colors"></i>
-                            </a>
-                            <a href="#bar" class="group bg-bone p-6 sm:p-7 hover:bg-white transition-colors duration-500 flex items-center justify-between gap-4">
-                                <span class="flex items-center gap-3"><i data-lucide="martini" class="w-4 h-4 text-brass shrink-0"></i><span class="font-display text-lg text-ink">Cabalante Bar</span></span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-ink/40 group-hover:text-ink transition-colors"></i>
-                            </a>
-                            <a href="#eventos" class="group bg-bone p-6 sm:p-7 hover:bg-white transition-colors duration-500 flex items-center justify-between gap-4">
-                                <span class="flex items-center gap-3"><i data-lucide="party-popper" class="w-4 h-4 text-brass shrink-0"></i><span class="font-display text-lg text-ink">Salones para eventos</span></span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-ink/40 group-hover:text-ink transition-colors"></i>
-                            </a>
-                        </div>
-                    </div>
+                <div class="lg:col-span-5">
+                    <span class="micro text-graphite/70 block mb-3 hairline-t pt-6">Horarios</span>
+                    <dl class="body-sm">
+                        <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Piscinas</dt><dd class="text-ink text-right">8:00 a. m. – 5:30 p. m.</dd></div>
+                        <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Sauna</dt><dd class="text-ink text-right">10:00 – 10:30 a. m.</dd></div>
+                        <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Jacuzzi</dt><dd class="text-ink text-right">10:30 – 11:00 a. m.<br>4:30 – 5:00 p. m.</dd></div>
+                        <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Baño turco</dt><dd class="text-ink text-right">4:00 – 4:30 p. m.</dd></div>
+                        <div class="flex justify-between gap-4 hairline-b py-2.5"><dt class="text-graphite/70">Mini tejo</dt><dd class="text-ink text-right">9:00 a. m. – 5:30 p. m.</dd></div>
+                    </dl>
                 </div>
+            </div>
 
+            <!-- Cada servicio con su foto, todos a la vista (sin "Ver más"). En computador, 4 columnas: la piscina
+                 y los equipos de avistamiento ocupan dos para que las filas queden completas -->
+            <div class="servicios-cuadricula reveal d1" id="lista-servicios">
+                    <article class="servicio servicio--ancho">
+                        <div class="servicio-foto"><img src="foto-piscina-nadadores-sm.jpg" alt="Huéspedes en la piscina para adultos con la cordillera de fondo" style="object-position: 50% 60%" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="waves" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Piscina para adultos</h3>
+                            <p class="body-sm text-graphite/70">Rodeada de jardines, con la montaña de fondo. De 90 a 170 cm de profundidad.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-hotel-aereo-sm.jpg" alt="Vista aérea de las piscinas del hotel" style="object-position: 50% 82%" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="baby" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Piscina infantil</h3>
+                            <p class="body-sm text-graphite/70">60 cm de profundidad, para los más pequeños y siempre con un adulto.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-piscina-montanas-sm.jpg" alt="Piscina y jacuzzi con las montañas de fondo" style="object-position: 50% 78%" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="bath" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Jacuzzi</h3>
+                            <p class="body-sm text-graphite/70">En la piscina principal, con turnos en la mañana y en la tarde.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-sauna-sm.jpg" alt="Pareja en el sauna" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="flame" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Sauna</h3>
+                            <p class="body-sm text-graphite/70">Sauna seco de 80 a 90 °C, con turno en la mañana.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-bano-turco-sm.jpg" alt="Familia en el baño turco" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="cloud-fog" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Baño turco</h3>
+                            <p class="body-sm text-graphite/70">Baño turco de vapor de 50 a 70 °C, con turno en la tarde.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-gimnasio-huespedes-sm.jpg" alt="Huéspedes en el gimnasio" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="dumbbell" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Gimnasio</h3>
+                            <p class="body-sm text-graphite/70">Para no perder la rutina, aun estando de descanso.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-cancha-futbol-sm.jpg" alt="Partido en la cancha polideportiva" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="volleyball" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Cancha polideportiva</h3>
+                            <p class="body-sm text-graphite/70">Para jugar en familia o con amigos.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-mini-tejo-sm.jpg" alt="Huéspedes jugando mini tejo" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="target" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Mini tejo y juego de rana</h3>
+                            <p class="body-sm text-graphite/70">Los juegos de siempre, en clima cálido.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-salon-juegos-sm.jpg" alt="Salón de juegos con billar y ping pong" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="circle-dot" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Billar y ping pong</h3>
+                            <p class="body-sm text-graphite/70">En los salones de entretenimiento, para las tardes de juego.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-ninos-sendero-sm.jpg" alt="Niños jugando en los senderos del hotel" style="object-position: 50% 70%" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="trees" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Zonas verdes y senderos</h3>
+                            <p class="body-sm text-graphite/70">Jardines y senderos para caminar y para que los niños jueguen.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-huerta-sm.jpg" alt="Huerta del hotel" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="sprout" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Huerta turística</h3>
+                            <p class="body-sm text-graphite/70">Un recorrido por la huerta del hotel.</p>
+                        </div>
+                    </article>
+                    <article class="servicio servicio--ancho">
+                        <div class="servicio-foto"><img src="panorama.jpg" alt="Montañas de la Cordillera Oriental vistas desde el hotel" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="binoculars" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Equipos de avistamiento</h3>
+                            <p class="body-sm text-graphite/70">En alquiler, para disfrutar el paisaje y su fauna.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto servicio-foto--icono" aria-hidden="true"><i data-lucide="shopping-bag" class="w-10 h-10"></i></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="shopping-bag" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Tienda de souvenirs</h3>
+                            <p class="body-sm text-graphite/70">Un recuerdo de Cabaleón para llevar a casa.</p>
+                        </div>
+                    </article>
+                    <article class="servicio">
+                        <div class="servicio-foto"><img src="foto-parqueadero-sm.jpg" alt="Parqueadero del hotel" loading="lazy"></div>
+                        <div class="servicio-cuerpo">
+                            <i data-lucide="square-parking" class="ico-lujo"></i>
+                            <h3 class="font-display text-xl text-ink mb-2">Parqueadero gratuito</h3>
+                            <p class="body-sm text-graphite/70">Llegas, parqueas y te olvidas del carro hasta el regreso.</p>
+                        </div>
+                    </article>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-px bg-line border border-line mt-6 atajos-servicios">
+                <a href="#restaurante" class="group bg-bone p-6 sm:p-7 hover:bg-white transition-colors duration-500 flex items-center justify-between gap-4">
+                    <span class="flex items-center gap-3"><i data-lucide="utensils-crossed" class="w-4 h-4 text-brass shrink-0"></i><span class="font-display text-lg text-ink">Restaurante Mangolé</span></span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-ink/40 group-hover:text-ink transition-colors"></i>
+                </a>
+                <a href="#bar" class="group bg-bone p-6 sm:p-7 hover:bg-white transition-colors duration-500 flex items-center justify-between gap-4">
+                    <span class="flex items-center gap-3"><i data-lucide="martini" class="w-4 h-4 text-brass shrink-0"></i><span class="font-display text-lg text-ink">Cabalante Bar</span></span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-ink/40 group-hover:text-ink transition-colors"></i>
+                </a>
+                <a href="#eventos" class="group bg-bone p-6 sm:p-7 hover:bg-white transition-colors duration-500 flex items-center justify-between gap-4">
+                    <span class="flex items-center gap-3"><i data-lucide="party-popper" class="w-4 h-4 text-brass shrink-0"></i><span class="font-display text-lg text-ink">Salones para eventos</span></span>
+                    <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-ink/40 group-hover:text-ink transition-colors"></i>
+                </a>
             </div>
         </div>
     </section>
@@ -3476,9 +3636,9 @@
             <div class="carta-fijo">
             <!-- Carta de favoritos con pedido: se genera desde `CARTA_FAVORITOS` (script) -->
             <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8 reveal">
-                <div class="max-w-xl">
+                <div class="max-w-2xl">
                     <span class="eyebrow mb-4">Carta de favoritos · Pide aquí</span>
-                    <h3 class="font-display text-3xl sm:text-4xl text-ink mb-3">Inspiración del día</h3>
+                    <h3 class="font-display text-3xl sm:text-4xl text-ink mb-3">Pide y prepara tu <em class="italic text-moss">experiencia personalizada</em></h3>
                     <p class="body-sm text-graphite/70">
                         Agrega tus platos, elige si es para el almuerzo o la cena y envía el pedido por WhatsApp:
                         el equipo de Mangolé te lo confirma con la hora. Los platos marcados incluyen la bebida del día de cortesía.
@@ -3493,22 +3653,16 @@
             </div>
 
             </div>
-            <!-- Afiches originales de la carta: se generan desde `CARTA_FAVORITOS` y `AFICHES`.
-                 Con pantallas se ven de a dos; "Ver más" pasa a los siguientes -->
-            <div class="pantalla afiches-pantalla">
-            <div class="afiches-fijo reveal">
-                <div class="flex items-end justify-between gap-4 mb-6 afiches-cabeza">
-                    <div>
-                        <span class="eyebrow is-centered mb-4">Afiches de Mangolé</span>
-                        <h3 class="font-display text-2xl sm:text-3xl text-ink">La carta, como la ves en el restaurante</h3>
-                    </div>
-                    <div class="carrusel-botones" data-tira="afiches">
-                        <button type="button" onclick="moverTira('afiches', -1)" aria-label="Afiches anteriores" class="carrusel-flecha" data-dir="-1"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
-                        <button type="button" onclick="moverTira('afiches', 1)" aria-label="Ver más afiches" class="carrusel-mas" data-dir="1">Ver más <span class="carrusel-mas-ico"><i data-lucide="arrow-right" class="w-4 h-4"></i></span></button>
-                    </div>
+            <!-- Afiches de Mangolé: el botón "Ver inspiración del día" abre los afiches de la carta de uno en uno,
+                 con flechas (visor #visor-afiches). La vista previa se genera desde `CARTA_FAVORITOS` y `AFICHES` -->
+            <div class="visor-bloque reveal">
+                <div class="visor-pila" id="afiches" onclick="abrirVisor('afiches', 0)" aria-hidden="true"></div>
+                <div>
+                    <span class="eyebrow is-centered mb-4">Afiches de Mangolé</span>
+                    <h3 class="font-display text-2xl sm:text-3xl text-ink mb-3">La carta, como la ves en el restaurante</h3>
+                    <p class="body-sm text-graphite/70 mb-6"><span data-afiches-total>10</span> afiches, uno por uno: pasa de uno a otro con las flechas y agrega a tu pedido el plato que te provoque.</p>
+                    <button type="button" onclick="abrirVisor('afiches', 0)" class="carrusel-mas">Ver inspiración del día <span class="carrusel-mas-ico"><i data-lucide="arrow-right" class="w-4 h-4"></i></span></button>
                 </div>
-                <div id="afiches" class="reels flex gap-3 overflow-x-auto snap-x snap-mandatory"></div>
-            </div>
             </div>
         </div>
     </section>
@@ -3577,7 +3731,8 @@
                             <svg class="w-[18px] h-[18px]" aria-hidden="true"><use href="#i-cloche"/></svg> Ver mi pedido <span data-pedido-cuenta class="ml-1 min-w-[1.4rem] h-[1.4rem] px-1.5 rounded-full bg-brass text-ink text-[0.75rem] tracking-normal inline-flex items-center justify-center">0</span>
                         </button>
                     </div>
-                    <div class="carrusel bebidas-lista" id="bebidas-grid"></div>
+                    <!-- Todas las categorías a la vista, sin "Ver más": dos columnas equilibradas (en celular, una) -->
+                    <div class="bebidas-lista" id="bebidas-grid"></div>
                     <p class="bebidas-nota">
                         Precios en pesos colombianos, sujetos a cambios. Los licores se venden por botella.
                         El exceso de alcohol es perjudicial para la salud. Prohíbese el expendio de bebidas embriagantes a menores de edad.
@@ -3620,23 +3775,26 @@
                 </div>
             </div>
 
-            <!-- Filtro por categoría: se generan solo las categorías que tienen fotos -->
-            <div class="hairline-t hairline-b py-5 mb-10 sm:mb-14 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 reveal">
-                <span class="micro text-graphite/70 shrink-0">Filtrar por categoría</span>
-                <div class="flex flex-wrap gap-2" id="gallery-filters"></div>
-                <p class="body-sm text-graphite/70 sm:ml-auto" id="gallery-note"></p>
+            <!-- Categorías: todas a la vista (en celular, en varias filas). Se generan solo las que tienen fotos -->
+            <div class="gal-barra reveal">
+                <span class="gal-barra-titulo">¿Qué quieres ver?</span>
+                <div class="gal-filtros" id="gallery-filters"></div>
             </div>
+            <p class="gal-nota" id="gallery-note" aria-live="polite"></p>
 
-            <!-- Las fotografías se generan desde `galeria` (script) -->
-            <div class="grid grid-cols-2 md:grid-cols-4 grid-flow-row-dense gap-2.5 sm:gap-3 auto-rows-[150px] sm:auto-rows-[200px] lg:auto-rows-[230px] reveal carrusel" data-tableta="3" data-por-vista="4" id="gallery-grid"></div>
+            <!-- Mosaico: fotos de varios tamaños con su nombre siempre visible; se generan desde `galeria` (script).
+                 Se ven de a tandas y "Ver más fotos" suma las siguientes aquí mismo -->
+            <div class="gal-mosaico reveal" id="gallery-grid"></div>
 
             <p id="gallery-empty" class="hidden body-sm text-graphite/70 py-10 text-center">
                 No hay fotografías en esta categoría todavía.
             </p>
-            <div class="text-center mt-8" id="gallery-more-wrap">
-                <button type="button" id="gallery-more" class="btn btn-outline text-ink">
-                    <i data-lucide="images" class="w-4 h-4"></i> <span id="gallery-more-txt">Ver más fotografías</span>
+            <div class="gal-acciones" id="gallery-more-wrap">
+                <button type="button" id="gallery-more" class="carrusel-mas">
+                    <span id="gallery-more-txt">Ver más fotos</span> <span class="carrusel-mas-ico"><i data-lucide="plus" class="w-4 h-4"></i></span>
                 </button>
+                <span class="gal-quedan" id="gallery-quedan"></span>
+                <a href="https://maps.app.goo.gl/tFjXZFSAjQHFDaHWA" target="_blank" rel="noopener noreferrer" class="hab-cambiar gal-google">Álbum completo en Google ↗</a>
             </div>
             </div>
 
@@ -3760,7 +3918,8 @@
             </div>
 
             <div class="reveal d1">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-line border border-line carrusel" data-tableta="3" data-por-vista="3" id="tarjetas-info">
+                <!-- Las seis tarjetas a la vista, sin "Ver más": de a tres en computador, de a dos en tableta y una debajo de otra en celular -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-line border border-line" id="tarjetas-info">
 
                     <div class="bg-bone p-7 sm:p-9 flex flex-col hover:bg-white transition-colors duration-500">
                         <div class="flex items-center gap-3 mb-6">
@@ -3878,58 +4037,18 @@
             </div>
 
             </div>
-            <div class="pantalla guias-pantalla">
-            <div class="guias-fijo">
-            <!-- Guías y folletos del hotel (imágenes de la carpeta; se abren en grande) -->
-            <div class="reveal">
-                <span class="eyebrow mb-4">Guías y folletos</span>
-                <h3 class="font-display text-2xl sm:text-3xl text-ink mb-8">Para tener a mano durante tu estadía</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 carrusel" data-movil="2" data-tableta="3" data-por-vista="6" id="guias-info">
-                    <a href="bienvenido.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
-                        <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="guia-bienvenida.jpg" alt="Guía de bienvenida" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
-                        <div class="p-3 sm:p-4">
-                            <span class="block font-display text-lg text-ink leading-tight mb-1">Guía de bienvenida</span>
-                            <span class="block micro leading-relaxed text-graphite/70">Horarios y recomendaciones</span>
-                        </div>
-                    </a>
-                    <a href="reglas-piscina.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
-                        <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="reglamento-piscina.jpg" alt="Reglamento de la piscina" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
-                        <div class="p-3 sm:p-4">
-                            <span class="block font-display text-lg text-ink leading-tight mb-1">Reglamento de la piscina</span>
-                            <span class="block micro leading-relaxed text-graphite/70">Normas y profundidades</span>
-                        </div>
-                    </a>
-                    <a href="sauna-y-turcos.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
-                        <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="sauna-y-turcos.jpg" alt="Tu espacio de bienestar" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
-                        <div class="p-3 sm:p-4">
-                            <span class="block font-display text-lg text-ink leading-tight mb-1">Tu espacio de bienestar</span>
-                            <span class="block micro leading-relaxed text-graphite/70">Sauna, turco y jacuzzi</span>
-                        </div>
-                    </a>
-                    <a href="cabalante-menu.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
-                        <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="cabalante-menu.jpg" alt="Carta de Cabalante" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
-                        <div class="p-3 sm:p-4">
-                            <span class="block font-display text-lg text-ink leading-tight mb-1">Carta de Cabalante</span>
-                            <span class="block micro leading-relaxed text-graphite/70">Bebidas y precios</span>
-                        </div>
-                    </a>
-                    <a href="flyer1.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
-                        <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="flyer1.jpg" alt="Pasadía Premium" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
-                        <div class="p-3 sm:p-4">
-                            <span class="block font-display text-lg text-ink leading-tight mb-1">Pasadía Premium</span>
-                            <span class="block micro leading-relaxed text-graphite/70">Volante de apertura</span>
-                        </div>
-                    </a>
-                    <a href="experiencias.jpg" target="_blank" rel="noopener" class="group block bg-bone border border-line hover:bg-white transition-colors duration-500">
-                        <div class="aspect-[3/4] overflow-hidden bg-sand"><img src="experiencias.jpg" alt="Folleto del hotel" class="w-full h-full object-cover object-top group-hover:scale-[1.03] transition-transform duration-700" loading="lazy"></div>
-                        <div class="p-3 sm:p-4">
-                            <span class="block font-display text-lg text-ink leading-tight mb-1">Folleto del hotel</span>
-                            <span class="block micro leading-relaxed text-graphite/70">Experiencias y habitaciones</span>
-                        </div>
-                    </a>
+            <div class="guias-bloque">
+            <!-- Guías y folletos: vista previa en abanico y el botón "Ver guías y folletos", que las abre de una en una
+                 con flechas (el mismo visor de los afiches). Se generan desde `GUIAS` (script) -->
+            <div class="visor-bloque reveal">
+                <div class="visor-pila visor-pila--guias" id="guias-pila" onclick="abrirVisor('guias', 0)" aria-hidden="true"></div>
+                <div>
+                    <span class="eyebrow is-centered mb-4">Guías y folletos</span>
+                    <h3 class="font-display text-2xl sm:text-3xl text-ink mb-3">Para tener a mano durante tu estadía</h3>
+                    <p class="body-sm text-graphite/70 mb-6"><span data-guias-total>6</span> guías del hotel, una por una: la de bienvenida, el reglamento de la piscina, el bienestar, la carta de Cabalante y más.</p>
+                    <button type="button" onclick="abrirVisor('guias', 0)" class="carrusel-mas">Ver guías y folletos <span class="carrusel-mas-ico"><i data-lucide="arrow-right" class="w-4 h-4"></i></span></button>
                 </div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mt-14 hairline-t pt-10 reveal notas-info">
                 <div class="flex items-start gap-4">
                     <i data-lucide="baby" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
@@ -3952,7 +4071,6 @@
                         <p class="body-sm text-graphite/70">Para 5 huéspedes o más combinamos habitaciones. Escríbenos y armamos la mejor opción para todos.</p>
                     </div>
                 </div>
-            </div>
             </div>
             </div>
 
@@ -4477,7 +4595,53 @@
                     <h2 class="blog-titulo" id="blog-titulo">Blog</h2>
                     <p class="blog-texto">Consejos y planes para disfrutar cada momento en Cabaleón.</p>
                 </div>
-                <div class="carrusel lista-completa" data-por-vista="4" id="blog-grid">
+                <!-- Todos los artículos a la vista (sin "Ver más"): de a cuatro en computador, de a dos en tableta.
+                     Las tarjetas salen de generar_blog.py (tarjetas-index.html), del más reciente al más antiguo -->
+                <div class="blog-cuadricula" id="blog-grid">
+                    <article class="blog-tarjeta">
+                        <a href="blog-que-hacer-en-tena-cundinamarca.html" class="blog-tarjeta-boton" onclick="registrar('blog', 'que-hacer-en-tena')">
+                            <span class="blog-foto"><img src="blog-que-hacer-en-tena-sm.jpg" alt="Hotel Cabaleón entre montañas verdes en Tena, Cundinamarca: edificios de techo azul, kioscos y piscina" width="640" height="360" loading="lazy"><span class="blog-categoria">Qué hacer</span></span>
+                            <span class="blog-cuerpo">
+                                <span class="blog-meta">Lectura de 8 min</span>
+                                <h3 class="blog-tarjeta-titulo">Qué hacer en Tena, Cundinamarca: guía completa para tu escapada</h3>
+                                <span class="blog-resumen">Laguna de Pedro Palo, cascadas, caminos reales, aves y un plan de dos días para conocer Tena sin afanes.</span>
+                                <span class="blog-leer">Leer artículo <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                            </span>
+                        </a>
+                    </article>
+                    <article class="blog-tarjeta">
+                        <a href="blog-laguna-de-pedro-palo-tena.html" class="blog-tarjeta-boton" onclick="registrar('blog', 'laguna-pedro-palo')">
+                            <span class="blog-foto"><img src="blog-laguna-pedro-palo-sm.jpg" alt="Montañas y bosques de la Cordillera Oriental vistos desde Hotel Cabaleón, en Tena, Cundinamarca" width="640" height="360" loading="lazy"><span class="blog-categoria">Naturaleza</span></span>
+                            <span class="blog-cuerpo">
+                                <span class="blog-meta">Lectura de 7 min</span>
+                                <h3 class="blog-tarjeta-titulo">Laguna de Pedro Palo en Tena: qué es, cómo visitarla y qué saber antes de ir</h3>
+                                <span class="blog-resumen">La laguna sagrada de Tena: historia, aves, reglas de la reserva y cómo visitarla con guía, paso a paso.</span>
+                                <span class="blog-leer">Leer artículo <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                            </span>
+                        </a>
+                    </article>
+                    <article class="blog-tarjeta">
+                        <a href="blog-pueblos-de-clima-calido-cerca-de-bogota.html" class="blog-tarjeta-boton" onclick="registrar('blog', 'pueblos-clima-calido')">
+                            <span class="blog-foto"><img src="blog-pueblos-clima-calido-sm.jpg" alt="Huéspedes en la piscina de Hotel Cabaleón con parasoles azules y asoleadoras, clima cálido en Tena" width="640" height="360" loading="lazy"><span class="blog-categoria">Comparativo</span></span>
+                            <span class="blog-cuerpo">
+                                <span class="blog-meta">Lectura de 5 min</span>
+                                <h3 class="blog-tarjeta-titulo">Pueblos de clima cálido cerca de Bogotá: comparativo para elegir tu escapada</h3>
+                                <span class="blog-resumen">Tena, La Mesa, La Vega, Anapoima, Villeta, Tocaima, Melgar y más, comparados por distancia, altura y temperatura.</span>
+                                <span class="blog-leer">Leer artículo <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                            </span>
+                        </a>
+                    </article>
+                    <article class="blog-tarjeta">
+                        <a href="blog-festivos-y-puentes-2027-colombia.html" class="blog-tarjeta-boton" onclick="registrar('blog', 'puentes-festivos-2027')">
+                            <span class="blog-foto"><img src="blog-puentes-festivos-sm.jpg" alt="Kiosko de techo azul entre palmeras de coco en Hotel Cabaleón, Tena: plan para un puente festivo cerca de Bogotá" width="640" height="360" loading="lazy"><span class="blog-categoria">Festivos</span></span>
+                            <span class="blog-cuerpo">
+                                <span class="blog-meta">Lectura de 7 min</span>
+                                <h3 class="blog-tarjeta-titulo">Festivos y puentes 2027 en Colombia: calendario completo y cómo aprovecharlos</h3>
+                                <span class="blog-resumen">Los 19 festivos de 2027, los 11 puentes, Semana Santa, los meses sin festivo y cómo aprovechar cada uno.</span>
+                                <span class="blog-leer">Leer artículo <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></span>
+                            </span>
+                        </a>
+                    </article>
                     <article class="blog-tarjeta">
                         <a href="blog-como-llegar-a-tena-desde-bogota.html" class="blog-tarjeta-boton" onclick="registrar('blog', 'como-llegar')">
                             <span class="blog-foto"><img src="blog-como-llegar-sm.jpg" alt="Vista aérea de Hotel Cabaleón en Tena, Cundinamarca: kioscos, terraza, piscina y jardines entre montañas" width="640" height="360" loading="lazy"><span class="blog-categoria">Cómo llegar</span></span>
@@ -4804,6 +4968,26 @@
     </div>
 
     <!-- ============================= LIGHTBOX ============================= -->
+    <!-- Visor de imágenes de a una (afiches de Mangolé y guías del hotel): flechas, teclado y deslizar -->
+    <div id="visor-afiches" class="is-hidden" role="dialog" aria-modal="true" aria-labelledby="va-nombre">
+        <div class="va-cabeza">
+            <span class="va-etiqueta" id="va-etiqueta"></span>
+            <button type="button" onclick="cerrarVisor()" class="va-cerrar" aria-label="Cerrar"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div class="va-escena" id="va-escena">
+            <img id="va-img" alt="" class="va-img">
+        </div>
+        <div class="va-pie">
+            <button type="button" onclick="pasarVisor(-1)" class="va-flecha va-ant" aria-label="Anterior"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+            <div class="va-info">
+                <h3 id="va-nombre" class="va-nombre"></h3>
+                <p class="va-datos"><span id="va-precio" class="va-precio"></span><span id="va-sub" class="va-sub"></span><span id="va-cuenta" class="va-cuenta"></span></p>
+                <div class="plato-ctrl va-ctrl" id="va-ctrl" data-plato=""></div>
+            </div>
+            <button type="button" onclick="pasarVisor(1)" class="va-flecha va-sig" aria-label="Siguiente"><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+        </div>
+    </div>
+
     <div id="lightbox" class="is-hidden fixed inset-0 z-[150] bg-ink/95 flex items-center justify-center p-4 sm:p-10">
         <button onclick="closeLightbox()" aria-label="Cerrar galería" class="absolute top-5 right-5 sm:top-8 sm:right-8 w-11 h-11 rounded-full border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-ink transition-colors">
             <i data-lucide="x" class="w-5 h-5"></i>
@@ -5161,13 +5345,14 @@
         const ANTICIPO = 0.5;           // porcentaje que se paga para confirmar la reserva
 
         /* Festivos de Colombia (2026–2027). La noche anterior a un festivo
-           se cobra con tarifa de fin de semana. Actualizar cada año. */
+           se cobra con tarifa de fin de semana. Actualizar cada año.
+           Incluye la Virgen de Chiquinquirá (Ley 2578 de 2026): lunes 13 de julio de 2026 y lunes 12 de julio de 2027. */
         const FESTIVOS = new Set([
             '2026-01-01', '2026-01-12', '2026-03-23', '2026-04-02', '2026-04-03', '2026-05-01',
-            '2026-05-18', '2026-06-08', '2026-06-15', '2026-06-29', '2026-07-20', '2026-08-07',
+            '2026-05-18', '2026-06-08', '2026-06-15', '2026-06-29', '2026-07-13', '2026-07-20', '2026-08-07',
             '2026-08-17', '2026-10-12', '2026-11-02', '2026-11-16', '2026-12-08', '2026-12-25',
             '2027-01-01', '2027-01-11', '2027-03-22', '2027-03-25', '2027-03-26', '2027-05-01',
-            '2027-05-10', '2027-05-31', '2027-06-07', '2027-07-05', '2027-07-20', '2027-08-07',
+            '2027-05-10', '2027-05-31', '2027-06-07', '2027-07-05', '2027-07-12', '2027-07-20', '2027-08-07',
             '2027-08-16', '2027-10-18', '2027-11-01', '2027-11-15', '2027-12-08', '2027-12-25'
         ]);
 
@@ -5228,6 +5413,16 @@
             'pollo-curry': 6, 'hamburguesa': 7, 'crepe-pollo': 8, 'pasta-cabaleon': 9, 'wrap-mangole': 10
         };
         const aficheDe = id => 'restaurante-' + String(AFICHES[id]).padStart(2, '0') + '.jpg';
+
+        /* Guías y folletos del hotel: `img` se ve en el visor; `vista`, si está, es la imagen de la vista previa */
+        const GUIAS = [
+            { img: 'bienvenido.jpg', vista: 'guia-bienvenida.jpg', titulo: 'Guía de bienvenida', sub: 'Horarios y recomendaciones' },
+            { img: 'reglas-piscina.jpg', vista: 'reglamento-piscina.jpg', titulo: 'Reglamento de la piscina', sub: 'Normas y profundidades' },
+            { img: 'sauna-y-turcos.jpg', titulo: 'Tu espacio de bienestar', sub: 'Sauna, turco y jacuzzi' },
+            { img: 'cabalante-menu.jpg', titulo: 'Carta de Cabalante', sub: 'Bebidas y precios' },
+            { img: 'flyer1.jpg', titulo: 'Pasadía Premium', sub: 'Volante de apertura' },
+            { img: 'experiencias.jpg', titulo: 'Folleto del hotel', sub: 'Experiencias y habitaciones' }
+        ];
 
         /* Carta de bebidas de Cabalante Bar (precios en COP; licores por botella) */
         const CARTA_BEBIDAS = [
@@ -5676,7 +5871,7 @@
             document.getElementById('bar-room').value = booking.room;
             document.getElementById('form-pets').value = booking.pets;
 
-            if (document.getElementById('room-filter-note')) {
+            if (document.getElementById('rooms-grid')) {
                 filtrarHabitaciones(booking.guests);
             }
 
@@ -7031,8 +7226,8 @@
             return '<img src="' + miniatura(h.fotos[0]) + '" alt="' + h.nombre + ' del Hotel Cabaleón" class="' + clases + ' object-cover" loading="lazy">';
         }
 
-        /* --- Habitaciones: primero la ventana "¿Cuántas personas se van a quedar?"; al elegir
-               aparecen solo las que les sirven, de dos en dos (una pantalla por pareja) --- */
+        /* --- Habitaciones: primero la ventana "¿Cuántas personas se van a quedar?"; al elegir,
+               en ese mismo lugar aparecen solo las que les sirven, de dos en dos, con "Volver" arriba --- */
         let huespedesHab = null;   // null: todavía no eligen; 1 a 5 (5 = cinco o más); 'todas'
 
         function habitacionesParaHuespedes(n) {
@@ -7042,21 +7237,18 @@
         function renderHabitaciones() {
             const grid = document.getElementById('rooms-grid');
             const n = huespedesHab;
-            if (n === null) { grid.hidden = true; grid.innerHTML = ''; return; }
+            if (n === null) { grid.innerHTML = ''; return; }
             const claves = habitacionesParaHuespedes(n);
             const pares = [];
             for (let i = 0; i < claves.length; i += 2) pares.push(claves.slice(i, i + 2));
-            const quienes = n === 'todas' ? 'Todas las habitaciones' : n >= 5 ? 'Para 5 huéspedes o más' : 'Para ' + n + (n === 1 ? ' huésped' : ' huéspedes');
-            grid.innerHTML = pares.map((par, p) =>
-                '<div class="hab-par' + (par.length === 1 ? ' es-unica' : '') + '">' +
-                    '<div class="hab-par-cabeza">' +
-                        '<span class="micro text-graphite/70">' + quienes + ' · ' +
-                            (claves.length === 1 ? '1 habitación' : (p * 2 + 1) + (par.length > 1 ? '–' + (p * 2 + 2) : '') + ' de ' + claves.length) + '</span>' +
-                        '<button type="button" class="hab-cambiar" onclick="volverAVentanaHab()">Cambiar</button>' +
-                    '</div>' +
-                    par.map(tarjetaHabitacion).join('') +
-                '</div>').join('');
-            grid.hidden = false;
+            const cuantas = claves.length + (claves.length === 1 ? ' habitación' : ' habitaciones');
+            const resumen = n === 'todas' ? ['Las ' + cuantas] : [n >= 5 ? '5 huéspedes o más' : 'Para ' + n + (n === 1 ? ' huésped' : ' huéspedes'), cuantas];
+            document.getElementById('hab-lista-resumen').innerHTML = resumen.map(t => '<span>' + t + '</span>').join('<span class="hab-lista-sep" aria-hidden="true"> · </span>');
+            const nota = document.getElementById('hab-lista-nota');
+            nota.textContent = n !== 'todas' && n >= 5 ? 'Para 5 huéspedes o más combinamos habitaciones: aquí están todas y en la reserva las sumas.' : '';
+            nota.hidden = !nota.textContent;
+            grid.innerHTML = pares.map(par =>
+                '<div class="hab-par' + (par.length === 1 ? ' es-unica' : '') + '">' + par.map(tarjetaHabitacion).join('') + '</div>').join('');
             if (window.lucide) lucide.createIcons();
         }
 
@@ -7220,18 +7412,6 @@
             });
         }
 
-        /* Guías y folletos: las imágenes se cargan apenas la sección se acerca (no aparecen en blanco al pasar de una a otra) */
-        function prepararGuias() {
-            const guias = document.getElementById('guias-info');
-            if (!guias || !('IntersectionObserver' in window)) return;
-            const cerca = new IntersectionObserver(entradas => {
-                if (!entradas.some(e => e.isIntersecting)) return;
-                guias.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
-                cerca.disconnect();
-            }, { rootMargin: '150% 0px' });
-            cerca.observe(guias);
-        }
-
         /* --- Ficha de la habitación (con enlace propio: #habitacion-suite, etc.) --- */
         let habitacionAbierta = null;
         let fotoHabitacion = 0;
@@ -7329,31 +7509,37 @@
                 btn.setAttribute('aria-pressed', activo ? 'true' : 'false');
             });
 
-            const total = habitacionesParaHuespedes(n).length;
-            const nota = document.getElementById('room-filter-note');
-            if (n === 'todas') {
-                nota.textContent = 'Estas son las ' + total + ' opciones de alojamiento. Desliza para verlas.';
-            } else if (n >= 5) {
-                nota.textContent = 'Para 5 huéspedes o más combinamos habitaciones: aquí están todas y en la reserva las sumas.';
-            } else if (total === 1) {
-                nota.textContent = 'Una habitación recibe a ' + n + (n === 1 ? ' huésped.' : ' huéspedes.') + ' Desliza para verla.';
-            } else {
-                nota.textContent = total + ' habitaciones reciben a ' + n + (n === 1 ? ' huésped.' : ' huéspedes.') + ' Desliza para verlas.';
-            }
             renderHabitaciones();
         }
 
-        /* Lleva a la primera pareja de habitaciones (en celular, a la primera tarjeta) */
-        function irAHabitaciones() {
-            const destino = document.querySelector('#rooms-grid .hab-par');
-            if (!destino) return;
-            const movil = window.matchMedia('(max-width: 767px)').matches;
-            const blanco = movil ? destino.querySelector('.room-card') || destino : destino;
-            requestAnimationFrame(() => blanco.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        /* Cambia la ventana por las habitaciones (o al revés) en el mismo lugar de la pantalla: lo que
+           entra queda a la misma altura que lo que sale, sin saltos. Si lo que sale no se veía (por
+           ejemplo, "Elegir otro número" al final de la lista), lleva con suavidad a lo que entra */
+        function cambiarVistaHab(mostrarLista) {
+            const ventana = document.querySelector('#habitaciones .hab-ventana');
+            const lista = document.getElementById('hab-lista');
+            const sale = mostrarLista ? ventana : lista;
+            const entra = mostrarLista ? lista : ventana;
+            if (sale.hidden && !entra.hidden) return;
+            const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alto-nav')) || 0;
+            const arriba = sale.getBoundingClientRect().top;
+            const seVeia = arriba >= nav - 2 && arriba < innerHeight - 140;
+            sale.hidden = true;
+            entra.hidden = false;
+            if (seVeia) window.scrollBy({ top: entra.getBoundingClientRect().top - arriba, behavior: 'instant' });
+            else entra.scrollIntoView({ behavior: 'smooth', block: mostrarLista ? 'start' : 'center' });
+        }
+
+        function mostrarHabitacionesElegidas() {
+            cambiarVistaHab(true);
+            const volver = document.querySelector('#hab-lista .hab-volver');
+            if (volver) volver.focus({ preventScroll: true });
         }
 
         function volverAVentanaHab() {
-            document.querySelector('#habitaciones .hab-inicio').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            cambiarVistaHab(false);
+            const elegido = document.querySelector('#room-filters .room-filter.is-active') || document.querySelector('#room-filters .room-filter');
+            if (elegido) elegido.focus({ preventScroll: true });
         }
 
         /* =========================================================
@@ -7387,22 +7573,89 @@
         /* =========================================================
            Cartas del restaurante y del bar
            ========================================================= */
+        /* Visor de imágenes de a una, con flechas, teclado y deslizar con el dedo:
+             - 'afiches': la "Inspiración del día" de Mangolé; debajo, el plato con su precio y "Agregar" al pedido
+             - 'guias': las guías y folletos del hotel; debajo, el nombre y de qué trata */
+        const VISORES = {
+            afiches: {
+                etiqueta: 'Inspiración del día · Mangolé',
+                items: () => CARTA_FAVORITOS.map(p => ({ img: aficheDe(p.foto), alt: 'Afiche de ' + p.nombre + ' en Mangolé', titulo: p.nombre, precio: COP(p.precio), plato: p.foto }))
+            },
+            guias: {
+                etiqueta: 'Guías y folletos · Hotel Cabaleón',
+                items: () => GUIAS.map(g => ({ img: g.img, alt: g.titulo + ' de Hotel Cabaleón', titulo: g.titulo, sub: g.sub }))
+            }
+        };
+        let visorTipo = 'afiches';
+        let visorItems = [];
+        let visorActual = 0;
+        let focoAntesDelVisor = null;
+
+        function pintarVisor() {
+            const it = visorItems[visorActual];
+            const img = document.getElementById('va-img');
+            img.classList.add('cambiando');
+            const nueva = new Image();
+            nueva.onload = nueva.onerror = () => { img.src = nueva.src; img.alt = it.alt; img.classList.remove('cambiando'); };
+            nueva.src = it.img;
+            document.getElementById('va-nombre').textContent = it.titulo;
+            document.getElementById('va-cuenta').textContent = (visorActual + 1) + ' / ' + visorItems.length;
+            const precio = document.getElementById('va-precio'), sub = document.getElementById('va-sub');
+            precio.textContent = it.precio || ''; precio.hidden = !it.precio;
+            sub.textContent = it.sub || ''; sub.hidden = !it.sub;
+            const ctrl = document.getElementById('va-ctrl');
+            ctrl.hidden = !it.plato;
+            ctrl.dataset.plato = it.plato || '';
+            ctrl.innerHTML = it.plato ? controlPlato(it.plato) : '';
+            if (it.plato && window.lucide) lucide.createIcons({ root: ctrl });
+            // Deja listos el anterior y el siguiente para que el cambio sea inmediato
+            const n = visorItems.length;
+            [1, -1].forEach(d => { new Image().src = visorItems[(visorActual + d + n) % n].img; });
+        }
+
+        function abrirVisor(tipo, i) {
+            visorTipo = tipo;
+            visorItems = VISORES[tipo].items();
+            visorActual = Math.max(0, Math.min(i || 0, visorItems.length - 1));
+            focoAntesDelVisor = document.activeElement;
+            document.getElementById('va-etiqueta').textContent = VISORES[tipo].etiqueta;
+            pintarVisor();
+            document.getElementById('visor-afiches').classList.remove('is-hidden');
+            document.body.classList.add('no-scroll');
+            document.querySelector('#visor-afiches .va-cerrar').focus({ preventScroll: true });
+        }
+
+        function cerrarVisor() {
+            const visor = document.getElementById('visor-afiches');
+            if (visor.classList.contains('is-hidden')) return;
+            visor.classList.add('is-hidden');
+            document.body.classList.remove('no-scroll');
+            if (focoAntesDelVisor && focoAntesDelVisor.focus) focoAntesDelVisor.focus({ preventScroll: true });
+        }
+
+        function pasarVisor(d) {
+            const n = visorItems.length;
+            visorActual = (visorActual + d + n) % n;
+            pintarVisor();
+        }
+
         function moverTira(id, dir) {
             const tira = document.getElementById(id);
             tira.scrollBy({ left: dir * tira.clientWidth * 0.8, behavior: 'smooth' });
         }
 
         function renderCartas() {
-            document.getElementById('afiches').innerHTML = CARTA_FAVORITOS.map(p =>
-                '<a href="' + aficheDe(p.foto) + '" target="_blank" rel="noopener" class="reel block bg-sand overflow-hidden" aria-label="Afiche de ' + p.nombre + '">' +
-                    '<img src="' + aficheDe(p.foto) + '" alt="Afiche de ' + p.nombre + ' en Mangolé" class="w-full aspect-[9/16] object-cover hover:scale-[1.02] transition-transform duration-700" loading="lazy">' +
-                '</a>'
-            ).join('');
+            document.getElementById('afiches').innerHTML = CARTA_FAVORITOS.slice(0, 3).map(p =>
+                '<img src="' + aficheDe(p.foto) + '" alt="" loading="lazy">').join('');
+            document.querySelectorAll('[data-afiches-total]').forEach(el => { el.textContent = CARTA_FAVORITOS.length; });
+            document.getElementById('guias-pila').innerHTML = GUIAS.slice(0, 3).map(g =>
+                '<img src="' + (g.vista || g.img) + '" alt="" loading="lazy">').join('');
+            document.querySelectorAll('[data-guias-total]').forEach(el => { el.textContent = GUIAS.length; });
 
             document.getElementById('carta-grid').innerHTML = CARTA_FAVORITOS.map((p, i) =>
                 '<article class="flex flex-col bg-bone/60 border border-line reveal' + (i % 2 ? ' d1' : '') + '">' +
                     '<div class="relative">' +
-                        '<a href="' + aficheDe(p.foto) + '" target="_blank" rel="noopener" class="group/afiche block relative overflow-hidden" aria-label="Ver el afiche de ' + p.nombre + '">' +
+                        '<a href="' + aficheDe(p.foto) + '" target="_blank" rel="noopener" onclick="if (!event.ctrlKey && !event.metaKey) { event.preventDefault(); abrirVisor(\'afiches\', ' + i + '); }" class="group/afiche block relative overflow-hidden" aria-label="Ver el afiche de ' + p.nombre + '">' +
                             '<img src="plato-' + p.foto + '.jpg" alt="' + p.nombre + '" class="w-full aspect-[4/3] object-cover group-hover/afiche:scale-[1.04] transition-transform duration-700" loading="lazy">' +
                             '<span class="absolute bottom-2 right-2 bg-ink/85 text-white text-[0.6875rem] font-semibold uppercase tracking-[0.14em] px-2 py-1 opacity-0 group-hover/afiche:opacity-100 transition-opacity">Ver afiche</span>' +
                         '</a>' +
@@ -7411,19 +7664,29 @@
                     '<div class="p-4 sm:p-5 flex flex-col flex-grow">' +
                         '<h4 class="font-display text-lg sm:text-xl text-ink leading-snug mb-1.5">' + p.nombre + '</h4>' +
                         (p.desc ? '<p class="text-[0.75rem] leading-relaxed text-graphite/70 mb-3">' + p.desc + '</p>' : '') +
-                        '<span class="mt-auto font-display text-xl sm:text-2xl text-brass-deep">' + COP(p.precio) + '</span>' +
-                        '<div class="plato-ctrl mt-3" data-plato="' + p.foto + '"></div>' +
+                        '<div class="plato-fila mt-auto">' +
+                            '<span class="font-display text-xl sm:text-2xl text-brass-deep whitespace-nowrap">' + COP(p.precio) + '</span>' +
+                            '<div class="plato-ctrl" data-plato="' + p.foto + '"></div>' +
+                        '</div>' +
                     '</div>' +
                 '</article>'
             ).join('');
 
-            /* Las categorías largas se parten en tarjetas de hasta 6 bebidas, para que quepan en la pantalla */
-            const tarjetasBebidas = [];
-            CARTA_BEBIDAS.forEach(c => { for (let i = 0; i < c.items.length; i += 6) tarjetasBebidas.push({ ...c, items: c.items.slice(i, i + 6), sigue: i > 0 }); });
-            document.getElementById('bebidas-grid').innerHTML = tarjetasBebidas.map(c =>
-                '<div class="bebidas-columna">' +
-                    '<h4 class="bebidas-categoria"><span class="bebidas-icono">' + icono(c.icono, 'w-4 h-4') + '</span>' + c.categoria +
-                        (c.sigue ? ' <span class="bebidas-sigue">(continúa)</span>' : '') + '</h4>' +
+            /* Todas las categorías completas, en dos columnas con un alto parecido: se llenan en orden y se
+               pasa a la segunda cuando la primera ya tiene la mitad de las filas (cada título cuenta como dos) */
+            const filas = c => c.items.length + 2;
+            const mitad = CARTA_BEBIDAS.reduce((t, c) => t + filas(c), 0) / 2;
+            const columnas = [[], []];
+            let enPrimera = 0;
+            CARTA_BEBIDAS.forEach(c => {
+                const primera = columnas[1].length === 0 && (enPrimera === 0 || enPrimera + filas(c) / 2 <= mitad);
+                (primera ? columnas[0] : columnas[1]).push(c);
+                if (primera) enPrimera += filas(c);
+            });
+            document.getElementById('bebidas-grid').innerHTML = columnas.filter(col => col.length).map(col =>
+                '<div class="bebidas-columna">' + col.map(c =>
+                    '<section class="bebidas-grupo">' +
+                    '<h4 class="bebidas-categoria"><span class="bebidas-icono">' + icono(c.icono, 'w-4 h-4') + '</span>' + c.categoria + '</h4>' +
                     '<ul>' + c.items.map(([nombre, medida, precio]) =>
                         '<li class="bebida-fila">' +
                             '<span class="bebida-nombre">' + nombre + ' <span class="bebida-medida">' + medida + '</span></span>' +
@@ -7432,6 +7695,7 @@
                             '<span class="bebida-ctrl shrink-0" data-plato="' + idBebida(nombre, medida) + '"></span>' +
                         '</li>').join('') +
                     '</ul>' +
+                    '</section>').join('') +
                 '</div>'
             ).join('');
         }
@@ -7671,7 +7935,7 @@
             const m = /^foto-(.+?)(-sm)?\.jpg$/.exec(src);
             return m && ORIGINAL_DE[m[1]] ? 'lugar-' + String(ORIGINAL_DE[m[1]]).padStart(2, '0') + '.jpg' : '';
         };
-        /* forma: 'grande' (2×2), 'ancho' (2×1) o 'alto' (1×2). Las primeras FOTOS_INICIALES se ven al cargar. */
+        /* forma: 'grande' (2×2), 'ancho' (2×1) o 'alto' (1×2) en el mosaico. Se ven de a FOTOS_POR_TANDA. */
         const galeria = [
             G('hotel-aereo', 'hotel', 'Vista aérea del hotel y sus piscinas', 'El complejo desde el aire', 'alto'),
             G('piscina-nadadores', 'piscina', 'Huéspedes en la piscina con la cordillera de fondo', 'La piscina frente a la cordillera', 'grande'),
@@ -7750,9 +8014,11 @@
             O(61, 'actividades', 'Cancha de mini tejo', 'Mini tejo'),
             O(68, 'actividades', 'Cancha polideportiva', 'Cancha polideportiva')
         ];
-        const FOTOS_INICIALES = 16;
-        let galeriaCompleta = false;
+        const FOTOS_POR_TANDA = 10;          // fotos que se ven al elegir una categoría y que suma "Ver más fotos"
+        let fotosMostradas = FOTOS_POR_TANDA;
         let categoriaGaleria = 'todas';
+        let listaLightbox = [];               // fotos que recorre la pantalla completa: las de la categoría elegida
+        let columnasGaleria = 0;              // columnas del mosaico con que se acomodó la última tanda
 
         /* Clips en movimiento (verticales, sin audio) */
         const CLIPS = [
@@ -7763,7 +8029,7 @@
         let lightboxIndex = 0;
 
         function renderGaleria() {
-            const clasesForma = { grande: ' col-span-2 row-span-2', ancho: ' col-span-2', alto: ' row-span-2' };
+            const clasesForma = { grande: ' gal-grande', ancho: ' gal-ancho', alto: ' gal-alto' };
             const grid = document.getElementById('gallery-grid');
             grid.innerHTML = galeria.map((g, i) =>
                 '<button type="button" onclick="openLightbox(' + i + ')" class="gal-item' + (clasesForma[g.forma] || '') + '" data-cat="' + g.cat + '" data-i="' + i + '">' +
@@ -7771,19 +8037,15 @@
                     '<span class="gal-plus"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></span>' +
                     '<span class="gal-cap"><span class="gal-cap-cat">' + CATEGORIAS_GALERIA[g.cat] + '</span><span class="gal-cap-title">' + g.caption + '</span></span>' +
                 '</button>'
-            ).join('') +
-                '<a href="https://maps.app.goo.gl/tFjXZFSAjQHFDaHWA" target="_blank" rel="noopener noreferrer" class="col-span-2 bg-ink text-white p-6 sm:p-8 flex flex-col justify-between hover:bg-ink-soft transition-colors duration-500" data-cat="cta">' +
-                    '<span class="micro text-brass">Álbum completo</span>' +
-                    '<span class="font-display text-2xl sm:text-3xl leading-tight flex items-end justify-between gap-4">Ver más fotos en Google <i data-lucide="arrow-up-right" class="w-6 h-6 shrink-0 mb-1"></i></span>' +
-                '</a>';
+            ).join('');
 
             const conteo = {};
             galeria.forEach(g => { conteo[g.cat] = (conteo[g.cat] || 0) + 1; });
             const cats = Object.keys(CATEGORIAS_GALERIA).filter(c => conteo[c]);
 
             document.getElementById('gallery-filters').innerHTML =
-                '<button type="button" class="gal-filter is-active" data-cat="todas">Todas <span>' + galeria.length + '</span></button>' +
-                cats.map(c => '<button type="button" class="gal-filter" data-cat="' + c + '">' + CATEGORIAS_GALERIA[c] + ' <span>' + conteo[c] + '</span></button>').join('');
+                '<button type="button" class="gal-filter is-active" data-cat="todas" aria-pressed="true">Todas <span>' + galeria.length + '</span></button>' +
+                cats.map(c => '<button type="button" class="gal-filter" data-cat="' + c + '" aria-pressed="false">' + CATEGORIAS_GALERIA[c] + ' <span>' + conteo[c] + '</span></button>').join('');
             document.getElementById('gal-total').textContent = galeria.length;
             document.getElementById('gal-cats').textContent = cats.length;
             filtrarGaleria('todas');
@@ -7827,7 +8089,9 @@
             img.removeAttribute('hidden');
             document.getElementById('lightbox-cat').textContent = CATEGORIAS_GALERIA[item.cat];
             document.getElementById('lightbox-caption').textContent = item.caption;
-            document.getElementById('lightbox-count').textContent = (lightboxIndex + 1) + ' / ' + galeria.length;
+            const lista = listaLightbox.length ? listaLightbox : galeria.map((g, i) => i);
+            document.getElementById('lightbox-count').textContent = (lista.indexOf(lightboxIndex) + 1) + ' / ' + lista.length +
+                (categoriaGaleria === 'todas' ? '' : ' · ' + CATEGORIAS_GALERIA[categoriaGaleria]);
 
             const thumbs = document.getElementById('lightbox-thumbs');
             if (thumbs && !thumbs.dataset.built) {
@@ -7844,6 +8108,7 @@
             }
             if (thumbs) {
                 thumbs.querySelectorAll('.lb-thumb').forEach((t, i) => {
+                    t.hidden = !lista.includes(i);
                     t.classList.toggle('is-active', i === lightboxIndex);
                     if (i === lightboxIndex) {
                         const r = t.getBoundingClientRect(), c = thumbs.getBoundingClientRect();
@@ -7853,43 +8118,87 @@
             }
         }
 
-        /* --- Filtro de la galería por categoría (en "Todas" se ven primero FOTOS_INICIALES) --- */
-        function filtrarGaleria(cat) {
-            categoriaGaleria = cat;
-            let visible = 0;
-            document.querySelectorAll('#gallery-grid .gal-item').forEach(item => {
-                const show = cat === 'todas'
-                    ? (galeriaCompleta || parseInt(item.dataset.i, 10) < FOTOS_INICIALES)
-                    : item.dataset.cat === cat;
-                item.classList.toggle('is-hidden', !show);
-                if (show) visible++;
+        /* --- Galería por categoría: se ven las primeras FOTOS_POR_TANDA y "Ver más fotos" suma las
+               siguientes en el mismo lugar. `sumar` = true cuando se pide la tanda siguiente --- */
+        /* Mosaico sin huecos: simula cómo acomoda la cuadrícula (grid-auto-flow: dense) las fotos y cuenta
+           las casillas vacías que quedan entre fotos (una última fila incompleta, alineada a la izquierda, no
+           cuenta). `sencillas`: fotos que se muestran en una sola casilla aunque tengan forma */
+        function huecosMosaico(indices, cols, sencillas) {
+            const ocupado = [];
+            const lleno = (r, c) => !!(ocupado[r] && ocupado[r][c]);
+            let filas = 0;
+            indices.forEach(i => {
+                const f = sencillas.has(i) ? '' : galeria[i].forma;
+                const w = (f === 'grande' || f === 'ancho') ? Math.min(2, cols) : 1;
+                const h = (f === 'grande' || f === 'alto') ? 2 : 1;
+                for (let r = 0, puesto = false; !puesto; r++) {
+                    for (let c = 0; c + w <= cols && !puesto; c++) {
+                        let cabe = true;
+                        for (let y = r; y < r + h && cabe; y++) for (let x = c; x < c + w; x++) if (lleno(y, x)) { cabe = false; break; }
+                        if (!cabe) continue;
+                        for (let y = r; y < r + h; y++) { ocupado[y] = ocupado[y] || []; for (let x = c; x < c + w; x++) ocupado[y][x] = true; }
+                        filas = Math.max(filas, r + h);
+                        puesto = true;
+                    }
+                }
             });
+            let huecos = 0;
+            for (let r = 0; r < filas; r++) {
+                const ultimaLlena = r === filas - 1 ? Math.max(-1, ...[...Array(cols).keys()].filter(c => lleno(r, c))) : cols - 1;
+                for (let c = 0; c <= ultimaLlena; c++) if (!lleno(r, c)) huecos++;
+            }
+            return huecos;
+        }
+
+        function filtrarGaleria(cat, sumar) {
+            if (!sumar || cat !== categoriaGaleria) fotosMostradas = FOTOS_POR_TANDA;
+            categoriaGaleria = cat;
+            const enCategoria = galeria.map((g, i) => i).filter(i => cat === 'todas' || galeria[i].cat === cat);
+            listaLightbox = enCategoria;
+
+            // Si la tanda deja huecos, se suman hasta 4 fotos más; si no alcanza, las últimas fotos con forma van en una casilla
+            const grid = document.getElementById('gallery-grid');
+            const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+            const sencillas = new Set();
+            let n = Math.min(fotosMostradas, enCategoria.length);
+            if (huecosMosaico(enCategoria.slice(0, n), cols, sencillas)) {
+                const conMas = [1, 2, 3, 4].map(k => n + k).find(m => m <= enCategoria.length && !huecosMosaico(enCategoria.slice(0, m), cols, sencillas));
+                if (conMas) n = conMas;
+                else for (let k = n - 1; k >= 0 && huecosMosaico(enCategoria.slice(0, n), cols, sencillas); k--) {
+                    if (galeria[enCategoria[k]].forma) sencillas.add(enCategoria[k]);
+                }
+            }
+            fotosMostradas = n;
+            const visibles = new Set(enCategoria.slice(0, n));
+            grid.querySelectorAll('.gal-item').forEach(item => {
+                const i = parseInt(item.dataset.i, 10);
+                item.classList.toggle('is-hidden', !visibles.has(i));
+                item.classList.toggle('gal-sencilla', sencillas.has(i));
+            });
+            columnasGaleria = cols;
 
             document.querySelectorAll('#gallery-filters .gal-filter').forEach(b => {
-                b.classList.toggle('is-active', b.dataset.cat === cat);
+                const activo = b.dataset.cat === cat;
+                b.classList.toggle('is-active', activo);
+                b.setAttribute('aria-pressed', activo ? 'true' : 'false');
             });
 
-            const pendientes = galeria.length - visible;
-            const mas = document.getElementById('gallery-more-wrap');
-            mas.classList.toggle('hidden', !(cat === 'todas' && !galeriaCompleta && pendientes > 0));
-            document.getElementById('gallery-more-txt').textContent = 'Ver ' + pendientes + ' fotografías más';
+            const total = enCategoria.length, vistas = visibles.size, quedan = total - vistas;
+            const tanda = Math.min(FOTOS_POR_TANDA, quedan);
+            document.getElementById('gallery-more').hidden = quedan <= 0;
+            document.getElementById('gallery-more-txt').textContent = 'Ver ' + tanda + (tanda === 1 ? ' foto más' : ' fotos más');
+            document.getElementById('gallery-quedan').textContent = quedan > tanda ? 'Quedan ' + quedan + ' por ver' : '';
 
-            const note = document.getElementById('gallery-note');
-            if (cat === 'todas') {
-                note.textContent = 'Mostrando ' + visible + ' de ' + galeria.length + ' fotografías.';
-            } else {
-                const label = CATEGORIAS_GALERIA[cat].toLowerCase();
-                note.textContent = visible === 1
-                    ? 'Mostrando 1 fotografía de ' + label + '.'
-                    : 'Mostrando ' + visible + ' fotografías de ' + label + '.';
-            }
-            document.getElementById('gallery-empty').classList.toggle('hidden', visible > 0);
-            // Que el carrusel recalcule su contador ("1 / 3") y sus puntos con las fotos de esta categoría
-            document.getElementById('gallery-grid').dispatchEvent(new Event('scroll'));
+            const de = cat === 'todas' ? '' : ' de ' + CATEGORIAS_GALERIA[cat].toLowerCase();
+            document.getElementById('gallery-note').textContent = total
+                ? 'Estás viendo ' + vistas + ' de ' + total + (total === 1 ? ' foto' : ' fotos') + de + '. Toca una foto para verla en grande.'
+                : '';
+            document.getElementById('gallery-empty').classList.toggle('hidden', total > 0);
         }
 
         function openLightbox(index) {
             registrar('galeria', galeria[index] ? galeria[index].cat : '');
+            if (!listaLightbox.includes(index)) listaLightbox = galeria.map((g, i) => i);
             lightboxIndex = index;
             paintLightbox();
             document.getElementById('lightbox').classList.remove('is-hidden');
@@ -7901,8 +8210,11 @@
             document.body.classList.remove('no-scroll');
         }
 
+        /* Las flechas recorren solo las fotos de la categoría elegida */
         function stepLightbox(direction) {
-            lightboxIndex = (lightboxIndex + direction + galeria.length) % galeria.length;
+            const lista = listaLightbox.length ? listaLightbox : galeria.map((g, i) => i);
+            const pos = Math.max(0, lista.indexOf(lightboxIndex));
+            lightboxIndex = lista[(pos + direction + lista.length) % lista.length];
             paintLightbox();
         }
 
@@ -8039,8 +8351,8 @@
                 respuesta: (DOS_TARIFAS
                     ? 'Manejamos dos tarifas: <strong>fin de semana</strong> (noches de viernes, sábado y víspera de festivo) y <strong>entre semana</strong> (domingo a jueves). '
                     : 'Cada habitación tiene <strong>una sola tarifa por noche</strong>, igual entre semana, fines de semana y festivos. ') +
-                    'En temporadas especiales como Semana Santa o fin de año te confirmamos el valor según tus fechas. En puentes conviene reservar con tiempo.',
-                acciones: [{ t: 'Consultar fechas', wa: true }]
+                    'En temporadas especiales como Semana Santa o fin de año te confirmamos el valor según tus fechas. En puentes conviene reservar con tiempo: en 2027 hay 19 festivos y 11 lunes de puente.',
+                acciones: [{ t: 'Calendario de festivos 2027', url: 'blog-festivos-y-puentes-2027-colombia.html' }, { t: 'Consultar fechas', wa: true }]
             },
             {
                 id: 'planes',
@@ -8254,7 +8566,7 @@
                 id: 'experiencias',
                 clave: ['huerta', 'huerta turistica', 'avistamiento', 'aves', 'pajaros', 'binoculares', 'souvenirs', 'recuerdos', 'tienda'],
                 respuesta: 'Puedes recorrer la <strong>huerta turística</strong>, alquilar <strong>equipos de avistamiento</strong> para disfrutar el paisaje y su fauna, y llevarte un recuerdo de la <strong>tienda de souvenirs</strong>.',
-                acciones: [{ t: 'Ver servicios', h: '#servicios' }]
+                acciones: [{ t: 'Ver servicios', h: '#servicios' }, { t: 'Aves en Pedro Palo', url: 'blog-laguna-de-pedro-palo-tena.html' }]
             },
             {
                 id: 'servicios',
@@ -8348,7 +8660,14 @@
             {
                 id: 'pueblo',
                 clave: ['pueblo', 'pueblos', 'tena pueblo', 'casco urbano', 'supermercado', 'mercado', 'cajero', 'banco', 'farmacia', 'droguería', 'que hay cerca', 'que hay en tena', 'restaurantes cerca', 'la mesa', 'gran via', 'la gran via', 'mesitas', 'mesitas del colegio', 'centros urbanos', 'pueblos cerca'],
-                respuesta: 'Los centros urbanos más cercanos son <strong>La Gran Vía, a 25 minutos</strong>, y <strong>La Mesa, a 40 minutos</strong>. Mesitas del Colegio queda a 30 minutos y el casco urbano de Tena, a unos 50 minutos.'
+                respuesta: 'Los centros urbanos más cercanos son <strong>La Gran Vía, a 25 minutos</strong>, y <strong>La Mesa, a 40 minutos</strong>. Mesitas del Colegio queda a 30 minutos y el casco urbano de Tena, a unos 50 minutos.',
+                acciones: [{ t: 'Qué hacer en Tena', url: 'blog-que-hacer-en-tena-cundinamarca.html' }, { t: 'Pueblos de clima cálido', url: 'blog-pueblos-de-clima-calido-cerca-de-bogota.html' }]
+            },
+            {
+                id: 'laguna',
+                clave: ['laguna', 'pedro palo', 'laguna de pedro palo', 'tenasuca', 'laguna sagrada', 'reserva natural'],
+                respuesta: 'La <strong>Laguna de Pedro Palo</strong> (Tenasucá) es una reserva natural de Tena, a 2.011 metros de altura, con más de 340 especies de aves. El acceso al agua está restringido: se conoce desde senderos y miradores, idealmente con guía. En el hotel alquilamos equipos de avistamiento.',
+                acciones: [{ t: 'Cómo visitarla', url: 'blog-laguna-de-pedro-palo-tena.html' }, { t: 'Qué hacer en Tena', url: 'blog-que-hacer-en-tena-cundinamarca.html' }]
             },
             {
                 id: 'salud',
@@ -8360,7 +8679,8 @@
             {
                 id: 'clima',
                 clave: ['clima', 'temperatura', 'calor', 'frio', 'grados', 'llueve', 'lluvia', 'hace frio', 'hace calor', 'como es el clima', 'que tiempo hace', 'soleado'],
-                respuesta: 'Clima <strong>cálido de día, entre 24 °C y 28 °C</strong> — ideal para la piscina — y <strong>fresco al caer la tarde</strong>. Trae ropa ligera, vestido de baño y un saco liviano para la noche.'
+                respuesta: 'Clima <strong>cálido de día, entre 24 °C y 28 °C</strong> — ideal para la piscina — y <strong>fresco al caer la tarde</strong>. Trae ropa ligera, vestido de baño y un saco liviano para la noche.',
+                acciones: [{ t: 'Qué llevar a clima cálido', url: 'blog-que-llevar-a-clima-calido.html' }]
             },
             {
                 id: 'llevar',
@@ -8378,9 +8698,9 @@
             /* ---------- Planes y entorno ---------- */
             {
                 id: 'actividades',
-                clave: ['que hacer', 'que se puede hacer', 'actividades', 'que hay para hacer', 'entretenimiento', 'diversion', 'caminata', 'caminatas', 'senderos', 'senderismo', 'miradores', 'naturaleza', 'paseo', 'tour', 'excursion'],
+                clave: ['que hacer', 'que hacer en tena', 'planes en tena', 'sitios turisticos', 'lugares turisticos', 'turismo', 'que se puede hacer', 'actividades', 'que hay para hacer', 'entretenimiento', 'diversion', 'caminata', 'caminatas', 'senderos', 'senderismo', 'miradores', 'naturaleza', 'paseo', 'tour', 'excursion'],
                 respuesta: 'Dentro del hotel: piscinas y jacuzzi, sauna, turco, gimnasio, cancha polideportiva, mini tejo, rana, billar, ping pong, la huerta turística y equipos de avistamiento en alquiler. Y en Cabalante Bar, un cóctel frente a la cordillera. Si quieres salir, La Gran Vía está a 25 minutos y La Mesa a 40.',
-                acciones: [{ t: 'Ver servicios', h: '#servicios' }]
+                acciones: [{ t: 'Ver servicios', h: '#servicios' }, { t: 'Qué hacer en Tena', url: 'blog-que-hacer-en-tena-cundinamarca.html' }]
             },
             {
                 id: 'atardecer',
@@ -8933,11 +9253,9 @@
             cargarPedido();
             prepararFormularioPedido();
             pintarPedido();
-            if (document.documentElement.classList.contains('pantallas')) galeriaCompleta = true;
             renderGaleria();
             prepararCarruseles();
             prepararBotonesTiras();
-            prepararGuias();
             document.querySelectorAll('[data-tarifa="mascota"]').forEach(el => { el.textContent = COP(TARIFA_MASCOTA); });
             const valoresNoche = Object.values(TARIFAS).flatMap(t => [t.finde, t.semana]);
             document.querySelectorAll('[data-tarifa="desde"]').forEach(el => { el.textContent = COP(Math.min(...valoresNoche)); });
@@ -9070,12 +9388,12 @@
                     filtrarHabitaciones(n, true);
                     booking.guests = n;
                     renderBooking();
-                    irAHabitaciones();
+                    mostrarHabitacionesElegidas();
                 });
             });
             document.getElementById('room-filter-todas').addEventListener('click', () => {
                 filtrarHabitaciones('todas', true);
-                irAHabitaciones();
+                mostrarHabitacionesElegidas();
             });
 
             document.getElementById('room-modal').addEventListener('click', (e) => {
@@ -9145,9 +9463,30 @@
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && !document.getElementById('pedido-panel').classList.contains('is-hidden')) cerrarPedido();
             });
+            /* Visor (afiches y guías): flechas del teclado, Escape, tocar fuera de la imagen y deslizar con el dedo */
+            document.addEventListener('keydown', (e) => {
+                if (document.getElementById('visor-afiches').classList.contains('is-hidden')) return;
+                if (e.key === 'Escape') cerrarVisor();
+                if (e.key === 'ArrowRight') pasarVisor(1);
+                if (e.key === 'ArrowLeft') pasarVisor(-1);
+            });
+            const escenaAfiches = document.getElementById('va-escena');
+            escenaAfiches.addEventListener('click', (e) => { if (e.target === escenaAfiches) cerrarVisor(); });
+            let toqueX = null;
+            escenaAfiches.addEventListener('touchstart', (e) => { toqueX = e.touches[0].clientX; }, { passive: true });
+            escenaAfiches.addEventListener('touchend', (e) => {
+                if (toqueX === null) return;
+                const dx = e.changedTouches[0].clientX - toqueX;
+                toqueX = null;
+                if (Math.abs(dx) > 45) pasarVisor(dx < 0 ? 1 : -1);
+            });
             document.getElementById('gallery-more').addEventListener('click', () => {
-                galeriaCompleta = true;
-                filtrarGaleria('todas');
+                fotosMostradas += FOTOS_POR_TANDA;
+                filtrarGaleria(categoriaGaleria, true);
+            });
+            window.addEventListener('resize', () => {
+                const cols = getComputedStyle(document.getElementById('gallery-grid')).gridTemplateColumns.split(' ').filter(Boolean).length;
+                if (cols !== columnasGaleria) filtrarGaleria(categoriaGaleria, true);
             });
 
         });
