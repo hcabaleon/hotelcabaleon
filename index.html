@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Pantalla de carga solo la primera vez en la sesión: si ya se vio, se quita antes del primer
+         cuadro y la portada aparece de inmediato (sin acceso a sessionStorage, se muestra como siempre) -->
+    <script>try { if (sessionStorage.getItem('cabaleon-telon')) document.documentElement.classList.replace('cargando', 'sin-telon'); } catch (e) {}</script>
     <title>Hotel Cabaleón | Complejo turístico campestre en Tena, cerca de Bogotá</title>
     <meta name="description" content="Hotel Cabaleón: complejo turístico campestre en la vereda Escalante de Tena, Cundinamarca, a 2 horas de Bogotá. 15 habitaciones y una cabaña con atención personalizada, piscinas, jacuzzi, sauna, turco, Restaurante Mangolé y Cabalante Bar.">
     <meta name="robots" content="index, follow, max-image-preview:large">
@@ -155,6 +158,17 @@
             .carrusel[data-movil="2"], .carrusel-movil[data-movil="2"] { --carrusel-ancho: calc((100% - 0.75rem) / 2); }
         }
         @media (min-width: 768px) { .carrusel { --carrusel-ancho: calc((100% - 1rem) / 2); } }
+        /* Listas que en el computador se ven completas (planes, blog): en celular y tableta también,
+           una debajo de otra (en tableta, de a dos), sin carrusel */
+        @media (max-width: 1099px) {
+            .carrusel.lista-completa {
+                grid-auto-flow: row !important; grid-template-columns: minmax(0, 1fr) !important;
+                gap: 1.25rem !important; overflow: visible; scroll-snap-type: none;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 1099px) {
+            .carrusel.lista-completa { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
         @media (min-width: 768px) and (max-width: 1099px) { .carrusel[data-tableta="3"] { --carrusel-ancho: calc((100% - 2rem) / 3); } }
         @media (min-width: 1100px) {
             .carrusel[data-por-vista="3"] { --carrusel-ancho: calc((100% - 2rem) / 3); }
@@ -264,13 +278,14 @@
         html.pantallas #steps .step-panel { display: block; grid-area: 1 / 1; visibility: hidden; }
         html.pantallas #steps .step-panel.is-active { visibility: visible; }
         html.pantallas #steps .lg\:col-span-5 > .flex-grow { display: grid; }
+        /* Celular y tableta: la foto con su proporción y las cuatro pestañas en una fila, como en el computador */
         @media (max-width: 1023px) {
-            html.pantallas #hotel .pantalla > div[role="tablist"] { display: none; }   /* navegación: en celular bastan las flechas de los pasos */
-            /* Celular: el texto completo de cada paso siempre cabe; la foto toma el espacio que queda */
-            html.pantallas #steps { gap: 1rem; display: flex; flex-direction: column; justify-content: center; flex: 1 1 auto; min-height: 0; }
-            html.pantallas #steps > :first-child { display: flex; flex: 1 1 auto; min-height: 96px; max-height: 46vh; }
-            html.pantallas #steps .aspect-\[4\/3\] { height: auto; flex: 1 1 auto; }
-            html.pantallas #steps > :last-child { flex: 0 0 auto; }
+            html.pantallas #steps { gap: 1.5rem; }
+            html.pantallas #steps .aspect-\[4\/3\] { aspect-ratio: 4 / 3; height: auto; }
+            html.pantallas #hotel .pantalla > div[role="tablist"] { margin-top: 1.75rem; align-items: start; }
+            #hotel .step-track { margin-bottom: 0.75rem; }
+            #hotel .step-num { letter-spacing: 0.2em; margin-bottom: 0.35rem; }
+            #hotel .step-name { font-size: 1.02rem; }
         }
 
         /* Carta de bebidas de Cabalante: banda a todo el ancho, con menos relleno para caber en la pantalla */
@@ -326,7 +341,7 @@
         html.pantallas #fotos-bar img { aspect-ratio: auto; height: 100%; min-height: 0; }
         html.pantallas #fotos-bar figure { min-height: 0; }
         @media (max-width: 1023px) {
-            html.pantallas #fotos-bar { height: clamp(160px, 26vh, 260px); }
+            html.pantallas #fotos-bar { height: min(88vw, 30rem); }
         }
 
         /* ---------- Galería ---------- */
@@ -404,7 +419,6 @@
         @media (max-width: 767px) {
             html.pantallas .hab-par { padding-bottom: 1.25rem; }
             html.pantallas .hab-par > .room-card { scroll-margin-top: calc(var(--alto-nav) + 0.75rem); }
-            html.pantallas .hab-par-cabeza { display: none; }   /* en celular cada tarjeta ya dice "Hasta N huéspedes" */
         }
 
         /* ---------- Planes: encabezado y tarjetas centrados ---------- */
@@ -542,17 +556,6 @@
             .beneficios-lista li { padding-block: 0.5rem; }
             .beneficios-acciones .btn { padding-block: 0.7rem; }
         }
-        @media (max-width: 767px) and (max-height: 700px) {
-            #beneficios .beneficios { padding-block: 1rem; }
-            #beneficios .beneficios-titulo { font-size: 1.7rem; }
-            #beneficios .beneficios-texto { margin-top: 0.3rem; }
-            #beneficios .beneficios-lista { margin-top: 0.7rem; }
-            #beneficios .beneficios-lista li { padding-block: 0.5rem; }
-            #beneficios .beneficios-icono { width: 1.9rem; height: 1.9rem; }
-            #beneficios .beneficios-lista p { font-size: 0.68rem; }
-            #beneficios .beneficios-acciones { margin-top: 0.7rem; }
-            #beneficios .beneficios-acciones .btn { padding-block: 0.7rem; }
-        }
         @media (max-width: 767px) {
             .beneficios { padding: 1.5rem 1rem; }
             .beneficios-titulo { font-size: 2rem; }
@@ -615,7 +618,7 @@
         @media (min-width: 1024px) {
             html.pantallas #planes .planes-encabezado { max-width: 72rem; }   /* el texto en una línea */
         }
-        @media (max-height: 700px) {
+        @media (min-width: 1024px) and (max-height: 700px) {
             html.pantallas #planes { padding-block: 0.6rem; }
             html.pantallas #planes .planes-encabezado { margin-bottom: 0.6rem; }
             html.pantallas #planes .planes-encabezado .display-lg { font-size: clamp(1.6rem, 5.2vh, 2.3rem); }
@@ -627,43 +630,19 @@
             html.pantallas #plans-grid .font-display.text-3xl { font-size: 1.25rem; }
         }
         @media (max-width: 767px) {
-            html.pantallas #planes .planes-encabezado .lead { font-size: 0.84rem; line-height: 1.5; }
-            html.pantallas #plans-grid img { height: clamp(60px, 9vh, 110px); }
-            html.pantallas #plans-grid + .carrusel-nav { margin-top: 0.4rem; }
+            html.pantallas #planes .planes-encabezado .lead { font-size: 0.9rem; line-height: 1.6; }
         }
 
-        /* ---------- Celular: cada pantalla con lo esencial ---------- */
+        /* ---------- Celular: tarjetas de la carta, de a dos ---------- */
         @media (max-width: 1023px) {
-            html.pantallas .room-card .img-zoom > :first-child { height: clamp(110px, 16vh, 170px); }
             html.pantallas .room-card .grid.grid-cols-2 { margin-top: 0.6rem; }
-            html.pantallas #fotos-mangole img:first-child { height: clamp(140px, 22vh, 220px); }
-            html.pantallas #restaurante .pantalla .md\:flex-row { gap: 0.75rem; margin-bottom: 0.75rem; }
-            html.pantallas #carta-grid img { height: clamp(90px, 12vh, 120px); }
-            html.pantallas #carta-grid .p-4 { padding: 0.65rem 0.75rem 0.75rem; }
-            html.pantallas #carta-grid .plato-ctrl { margin-top: 0.5rem; }
-            html.pantallas .pantalla, html.pantallas .pantalla-movil, html.pantallas section.section:not(.con-pantallas) { padding-block: clamp(0.6rem, 2vh, 1.5rem); }
-            html.pantallas #carta-grid h4 { font-size: 1rem; line-height: 1.25; }
-            html.pantallas #restaurante .pantalla .eyebrow.mb-4 { margin-bottom: 0.5rem; }
-            html.pantallas #restaurante .pantalla h3.text-3xl { font-size: 1.6rem; margin-bottom: 0; }
-            html.pantallas #informacion .notas-info { margin-top: 0.75rem; padding-top: 0.75rem; }
-            html.pantallas #informacion .pantalla h3.mb-8 { margin-bottom: 0.75rem; font-size: 1.4rem; }
-            html.pantallas #informacion .info-fijo > div:first-child { gap: 0.5rem; }
-        }
-
-        /* ---------- Celulares pequeños (760 px de alto o menos) ---------- */
-        @media (max-width: 1023px) and (max-height: 760px) {
-            html.pantallas .display-lg { font-size: 1.65rem; }
-            html.pantallas .section .eyebrow { margin-bottom: 0.4rem; }
-            html.pantallas .room-card .img-zoom > :first-child { height: 96px; }
-            html.pantallas .room-card .display-md { font-size: 1.2rem; }
-            html.pantallas #carta-grid img { height: 84px; }
-            html.pantallas #carta-grid h4 { font-size: 0.92rem; }
-            html.pantallas #restaurante .pantalla .md\:flex-row .btn { padding: 0.7rem 1.1rem; }
-            html.pantallas #resenas blockquote { font-size: 1.05rem; line-height: 1.55; margin-bottom: 1rem; }
-            html.pantallas #resenas .text-center.mb-14 { margin-bottom: 0.75rem; }
-            html.pantallas #tarjetas-info ul li { font-size: 0.78rem; line-height: 1.45; }
-            html.pantallas #tarjetas-info .mb-6 { margin-bottom: 0.4rem; }
-            html.pantallas #tarjetas-info h3 { font-size: 1.3rem; }
+            html.pantallas .room-card .grid.grid-cols-2 .btn { padding-inline: 0.75rem; letter-spacing: 0.16em; white-space: nowrap; }
+            html.pantallas #restaurante .pantalla .md\:flex-row { gap: 1rem; margin-bottom: 1.25rem; }
+            html.pantallas #carta-grid .p-4 { padding: 0.75rem 0.8rem 0.85rem; }
+            html.pantallas #carta-grid .plato-ctrl { margin-top: 0.6rem; }
+            html.pantallas #carta-grid h4 { font-size: 1.05rem; line-height: 1.25; }
+            html.pantallas #restaurante .pantalla h3.text-3xl { font-size: 1.75rem; }
+            html.pantallas #informacion .info-fijo > div:first-child { gap: 0.75rem; }
         }
 
         /* ---------- Tabletas (768 a 1023 px de ancho) ---------- */
@@ -700,6 +679,46 @@
             html.pantallas #inicio .shell.pt-28 { padding-top: calc(var(--alto-nav) + 2.5rem); }
             html.pantallas #tarjetas-info ul li { font-size: 0.8rem; line-height: 1.5; }
             html.pantallas #contacto dl > div { padding-block: 0.45rem; }
+        }
+
+        /* ---------- Celular y tableta: cada sección con su alto natural ----------
+           Sin paradas al bajar ya no hace falta que cada parte ocupe y quepa en una pantalla: se quita
+           el alto mínimo (dejaba grandes espacios en blanco) y las fotos vuelven a su proporción, como
+           en el computador. Va al final para ganarles a los ajustes por alto de arriba. */
+        @media (max-width: 1023px) {
+            html.pantallas section.section:not(.con-pantallas),
+            html.pantallas section.section-tight,
+            html.pantallas #destacados,
+            html.pantallas .pantalla,
+            html.pantallas .pantalla-movil { min-height: 0; }
+            /* Espacios: unos 3,5 rem entre secciones y entre las partes de una misma sección
+               (las partes .pantalla-movil ya se separan con el espacio de su cuadrícula) */
+            html.pantallas section.section:not(.con-pantallas),
+            html.pantallas section[id].section.con-pantallas-movil,
+            html.pantallas section.section-tight,
+            html.pantallas #destacados { padding-block: clamp(3.25rem, 10vw, 4.5rem); }
+            html.pantallas section.section.con-pantallas { padding-block: clamp(1.6rem, 5vw, 2.25rem); }
+            html.pantallas .pantalla { padding-block: clamp(1.6rem, 5vw, 2.25rem); }
+            html.pantallas .pantalla-movil { padding-block: 0; }
+            html.pantallas #bar { padding-bottom: 0; }   /* la banda de bebidas llega hasta la galería */
+            html.pantallas #bar .bebidas-pantalla { padding-block: 3rem; margin-top: clamp(1.6rem, 5vw, 2.25rem); }
+
+            /* Fotos con su proporción natural */
+            html.pantallas .room-card .img-zoom > :first-child { aspect-ratio: 16 / 10 !important; height: auto; }
+            html.pantallas #fotos-servicios img { aspect-ratio: 4 / 5; height: auto; }
+            html.pantallas #eventos .grid.mt-10 img { aspect-ratio: 4 / 5; height: auto; }
+            html.pantallas #fotos-mangole img:first-child { aspect-ratio: 16 / 10; height: auto; }
+            html.pantallas #fotos-mangole img:not(:first-child) { aspect-ratio: 4 / 3; height: auto; }
+            html.pantallas #carta-grid img { aspect-ratio: 4 / 3 !important; height: auto; }
+            html.pantallas #plans-grid img { aspect-ratio: 16 / 10 !important; height: auto; }
+            html.pantallas #plans-grid article > div { padding: 1.5rem 1.4rem !important; }
+            html.pantallas #blog .blog-foto { aspect-ratio: 16 / 10; height: auto; }
+            html.pantallas #gallery-grid { grid-auto-rows: min(105vw, 30rem) !important; }
+            html.pantallas #guias-info { --alto-guia: min(125vw, 36rem); }
+            html.pantallas #afiches { width: 100%; }
+            html.pantallas #contacto .aspect-\[4\/3\] { height: min(100vw, 30rem); }
+            html.pantallas #informacion .notas-info { margin-top: 2.25rem; padding-top: 2rem; }
+            html.pantallas #informacion .pantalla h3.mb-8 { margin-bottom: 1.25rem; }
         }
 
 
@@ -939,10 +958,11 @@
         .kenburns { animation: kenburns 26s ease-in-out infinite alternate; }
 
         /* ---------- Pantalla de carga ----------
-           Cuenta de 000 a 100 en 2,5 s exactos (DURACION en el script que va
-           justo después de la pantalla) y sube como un telón con filo dorado
-           para descubrir la portada. No depende de Tailwind: se ve bien
-           desde el primer instante. */
+           Solo la primera vez en la sesión: cuenta de 000 a 100 en 1 s (DURACION en
+           el script que va justo después de la pantalla) y sube como un telón con filo
+           dorado para descubrir la portada. Al volver o recargar no aparece (html.sin-telon).
+           No depende de Tailwind: se ve bien desde el primer instante. */
+        html.sin-telon #preloader { display: none; }
         #preloader {
             position: fixed;
             inset: 0;
@@ -955,7 +975,7 @@
             background:
                 radial-gradient(70% 55% at 50% 42%, rgba(201, 160, 99, 0.07) 0%, rgba(201, 160, 99, 0) 70%),
                 radial-gradient(120% 90% at 50% 38%, #17333F 0%, #0A212E 55%, #061620 100%);
-            transition: transform 1s cubic-bezier(.77, 0, .18, 1);
+            transition: transform .85s cubic-bezier(.77, 0, .18, 1);
             will-change: transform;
         }
         /* Filo dorado del telón: se ve mientras sube */
@@ -980,7 +1000,7 @@
             align-items: center;
             text-align: center;
             padding: 0 1.5rem;
-            transition: opacity .5s ease, transform 1s cubic-bezier(.77, 0, .18, 1);
+            transition: opacity .4s ease, transform .85s cubic-bezier(.77, 0, .18, 1);
         }
         #preloader.pl-sale .pl-inner { opacity: 0; transform: translate3d(0, -8vh, 0); }
 
@@ -1152,8 +1172,8 @@
 
         /* Portada: el texto y la consulta rápida suben cuando se levanta el telón */
         .entra {
-            transition: opacity 1.2s cubic-bezier(.16, 1, .3, 1), transform 1.2s cubic-bezier(.16, 1, .3, 1);
-            transition-delay: calc(var(--i, 0) * 110ms + 420ms);
+            transition: opacity 1s cubic-bezier(.16, 1, .3, 1), transform 1s cubic-bezier(.16, 1, .3, 1);
+            transition-delay: calc(var(--i, 0) * 90ms + 220ms);
         }
         html.cargando .entra { opacity: 0; transform: translate3d(0, 28px, 0); }
 
@@ -2013,12 +2033,6 @@
             .feat-nombre { font-size: 0.98rem; }
         }
         /* Celulares bajos: el ícono al lado del nombre, para que las diez quepan en la pantalla */
-        @media (max-width: 767px) and (max-height: 760px) {
-            .feat-item { flex-direction: row; text-align: left; padding: 0.6rem 0.65rem; gap: 0.6rem; }
-            .feat-item::before { left: 0.65rem; transform: none; }
-            .feat-icon { width: 2.1rem; height: 2.1rem; }
-            .feat-nombre { font-size: 0.92rem; }
-        }
 
         /* Habitación que todavía no tiene fotografías */
         .room-ph {
@@ -2185,28 +2199,67 @@
         }
 
         /* ---------- Sello del Registro Nacional de Turismo (RNT 146726) ----------
-           Tarjeta clara tipo pergamino con filo dorado y estrella de cuatro puntas, para que se lea
-           también sobre los fondos azul noche (reserva, ventana de reserva y pie de página). */
-        .sello-rnt {
-            display: inline-flex; flex-direction: column; align-items: center; gap: 0.15rem;
-            padding: 0.75rem 1.4rem 0.8rem; text-align: center; color: var(--ink);
-            background: linear-gradient(135deg, #FBF7EF 0%, #F1E8D8 100%);
-            border: 1px solid rgba(201, 160, 99, 0.75); border-radius: 2px;
-            box-shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.55), inset 0 0 0 3px rgba(255, 255, 255, 0.55);
+           Un diseño para cada lugar, todos sobre azul noche y sin fondo claro:
+           Reservar → emblema centrado con doble filo dorado y la estrella en un aro;
+           pie de página → filo dorado a la izquierda, como los datos de la columna;
+           barra de la ventana de reserva → píldora con filo dorado;
+           final de la ventana de reserva → filos a los lados, como el cierre de un documento. */
+        .sello-rnt { color: #fff; }
+        .sello-rnt-estrella { width: 0.8rem; height: 0.8rem; flex-shrink: 0; fill: currentColor; color: var(--brass); }
+        .sello-rnt-titulo { font-size: 0.56rem; font-weight: 600; letter-spacing: 0.26em; line-height: 1.4; text-transform: uppercase; }
+        .sello-rnt-num { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; letter-spacing: 0.04em; line-height: 1; white-space: nowrap; font-variant-numeric: lining-nums; }   /* cifras parejas: es un número oficial */
+
+        /* Reservar */
+        .sello-rnt--reserva {
+            display: inline-flex; align-items: center; gap: 1rem; margin-top: clamp(1.5rem, 3.4vh, 2.25rem);
+            padding: 0.85rem 1.6rem 0.85rem 0.9rem; text-align: left; background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(201, 160, 99, 0.5); outline: 1px solid rgba(201, 160, 99, 0.16); outline-offset: 4px;
         }
-        .sello-rnt-titulo { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.02em; line-height: 1.2; color: rgba(10, 33, 46, 0.85); }
-        .sello-rnt-num { display: inline-flex; align-items: center; gap: 0.55rem; font-size: 1.45rem; font-weight: 700; line-height: 1.1; letter-spacing: 0.01em; }
-        .sello-rnt-estrella { width: 1.05rem; height: 1.05rem; fill: var(--brass); }
-        /* Versión compacta (barra de la ventana de reserva) */
-        .sello-rnt.es-compacto { flex-direction: row; gap: 0.6rem; padding: 0.45rem 0.8rem; }
-        .sello-rnt.es-compacto .sello-rnt-titulo { max-width: 6.5rem; font-size: 0.56rem; line-height: 1.15; text-align: left; }
-        .sello-rnt.es-compacto .sello-rnt-num { font-size: 0.95rem; gap: 0.35rem; }
-        .sello-rnt.es-compacto .sello-rnt-estrella { width: 0.75rem; height: 0.75rem; }
+        .sello-rnt--reserva .sello-rnt-aro {
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 2.6rem; height: 2.6rem;
+            border: 1px solid rgba(201, 160, 99, 0.55); border-radius: 999px; box-shadow: 0 0 0 4px rgba(201, 160, 99, 0.06);
+        }
+        .sello-rnt--reserva .sello-rnt-estrella { width: 1rem; height: 1rem; }
+        .sello-rnt--reserva .sello-rnt-texto { display: flex; flex-direction: column; gap: 0.3rem; }
+        .sello-rnt--reserva .sello-rnt-titulo { color: rgba(255, 255, 255, 0.55); }
+        .sello-rnt--reserva .sello-rnt-num { font-size: 1.65rem; }
+        .sello-rnt--reserva .sello-rnt-num span { color: var(--brass); }
+        @media (max-width: 400px) {
+            .sello-rnt--reserva { gap: 0.75rem; padding-right: 1.1rem; }
+            .sello-rnt--reserva .sello-rnt-titulo { letter-spacing: 0.18em; }
+        }
+
+        /* Pie de página */
+        .sello-rnt--pie { display: flex; flex-direction: column; gap: 0.45rem; padding-left: 1rem; border-left: 1px solid var(--brass); }
+        .sello-rnt--pie .sello-rnt-titulo { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--brass); }
+        .sello-rnt--pie .sello-rnt-estrella { width: 0.7rem; height: 0.7rem; }
+        .sello-rnt--pie .sello-rnt-num { font-size: 1.5rem; }
+
+        /* Barra de la ventana de reserva */
+        .sello-rnt--barra {
+            display: inline-flex; align-items: center; gap: 0.6rem; flex-shrink: 0; height: 2.5rem; padding: 0 1rem 0 0.35rem;
+            border: 1px solid rgba(201, 160, 99, 0.45); border-radius: 999px;
+        }
+        .sello-rnt--barra .sello-rnt-estrella { box-sizing: content-box; width: 0.7rem; height: 0.7rem; padding: 0.45rem; border-radius: 999px; background: var(--brass); color: var(--ink); }
+        .sello-rnt--barra .sello-rnt-titulo { max-width: 7.5rem; font-size: 0.5rem; letter-spacing: 0.2em; line-height: 1.35; color: rgba(255, 255, 255, 0.5); }
+        .sello-rnt--barra .sello-rnt-num { font-size: 1.1rem; }
         @media (max-width: 480px) {
-            .sello-rnt.es-compacto .sello-rnt-titulo { display: none; }
-            .sello-rnt.es-compacto { padding: 0.4rem 0.6rem; }
+            .sello-rnt--barra { height: 2.3rem; gap: 0.45rem; padding-right: 0.8rem; }
+            .sello-rnt--barra .sello-rnt-titulo { display: none; }
+            .sello-rnt--barra .sello-rnt-num { font-size: 1rem; }
         }
-        .rv-intro .sello-rnt { margin-top: clamp(1rem, 2.6vh, 1.6rem); }
+
+        /* Final de la ventana de reserva */
+        .sello-rnt--ventana { display: flex; align-items: center; gap: 0.75rem; width: 100%; max-width: 42rem; }
+        .sello-rnt--ventana .sello-rnt-linea { flex: 1 1 0; min-width: 1.5rem; height: 1px; background: linear-gradient(90deg, rgba(201, 160, 99, 0), rgba(201, 160, 99, 0.55)); }
+        .sello-rnt--ventana .sello-rnt-linea:last-child { transform: scaleX(-1); }
+        .sello-rnt--ventana .sello-rnt-texto { display: flex; align-items: baseline; gap: 0.75rem; }
+        .sello-rnt--ventana .sello-rnt-titulo { color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+        .sello-rnt--ventana .sello-rnt-num { font-size: 1.2rem; color: var(--brass); }
+        @media (max-width: 560px) {
+            .sello-rnt--ventana .sello-rnt-texto { flex-direction: column; align-items: center; gap: 0.35rem; text-align: center; }
+            .sello-rnt--ventana .sello-rnt-titulo { letter-spacing: 0.2em; }
+        }
         #vr-rnt-pie { display: flex; justify-content: center; margin-top: 2rem; }
 
         /* ---------- Blog: tres artículos, minimal, sobre azul noche ---------- */
@@ -2476,6 +2529,7 @@
         <symbol id="i-whatsapp" viewBox="0 0 16 16" fill="currentColor">
             <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
         </symbol>
+        <symbol id="i-estrella" viewBox="0 0 24 24"><path d="M12 0C12.8 7.2 16.8 11.2 24 12 16.8 12.8 12.8 16.8 12 24 11.2 16.8 7.2 12.8 0 12 7.2 11.2 11.2 7.2 12 0Z"/></symbol>
         <symbol id="i-cloche" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="7.4" r="1"/>
             <path d="M4.2 16.4a7.8 7.8 0 0 1 15.6 0"/>
@@ -2528,10 +2582,12 @@
     <script>
         /* Pantalla de carga: cuenta de 000 a 100 en DURACION ms exactos.
            Empieza cuando la página terminó de armarse (así el conteo corre
-           fluido, sin saltos) y al llegar a 100 sube como un telón. */
+           fluido, sin saltos) y al llegar a 100 sube como un telón.
+           Si en esta sesión ya se vio, no aparece (lo decide el script del <head>). */
         (() => {
-            const DURACION = 2500;
+            const DURACION = 1000;
             const pl = document.getElementById('preloader');
+            if (document.documentElement.classList.contains('sin-telon')) { pl.remove(); return; }
             const digitos = pl.querySelectorAll('.pl-d');
             const relleno = document.getElementById('pl-relleno');
             const cabeza = document.getElementById('pl-cabeza');
@@ -2557,10 +2613,11 @@
             const salir = () => {
                 if (salio) return;
                 salio = true;
+                try { sessionStorage.setItem('cabaleon-telon', '1'); } catch (e) {}
                 pl.classList.add('pl-sale');
                 document.documentElement.classList.remove('cargando');
                 document.dispatchEvent(new Event('portada-visible'));
-                setTimeout(() => { pl.style.display = 'none'; }, menosMovimiento ? 500 : 1100);
+                setTimeout(() => { pl.style.display = 'none'; }, menosMovimiento ? 500 : 950);
             };
 
             const contar = () => {
@@ -2575,15 +2632,15 @@
                     if (x < 1) { requestAnimationFrame(cuadro); return; }
                     estado.textContent = 'Te damos la bienvenida';
                     estado.classList.add('is-fin');
-                    setTimeout(salir, 600);
+                    setTimeout(salir, 300);
                 };
                 requestAnimationFrame(cuadro);
             };
 
-            // Espera la tipografía de la cifra (máximo 0,7 s) para que no cambie a mitad del conteo
+            // Espera la tipografía de la cifra (máximo 0,4 s) para que no cambie a mitad del conteo
             const arrancar = () => {
                 const fuente = document.fonts ? document.fonts.load('300 1em "Cormorant Garamond"') : Promise.resolve();
-                const tope = new Promise(r => setTimeout(r, 700));
+                const tope = new Promise(r => setTimeout(r, 400));
                 Promise.race([fuente, tope]).catch(() => {}).then(() => setTimeout(contar, 0));
                 setTimeout(salir, DURACION + 4000);   // red de seguridad: nunca se queda pegada
             };
@@ -2782,7 +2839,7 @@
                         <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Reserva directa</span>
                         <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Wifi y parqueadero gratis</span>
                         <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Desayuno incluido</span>
-                        <span class="hidden sm:flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Impuestos incluidos</span>
+                        <span class="flex items-center gap-1.5 micro text-ink/55"><i data-lucide="check" class="w-3 h-3 text-moss"></i> Impuestos incluidos</span>
                     </div>
                 </div>
             </div>
@@ -2860,8 +2917,8 @@
                     </div>
                 </div>
 
-                <!-- Videos de la portada, uno tras otro (solo en computador) -->
-                <div class="hidden lg:block lg:col-span-5">
+                <!-- Videos de la portada, uno tras otro (en celular, debajo del texto) -->
+                <div class="lg:col-span-5">
                     <figure class="hotel-video relative overflow-hidden bg-ink">
                         <video muted playsinline preload="none" poster="portada-2.jpg" data-videos="portada-2.mp4 portada-3.mp4 portada-1.mp4"
                                aria-label="Piscinas, jardines y montañas del Hotel Cabaleón" class="absolute inset-0 w-full h-full object-cover"></video>
@@ -2955,7 +3012,7 @@
             </div>
 
             <!-- Pestañas de los pasos -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-7 sm:gap-9 mt-12 sm:mt-16 reveal" role="tablist" aria-label="Recorrido por el hotel">
+            <div class="grid grid-cols-4 gap-3 sm:gap-9 mt-12 sm:mt-16 reveal" role="tablist" aria-label="Recorrido por el hotel">
                 <button type="button" class="step-tab is-active" data-step="0" role="tab" aria-selected="true">
                     <span class="step-track"><span class="step-fill"></span></span>
                     <span class="step-num">01</span>
@@ -3296,7 +3353,7 @@
             </div>
 
             <!-- Las tarjetas se generan desde `PLANES` (script); `activo: false` oculta un plan -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 carrusel" data-por-vista="4" id="plans-grid"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 carrusel lista-completa" data-por-vista="4" id="plans-grid"></div>
 
         </div>
         </div>
@@ -3606,7 +3663,7 @@
                 <h2 class="display-lg text-white">Lo que dicen de nosotros</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10 carrusel-movil" id="lista-resenas">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10" id="lista-resenas">
 
                 <figure class="bg-ink p-8 sm:p-10 flex flex-col reveal">
                     <div class="flex gap-1 mb-7">
@@ -3867,7 +3924,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mt-14 hairline-t pt-10 reveal carrusel-movil notas-info">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 mt-14 hairline-t pt-10 reveal notas-info">
                 <div class="flex items-start gap-4">
                     <i data-lucide="baby" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                     <div>
@@ -3948,8 +4005,8 @@
                     <li><i data-lucide="receipt"></i> Impuestos incluidos</li>
                 </ul>
 
-                <!-- Registro Nacional de Turismo: visible al reservar y en el pie de página -->
-                <p class="sello-rnt" aria-label="Registro Nacional de Turismo RNT 146726"><span class="sello-rnt-titulo">Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726 <svg class="sello-rnt-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.8 7.2 16.8 11.2 24 12 16.8 12.8 12.8 16.8 12 24 11.2 16.8 7.2 12.8 0 12 7.2 11.2 11.2 7.2 12 0Z"/></svg></span></p>
+                <!-- Registro Nacional de Turismo: emblema con doble filo dorado, debajo de lo que incluye la reserva -->
+                <p class="sello-rnt sello-rnt--reserva"><span class="sello-rnt-aro"><svg class="sello-rnt-estrella" aria-hidden="true"><use href="#i-estrella"/></svg></span><span class="sello-rnt-texto"><span class="sello-rnt-titulo">Registro Nacional de Turismo</span><span class="sello-rnt-num"><span>RNT</span> 146726</span></span></p>
 
                 <!-- Barra de pasos de la ventana de reserva (el script la lleva a la ventana) -->
                 <div hidden>
@@ -4414,7 +4471,7 @@
                     <h2 class="blog-titulo" id="blog-titulo">Blog</h2>
                     <p class="blog-texto">Consejos y planes para disfrutar cada momento en Cabaleón.</p>
                 </div>
-                <div class="carrusel" data-por-vista="4" id="blog-grid">
+                <div class="carrusel lista-completa" data-por-vista="4" id="blog-grid">
                     <article class="blog-tarjeta">
                         <a href="blog-como-llegar-a-tena-desde-bogota.html" class="blog-tarjeta-boton" onclick="registrar('blog', 'como-llegar')">
                             <span class="blog-foto"><img src="blog-como-llegar-sm.jpg" alt="Vista aérea de Hotel Cabaleón en Tena, Cundinamarca: kioscos, terraza, piscina y jardines entre montañas" width="640" height="360" loading="lazy"><span class="blog-categoria">Cómo llegar</span></span>
@@ -4589,7 +4646,7 @@
                         Bogotá: 15 habitaciones y una cabaña, con atención personalizada. Descanso, piscina y naturaleza
                         entre montañas.
                     </p>
-                    <div class="mb-8"><p class="sello-rnt" aria-label="Registro Nacional de Turismo RNT 146726"><span class="sello-rnt-titulo">Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726 <svg class="sello-rnt-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.8 7.2 16.8 11.2 24 12 16.8 12.8 12.8 16.8 12 24 11.2 16.8 7.2 12.8 0 12 7.2 11.2 11.2 7.2 12 0Z"/></svg></span></p></div>
+                    <div class="mb-8"><p class="sello-rnt sello-rnt--pie"><span class="sello-rnt-titulo"><svg class="sello-rnt-estrella" aria-hidden="true"><use href="#i-estrella"/></svg> Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726</span></p></div>
                     <!-- Redes sociales: reemplazar cada # por el enlace real del hotel -->
                     <div class="flex gap-3">
                         <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center hover:border-brass hover:text-brass transition-colors duration-500">
@@ -5903,7 +5960,7 @@
                         '<img src="logo-blanco.png" alt="" class="h-10 w-auto hidden sm:block">' +
                         '<div class="min-w-0 flex-1"><span id="vr-paso-num" class="micro text-brass block"></span>' +
                         '<span id="vr-titulo" class="font-display text-xl sm:text-2xl text-white leading-tight block truncate">Tu reserva</span></div>' +
-                        '<p class="sello-rnt es-compacto" aria-label="Registro Nacional de Turismo RNT 146726"><span class="sello-rnt-titulo">Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726 <svg class="sello-rnt-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.8 7.2 16.8 11.2 24 12 16.8 12.8 12.8 16.8 12 24 11.2 16.8 7.2 12.8 0 12 7.2 11.2 11.2 7.2 12 0Z"/></svg></span></p>' +
+                        '<p class="sello-rnt sello-rnt--barra"><svg class="sello-rnt-estrella" aria-hidden="true"><use href="#i-estrella"/></svg><span class="sello-rnt-titulo">Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726</span></p>' +
                         '<button type="button" onclick="cerrarVentanaReserva()" class="w-10 h-10 shrink-0 rounded-full border border-white/25 flex items-center justify-center text-white hover:bg-white hover:text-ink transition-colors" aria-label="Cerrar la reserva">' +
                             '<i data-lucide="x" class="w-5 h-5"></i></button>' +
                     '</div>' +
@@ -5911,7 +5968,7 @@
                     '<p id="vr-resumen" class="hidden pb-3 text-[0.78rem] text-white/70"></p>' +
                 '</div></div>' +
                 '<div class="vr-cuerpo"><div class="shell py-7 sm:py-10"><div id="vr-contenido"></div>' +
-                    '<div id="vr-rnt-pie"><p class="sello-rnt" aria-label="Registro Nacional de Turismo RNT 146726"><span class="sello-rnt-titulo">Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726 <svg class="sello-rnt-estrella" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.8 7.2 16.8 11.2 24 12 16.8 12.8 12.8 16.8 12 24 11.2 16.8 7.2 12.8 0 12 7.2 11.2 11.2 7.2 12 0Z"/></svg></span></p></div></div></div>';
+                    '<div id="vr-rnt-pie"><p class="sello-rnt sello-rnt--ventana"><span class="sello-rnt-linea"></span><svg class="sello-rnt-estrella" aria-hidden="true"><use href="#i-estrella"/></svg><span class="sello-rnt-texto"><span class="sello-rnt-titulo">Registro Nacional de Turismo</span><span class="sello-rnt-num">RNT 146726</span></span><svg class="sello-rnt-estrella" aria-hidden="true"><use href="#i-estrella"/></svg><span class="sello-rnt-linea"></span></p></div></div></div>';
             document.body.appendChild(v);
 
             /* Los pasos (y la factura) pasan a la ventana; en la página queda la invitación a reservar */
@@ -7037,7 +7094,7 @@
            cuando la sección está cerca, y pasan de uno a otro al terminar */
         function prepararVideoHotel() {
             const v = document.querySelector('.hotel-video video');
-            if (!v || !window.matchMedia('(min-width: 1024px)').matches || !('IntersectionObserver' in window)) return;
+            if (!v || !('IntersectionObserver' in window)) return;
             const lista = v.dataset.videos.split(' ');
             let actual = 0;
             v.addEventListener('ended', () => {
