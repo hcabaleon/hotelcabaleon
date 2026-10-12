@@ -59,6 +59,7 @@
             --ink: #0A212E;
             --ink-soft: #16323F;
             --brass: #C9A063;
+            --brass-deep: #A8834A;
             --bone: #F7F5F0;
             --sand: #EDE7DD;
             --graphite: #20292E;
@@ -98,34 +99,18 @@
 
         /* ---------- Una sección por pantalla ----------
            Cada sección (o cada parte de una sección larga, marcada con .pantalla) ocupa al
-           menos la pantalla debajo del menú, con el contenido centrado. Al desplazarse, la
-           página pasa a la siguiente pantalla. Ninguna sección esconde información para caber:
-           si su contenido es más alto que la pantalla, el desplazamiento la recorre completa y
-           luego pasa a la siguiente. Las listas de tarjetas se recorren de lado (.carrusel).
-           Quitar la clase "pantallas" de <html> vuelve al desplazamiento normal. */
+           menos la pantalla debajo del menú, con el contenido centrado. El desplazamiento es
+           libre en toda la página: ninguna sección se queda fija ni tiene paradas al bajar.
+           Ninguna sección esconde información para caber; las listas de tarjetas se recorren
+           de lado (.carrusel) con el botón "Ver más".
+           Quitar la clase "pantallas" de <html> vuelve a las secciones con su alto natural. */
         :root { --alto-nav: 77px; --alto-mbar: 0px; }   /* barra del menú ya desplazada, en celular */
         @media (min-width: 640px) { :root { --alto-nav: 86px; } }
         /* En celular y tableta la barra de acciones (.m-bar) tapa el pie de la pantalla: cada pantalla termina encima de ella */
         @media (max-width: 1023px) { :root { --alto-mbar: calc(3.6rem + env(safe-area-inset-bottom, 0px)); } }
         section[id], .pantalla { scroll-margin-top: var(--alto-nav); }
-        /* El ajuste por paradas solo se enciende dentro de las zonas con efecto (recorrido, Servicios, Planes,
-           "Inspiración del día", bebidas y "Antes de tu llegada"): lo maneja prepararParadasEnZonas.
-           En el resto de la página el desplazamiento es libre. */
         html.pantallas { scroll-padding-bottom: var(--alto-mbar); }
-        html.pantallas.paradas-activas { scroll-snap-type: y mandatory; }
         @media (max-width: 1023px) { html.pantallas header#inicio { min-height: calc(100svh - var(--alto-mbar)); } }
-        html.pantallas header#inicio,
-        html.pantallas section[id]:not(.con-pantallas),
-        html.pantallas .pantalla { scroll-snap-align: start; scroll-snap-stop: always; }
-        html.pantallas footer { scroll-snap-align: end; }
-        /* Sección más alta que la pantalla: se recorre por páginas (las marcas las pone prepararPantallasLargas) */
-        html.pantallas .es-larga { scroll-snap-align: none !important; }
-        html.pantallas .es-larga[data-relativa] { position: relative; }
-        html.pantallas .es-larga[data-clip] { overflow: clip; }
-        .pagina-marca {
-            position: absolute; left: 0; width: 1px; pointer-events: none;
-            scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--alto-nav);
-        }
         html.pantallas section.section:not(.con-pantallas),
         html.pantallas section.section-tight,
         html.pantallas #destacados,
@@ -143,16 +128,13 @@
 
         /* Partes de una sección que son su propia pantalla solo en celular y tableta */
         @media (max-width: 1023px) {
-            html.pantallas section[id].con-pantallas-movil { padding-block: 0; scroll-snap-align: none; display: block; min-height: 0; }
+            html.pantallas section[id].con-pantallas-movil { padding-block: 0; display: block; min-height: 0; }
             html.pantallas .pantalla-movil {
-                scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--alto-nav);
+                scroll-margin-top: var(--alto-nav);
                 min-height: calc(100vh - var(--alto-nav) - var(--alto-mbar)); min-height: calc(100svh - var(--alto-nav) - var(--alto-mbar));
                 display: flex; flex-direction: column; justify-content: center; padding-block: clamp(1rem, 3vh, 2.5rem);
             }
         }
-        /* El cierre (logos y pie de página) */
-        html.pantallas section[aria-label="Marcas de Hotel Cabaleón"] { scroll-snap-align: start; scroll-margin-top: var(--alto-nav); }
-
         /* ---------- Carrusel: tarjetas que se recorren de lado ---------- */
         .carrusel {
             display: grid !important; grid-template-columns: none !important; grid-auto-flow: column !important;
@@ -180,18 +162,66 @@
             .carrusel[data-por-vista="5"] { --carrusel-ancho: calc((100% - 4rem) / 5); }
             .carrusel[data-por-vista="6"] { --carrusel-ancho: calc((100% - 5rem) / 6); }
         }
-        .carrusel-nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: clamp(0.5rem, 1.4vh, 1rem); }
+        /* Barra centrada debajo de cada carrusel (así no la tapan los botones flotantes): flecha para
+           volver, el avance (cuenta y filo dorado) y "Ver más", el botón principal: píldora azul noche con
+           filo dorado y una flecha que se asoma cada tanto hasta que la persona lo usa. En fondos oscuros
+           (.en-oscuro) va en blanco. El recorrido, los afiches y los clips usan los mismos botones. */
+        .carrusel-nav { display: flex; align-items: center; justify-content: center; gap: clamp(0.75rem, 2vw, 1.5rem); margin-top: clamp(0.75rem, 1.8vh, 1.25rem); }
         .carrusel-nav.is-vacio { display: none; }
+        .carrusel-avance { display: flex; align-items: center; gap: 0.85rem; flex: 0 1 9.5rem; min-width: 0; }
+        .carrusel-cuenta { font-size: 0.62rem; letter-spacing: 0.2em; font-weight: 600; white-space: nowrap; color: var(--brass-deep); }
+        .carrusel-linea { position: relative; flex: 1 1 auto; min-width: 2.5rem; height: 1px; background: rgba(10, 33, 46, 0.16); }
+        .carrusel-linea > span { position: absolute; left: 0; top: -0.5px; height: 2px; background: var(--brass); transition: width .5s cubic-bezier(.16, 1, .3, 1); }
+        .carrusel-botones { display: flex; align-items: center; gap: 0.6rem; flex-shrink: 0; }
         .carrusel-flecha {
-            width: clamp(2.1rem, 4.4vh, 2.6rem); height: clamp(2.1rem, 4.4vh, 2.6rem); border-radius: 999px; border: 1px solid currentColor; opacity: .55;
-            display: inline-flex; align-items: center; justify-content: center; transition: opacity .3s, background-color .3s, color .3s;
+            width: 2.75rem; height: 2.75rem; flex-shrink: 0; border-radius: 999px; border: 1px solid var(--brass); color: var(--ink); background: transparent;
+            display: inline-flex; align-items: center; justify-content: center; transition: background-color .3s, border-color .3s, color .3s, opacity .3s;
         }
-        .carrusel-flecha:hover:not(:disabled) { opacity: 1; }
-        .carrusel-flecha:disabled { opacity: .2; cursor: default; }
-        .carrusel-cuenta { font-size: 0.6rem; letter-spacing: 0.22em; font-weight: 600; opacity: .55; }
-        .carrusel-puntos { display: flex; gap: 6px; min-width: 0; overflow: hidden; }
-        .carrusel-puntos span { width: 6px; height: 6px; border-radius: 999px; background: currentColor; opacity: .2; transition: opacity .3s, width .3s; }
-        .carrusel-puntos span.is-actual { opacity: .8; width: 18px; }
+        .carrusel-flecha:hover:not(:disabled) { background: var(--ink); border-color: var(--ink); color: #fff; }
+        .carrusel-flecha:disabled { opacity: .3; cursor: default; }
+        .carrusel-mas {
+            display: inline-flex; align-items: center; gap: 0.75rem; height: 2.75rem; padding: 0 0.35rem 0 1.3rem; flex-shrink: 0;
+            border-radius: 999px; border: 1px solid var(--ink); background: var(--ink); color: #fff;
+            font-size: 0.62rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap;
+            box-shadow: 0 12px 26px -16px rgba(10, 33, 46, 0.75);
+            transition: background-color .35s, border-color .35s, color .35s, opacity .3s, box-shadow .35s;
+        }
+        .carrusel-mas-ico {
+            width: 2rem; height: 2rem; border-radius: 999px; border: 1px solid var(--brass); color: var(--brass);
+            display: inline-flex; align-items: center; justify-content: center; transition: border-color .35s, color .35s;
+        }
+        .carrusel-mas:hover:not(:disabled) { background: var(--brass); border-color: var(--brass); color: var(--ink); }
+        .carrusel-mas:hover:not(:disabled) .carrusel-mas-ico { border-color: var(--ink); color: var(--ink); }
+        .carrusel-mas:disabled { opacity: .35; cursor: default; box-shadow: none; }
+        @keyframes asomar-flecha {
+            0%, 68%, 100% { transform: translateX(0); }
+            76% { transform: translateX(4px); }
+            84% { transform: translateX(-1px); }
+            91% { transform: translateX(3px); }
+        }
+        .carrusel-mas:not(:disabled) .carrusel-mas-ico svg { animation: asomar-flecha 3.4s ease-in-out infinite; }
+        .carrusel-mas:hover .carrusel-mas-ico svg, .en-uso .carrusel-mas .carrusel-mas-ico svg { animation: none; }
+        @media (prefers-reduced-motion: reduce) { .carrusel-mas .carrusel-mas-ico svg { animation: none !important; } }
+        .en-oscuro .carrusel-cuenta { color: var(--brass); }
+        .en-oscuro .carrusel-linea { background: rgba(255, 255, 255, 0.2); }
+        .en-oscuro .carrusel-flecha { color: #fff; }
+        .en-oscuro .carrusel-flecha:hover:not(:disabled) { background: #fff; border-color: #fff; color: var(--ink); }
+        .en-oscuro .carrusel-mas { background: #fff; border-color: #fff; color: var(--ink); box-shadow: 0 12px 26px -16px rgba(0, 0, 0, 0.9); }
+        .en-oscuro .carrusel-mas-ico { color: var(--brass-deep); border-color: var(--brass-deep); }
+        /* Celular y tableta: el chat flota abajo a la izquierda, así que ahí va solo el avance y los botones a la derecha */
+        @media (max-width: 1023px) {
+            .carrusel-nav { justify-content: space-between; }
+            .carrusel-nav .carrusel-avance { order: -1; margin-right: auto; }
+            .carrusel-nav .carrusel-flecha { margin-right: -0.25rem; }
+        }
+        @media (max-width: 400px) {
+            .carrusel-nav { gap: 0.6rem; }
+            .carrusel-avance { gap: 0.6rem; }
+            .carrusel-botones { gap: 0.45rem; }
+            .carrusel-flecha { width: 2.5rem; height: 2.5rem; }
+            .carrusel-mas { height: 2.5rem; gap: 0.6rem; padding-left: 1rem; }
+            .carrusel-mas-ico { width: 1.8rem; height: 1.8rem; }
+        }
 
         /* ---------- Portada y destacados ---------- */
 
@@ -226,23 +256,7 @@
             #hotel .hotel-intro-texto p.body-sm { font-size: 0.82rem; line-height: 1.6; }
         }
         html.pantallas #hotel .pantalla > div[role="tablist"] { margin-top: clamp(1rem, 3vh, 4rem); }
-        /* Recorrido por pasos: 4 pantallas de alto; el contenido queda fijo y avanza un paso por pantalla */
-        .recorrido-marca { display: none; }
-        html.pantallas .recorrido-scroll { position: relative; height: calc((100vh - var(--alto-nav) - var(--alto-mbar)) * 4); height: calc((100svh - var(--alto-nav) - var(--alto-mbar)) * 4); }
-        html.pantallas .recorrido-scroll > .recorrido-fijo {
-            position: sticky; top: var(--alto-nav);
-            height: calc(100vh - var(--alto-nav) - var(--alto-mbar)); height: calc(100svh - var(--alto-nav) - var(--alto-mbar));
-            scroll-snap-align: none;
-        }
-        html.pantallas .recorrido-marca {
-            display: block; position: absolute; left: 0; width: 1px; pointer-events: none;
-            height: calc(100vh - var(--alto-nav) - var(--alto-mbar)); height: calc(100svh - var(--alto-nav) - var(--alto-mbar));
-            scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--alto-nav);
-        }
-        html.pantallas .recorrido-marca[data-paso="0"] { top: 0; }
-        html.pantallas .recorrido-marca[data-paso="1"] { top: calc(100vh - var(--alto-nav) - var(--alto-mbar)); top: calc(100svh - var(--alto-nav) - var(--alto-mbar)); }
-        html.pantallas .recorrido-marca[data-paso="2"] { top: calc((100vh - var(--alto-nav) - var(--alto-mbar)) * 2); top: calc((100svh - var(--alto-nav) - var(--alto-mbar)) * 2); }
-        html.pantallas .recorrido-marca[data-paso="3"] { top: calc((100vh - var(--alto-nav) - var(--alto-mbar)) * 3); top: calc((100svh - var(--alto-nav) - var(--alto-mbar)) * 3); }
+        /* Recorrido por pasos: una pantalla; los pasos avanzan solos o con "Siguiente paso" */
         html.pantallas #steps .aspect-\[4\/3\] { aspect-ratio: auto; height: clamp(170px, 44vh, 560px); }
         html.pantallas #steps .step-panel .mb-8 { margin-bottom: clamp(0.75rem, 2vh, 2rem); }
         html.pantallas #steps .hairline-t.mt-10 { margin-top: clamp(0.75rem, 2vh, 2.5rem); padding-top: clamp(0.6rem, 1.5vh, 1.5rem); }
@@ -251,7 +265,7 @@
         html.pantallas #steps .step-panel.is-active { visibility: visible; }
         html.pantallas #steps .lg\:col-span-5 > .flex-grow { display: grid; }
         @media (max-width: 1023px) {
-            html.pantallas #hotel .pantalla > div[role="tablist"] { display: none; }   /* navegación: cada paso se ve al desplazarse */
+            html.pantallas #hotel .pantalla > div[role="tablist"] { display: none; }   /* navegación: en celular bastan las flechas de los pasos */
             /* Celular: el texto completo de cada paso siempre cabe; la foto toma el espacio que queda */
             html.pantallas #steps { gap: 1rem; display: flex; flex-direction: column; justify-content: center; flex: 1 1 auto; min-height: 0; }
             html.pantallas #steps > :first-child { display: flex; flex: 1 1 auto; min-height: 96px; max-height: 46vh; }
@@ -259,55 +273,8 @@
             html.pantallas #steps > :last-child { flex: 0 0 auto; }
         }
 
-        /* ---------- Servicios: al bajar, las fotos y los servicios pasan de lado ----------
-           La sección (en celular, la pantalla de los objetos) queda fija mientras unas paradas
-           invisibles, una por pantalla, marcan cada paso; el desplazamiento corre los carruseles.
-           Después del último paso se ve el final de la sección y luego sigue Eventos.
-           Las paradas, el alto de la pausa y el arrastre los calcula prepararServiciosAlDesplazar. */
-        .pausa-scroll, .marca-lateral { display: none; }
-        html.pantallas .marca-lateral {
-            position: absolute; left: 0; width: 1px; pointer-events: none;
-            scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--alto-nav);
-        }
-        html.pantallas .marca-lateral.es-final { scroll-snap-align: end; scroll-margin-top: 0; }
-        /* El desplazamiento mueve el carrusel sin saltos: sus objetos dejan de ser puntos de ajuste.
-           (Se conserva el ajuste del carrusel: sin él, Chrome pasa esos objetos a la página como paradas.) */
-        html.pantallas .al-desplazar > * { scroll-snap-align: none !important; }
-        /* Solo el desplazamiento de la página mueve estos carruseles: la rueda, el touchpad o el dedo
-           encima de ellos desplazan la página (el carrusel no se mueve por su cuenta) */
-        html.pantallas .al-desplazar { overflow: hidden !important; overscroll-behavior: auto !important; }
-        @media (min-width: 1024px) {
-            html.pantallas #servicios { position: relative; scroll-snap-align: none; }
-            html.pantallas #servicios .servicios-fijo { position: sticky; }
-            html.pantallas #servicios .servicios-pausa-pc { display: block; }
-            html.pantallas #servicios > .marca-lateral { display: block; }
-        }
-        @media (max-width: 1023px) {
-            html.pantallas #servicios .servicios-objetos { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-            html.pantallas #servicios .servicios-objetos-fijo { position: sticky; }
-            html.pantallas #servicios .servicios-pausa-movil { display: block; flex: 0 0 auto; }
-            html.pantallas #servicios .servicios-objetos > .marca-lateral { display: block; }
-        }
-        /* "Inspiración del día": la carta queda fija y los platos pasan de lado (prepararCartaAlDesplazar) */
-        html.pantallas #restaurante .carta-pantalla { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-        html.pantallas #restaurante .carta-fijo { position: sticky; }
-        html.pantallas #restaurante .carta-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas #restaurante .carta-pantalla > .marca-lateral { display: block; }
-        /* Carta de bebidas de Cabalante: queda fija y las columnas pasan de lado (prepararBebidasAlDesplazar) */
-        html.pantallas #bar .bebidas-pantalla { position: relative; scroll-snap-align: none; justify-content: flex-start; padding-block: clamp(0.75rem, 2.4vh, 2.5rem); }
-        html.pantallas #bar .bebidas-fijo { position: sticky; }
-        html.pantallas #bar .bebidas-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas #bar .bebidas-pantalla > .marca-lateral { display: block; }
-        /* Planes: en celular, una tarjeta por desplazamiento */
-        html.pantallas #planes { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-        html.pantallas .planes-fijo { position: sticky; }
-        html.pantallas .planes-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas #planes > .marca-lateral { display: block; }
-        /* "Antes de tu llegada" (una flecha por desplazamiento) */
-        html.pantallas .info-pantalla, html.pantallas .guias-pantalla { position: relative; scroll-snap-align: none; justify-content: flex-start; }
-        html.pantallas .info-fijo, html.pantallas .guias-fijo { position: sticky; }
-        html.pantallas .info-pausa, html.pantallas .guias-pausa { display: block; flex: 0 0 auto; }
-        html.pantallas .info-pantalla > .marca-lateral, html.pantallas .guias-pantalla > .marca-lateral { display: block; }
+        /* Carta de bebidas de Cabalante: banda a todo el ancho, con menos relleno para caber en la pantalla */
+        html.pantallas #bar .bebidas-pantalla { padding-block: clamp(0.75rem, 2.4vh, 2.5rem); }
 
         /* ---------- Servicios ---------- */
         html.pantallas #servicios .lg\:sticky { position: static; }
@@ -429,14 +396,14 @@
         /* Cada pareja de habitaciones es una pantalla (en celular, cada tarjeta) */
         @media (min-width: 768px) {
             html.pantallas .hab-par {
-                scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--alto-nav);
+                scroll-margin-top: var(--alto-nav);
                 min-height: calc(100vh - var(--alto-nav) - var(--alto-mbar)); min-height: calc(100svh - var(--alto-nav) - var(--alto-mbar));
                 align-content: center; padding-block: clamp(0.75rem, 2.2vh, 2.5rem);
             }
         }
         @media (max-width: 767px) {
             html.pantallas .hab-par { padding-bottom: 1.25rem; }
-            html.pantallas .hab-par > .room-card { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: calc(var(--alto-nav) + 0.75rem); }
+            html.pantallas .hab-par > .room-card { scroll-margin-top: calc(var(--alto-nav) + 0.75rem); }
             html.pantallas .hab-par-cabeza { display: none; }   /* en celular cada tarjeta ya dice "Hasta N huéspedes" */
         }
 
@@ -879,6 +846,16 @@
             transition: color .4s, gap .4s;
         }
         .link-arrow:hover { color: var(--brass); gap: 0.9rem; }
+        /* "Ver todos": enlaces que llevan a ver más de una sección (artículos del blog, reseñas en Google).
+           Píldora con filo dorado, compañera de "Ver más" de los carruseles */
+        .boton-mas {
+            display: inline-flex; align-items: center; gap: 0.75rem; height: 2.75rem; padding: 0 0.35rem 0 1.3rem;
+            border-radius: 999px; border: 1px solid var(--brass);
+            font-size: 0.62rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; white-space: nowrap;
+            transition: background-color .35s, border-color .35s, color .35s;
+        }
+        .boton-mas:hover { background: var(--brass); color: var(--ink); }
+        .boton-mas:hover .carrusel-mas-ico { border-color: var(--ink); color: var(--ink); }
 
         /* ---------- Navegación ---------- */
         #nav {
@@ -2894,9 +2871,7 @@
             </div>
 
             </div>
-            <!-- Recorrido: la pantalla queda fija y cada marca (una por paso) es un punto de parada del desplazamiento -->
-            <div class="recorrido-scroll">
-            <div class="pantalla recorrido-fijo">
+            <div class="pantalla">
             <!-- Recorrido -->
             <div id="steps" class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 reveal">
 
@@ -2967,12 +2942,12 @@
 
                     <div class="hairline-t pt-6 mt-10 flex items-center justify-between gap-4">
                         <span class="micro text-graphite/40"><span id="step-current">01</span> <span class="text-graphite/25">/ 04</span></span>
-                        <div class="flex gap-2">
-                            <button type="button" onclick="stepBy(-1)" aria-label="Paso anterior" class="w-11 h-11 rounded-full border border-line flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors">
+                        <div class="carrusel-botones">
+                            <button type="button" onclick="stepBy(-1)" aria-label="Paso anterior" class="carrusel-flecha">
                                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                             </button>
-                            <button type="button" onclick="stepBy(1)" aria-label="Paso siguiente" class="w-11 h-11 rounded-full border border-line flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors">
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            <button type="button" onclick="stepBy(1)" class="carrusel-mas">
+                                Siguiente paso <span class="carrusel-mas-ico"><i data-lucide="arrow-right" class="w-4 h-4"></i></span>
                             </button>
                         </div>
                     </div>
@@ -3002,11 +2977,6 @@
                     <span class="step-name">La mesa</span>
                 </button>
             </div>
-            </div>
-            <span class="recorrido-marca" data-paso="0" aria-hidden="true"></span>
-            <span class="recorrido-marca" data-paso="1" aria-hidden="true"></span>
-            <span class="recorrido-marca" data-paso="2" aria-hidden="true"></span>
-            <span class="recorrido-marca" data-paso="3" aria-hidden="true"></span>
             </div>
 
         </div>
@@ -3079,8 +3049,6 @@
     <!-- ============================= SERVICIOS ============================= -->
     <section id="servicios" class="section con-pantallas-movil">
         <div class="shell">
-            <!-- Con pantallas, al bajar la sección queda fija y las fotos y los servicios pasan de lado
-                 (prepararServiciosAlDesplazar); después se ve el final y luego sigue Eventos -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 servicios-fijo">
 
                 <div class="lg:col-span-4 reveal pantalla-movil">
@@ -3237,11 +3205,9 @@
                             </a>
                         </div>
                     </div>
-                    <div class="pausa-scroll servicios-pausa-movil" aria-hidden="true"></div>
                 </div>
 
             </div>
-            <div class="pausa-scroll servicios-pausa-pc" aria-hidden="true"></div>
         </div>
     </section>
 
@@ -3334,7 +3300,6 @@
 
         </div>
         </div>
-        <div class="pausa-scroll planes-pausa" aria-hidden="true"></div>
     </section>
 
     <!-- ============================= BENEFICIOS DE RESERVAR DIRECTO ============================= -->
@@ -3445,7 +3410,6 @@
 
             </div>
             <div class="pantalla carta-pantalla">
-            <!-- Con pantallas, al bajar la carta queda fija y los platos pasan de lado (prepararCartaAlDesplazar) -->
             <div class="carta-fijo">
             <!-- Carta de favoritos con pedido: se genera desde `CARTA_FAVORITOS` (script) -->
             <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8 reveal">
@@ -3464,11 +3428,10 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 carrusel" data-movil="2" data-tableta="3" data-por-vista="5" id="carta-grid"></div>
             <p class="text-[0.72rem] text-graphite/45 mt-6">Precios en pesos colombianos, sujetos a cambios. Fotografías de referencia. Toca la foto de un plato para ver su afiche.</p>
             </div>
-            <div class="pausa-scroll carta-pausa" aria-hidden="true"></div>
 
             </div>
             <!-- Afiches originales de la carta: se generan desde `CARTA_FAVORITOS` y `AFICHES`.
-                 Con pantallas se ven de a dos y, al bajar, pasan los demás (prepararAfichesAlDesplazar) -->
+                 Con pantallas se ven de a dos; "Ver más" pasa a los siguientes -->
             <div class="pantalla afiches-pantalla">
             <div class="afiches-fijo reveal">
                 <div class="flex items-end justify-between gap-4 mb-6 afiches-cabeza">
@@ -3476,14 +3439,13 @@
                         <span class="eyebrow is-centered mb-4">Afiches de Mangolé</span>
                         <h3 class="font-display text-2xl sm:text-3xl text-ink">La carta, como la ves en el restaurante</h3>
                     </div>
-                    <div class="flex gap-2 shrink-0">
-                        <button type="button" onclick="moverTira('afiches', -1)" aria-label="Afiches anteriores" class="w-11 h-11 rounded-full border border-line flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
-                        <button type="button" onclick="moverTira('afiches', 1)" aria-label="Afiches siguientes" class="w-11 h-11 rounded-full border border-line flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                    <div class="carrusel-botones" data-tira="afiches">
+                        <button type="button" onclick="moverTira('afiches', -1)" aria-label="Afiches anteriores" class="carrusel-flecha" data-dir="-1"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+                        <button type="button" onclick="moverTira('afiches', 1)" aria-label="Ver más afiches" class="carrusel-mas" data-dir="1">Ver más <span class="carrusel-mas-ico"><i data-lucide="arrow-right" class="w-4 h-4"></i></span></button>
                     </div>
                 </div>
                 <div id="afiches" class="reels flex gap-3 overflow-x-auto snap-x snap-mandatory"></div>
             </div>
-            <div class="pausa-scroll afiches-pausa" aria-hidden="true"></div>
             </div>
         </div>
     </section>
@@ -3537,8 +3499,7 @@
             </div>
         </div>
 
-        <!-- Carta de bebidas: se genera desde `CARTA_BEBIDAS` (script). Banda azul noche a todo el ancho;
-             con pantallas queda fija y, al bajar, las columnas pasan de lado (prepararBebidasAlDesplazar) -->
+        <!-- Carta de bebidas: se genera desde `CARTA_BEBIDAS` (script). Banda azul noche a todo el ancho -->
         <div class="pantalla bebidas-pantalla">
             <div class="bebidas-fijo">
                 <div class="shell">
@@ -3560,7 +3521,6 @@
                     </p>
                 </div>
             </div>
-            <div class="pausa-scroll bebidas-pausa" aria-hidden="true"></div>
         </div>
     </section>
 
@@ -3568,7 +3528,6 @@
     <section id="galeria" class="section con-pantallas">
         <div class="shell">
             <div class="pantalla galeria-pantalla">
-            <!-- Con pantallas, al bajar queda fija y cada desplazamiento muestra otra categoría (prepararGaleriaAlDesplazar) -->
             <div class="galeria-fijo">
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-end mb-10 sm:mb-14 reveal">
@@ -3617,26 +3576,23 @@
                 </button>
             </div>
             </div>
-            <div class="pausa-scroll galeria-pausa" aria-hidden="true"></div>
 
             </div>
             <!-- Clips en movimiento: se generan desde `CLIPS` y solo se reproducen en pantalla -->
             <div class="pantalla reels-pantalla">
-            <!-- Con pantallas, al bajar queda fija y los clips pasan de lado (prepararClipsAlDesplazar) -->
             <div class="reels-fijo reveal">
-                <div class="flex items-end justify-between gap-4 mb-6">
+                <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
                     <div>
                         <span class="eyebrow mb-4">En movimiento</span>
                         <h3 class="font-display text-3xl sm:text-4xl text-ink">Un día en Cabaleón</h3>
                     </div>
-                    <div class="flex gap-2 shrink-0">
-                        <button type="button" onclick="moverClips(-1)" aria-label="Clips anteriores" class="w-11 h-11 rounded-full border border-line flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
-                        <button type="button" onclick="moverClips(1)" aria-label="Clips siguientes" class="w-11 h-11 rounded-full border border-line flex items-center justify-center text-ink hover:bg-ink hover:text-white transition-colors"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                    <div class="carrusel-botones" data-tira="reels">
+                        <button type="button" onclick="moverClips(-1)" aria-label="Clips anteriores" class="carrusel-flecha" data-dir="-1"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+                        <button type="button" onclick="moverClips(1)" aria-label="Ver más clips" class="carrusel-mas" data-dir="1">Ver más <span class="carrusel-mas-ico"><i data-lucide="arrow-right" class="w-4 h-4"></i></span></button>
                     </div>
                 </div>
                 <div id="reels" class="reels flex gap-3 overflow-x-auto snap-x snap-mandatory"></div>
             </div>
-            <div class="pausa-scroll reels-pausa" aria-hidden="true"></div>
             </div>
         </div>
     </section>
@@ -3712,20 +3668,18 @@
                     <span class="font-display text-4xl text-brass leading-none">4,8</span>
                     <span class="body-sm text-white/55 leading-tight">Calificación<br>promedio en Google</span>
                 </div>
-                <a href="https://maps.app.goo.gl/tFjXZFSAjQHFDaHWA" target="_blank" rel="noopener noreferrer" class="link-arrow text-white">
-                    Leer todas las reseñas <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                <a href="https://maps.app.goo.gl/tFjXZFSAjQHFDaHWA" target="_blank" rel="noopener noreferrer" class="boton-mas text-white">
+                    Leer todas las reseñas <span class="carrusel-mas-ico"><i data-lucide="arrow-up-right" class="w-4 h-4"></i></span>
                 </a>
             </div>
         </div>
         </div>
-        <div class="pausa-scroll resenas-pausa" aria-hidden="true"></div>
     </section>
 
     <!-- ============================= ANTES DE TU LLEGADA ============================= -->
     <section id="informacion" class="section bg-white con-pantallas">
         <div class="shell">
             <div class="pantalla info-pantalla">
-            <!-- Con pantallas, al bajar queda fija y cada desplazamiento es como tocar la flecha (prepararInformacionAlDesplazar) -->
             <div class="info-fijo">
 
             <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12 sm:mb-16 reveal">
@@ -3859,7 +3813,6 @@
                 </div>
             </div>
             </div>
-            <div class="pausa-scroll info-pausa" aria-hidden="true"></div>
 
             </div>
             <div class="pantalla guias-pantalla">
@@ -3938,7 +3891,6 @@
                 </div>
             </div>
             </div>
-            <div class="pausa-scroll guias-pausa" aria-hidden="true"></div>
             </div>
 
         </div>
@@ -4453,8 +4405,7 @@
 
     <!-- ============================= BLOG ============================= -->
     <!-- Cada tarjeta lleva a la página propia del artículo (blog-*.html), con su título, descripción y
-         datos estructurados para buscadores. Las páginas se generan con el mismo estilo (blog.css).
-         Con pantallas, en celular cada desplazamiento muestra el artículo siguiente (prepararBlogAlDesplazar) -->
+         datos estructurados para buscadores. Las páginas se generan con el mismo estilo (blog.css). -->
     <section id="blog" class="section-tight text-white" aria-labelledby="blog-titulo">
         <div class="blog-fijo">
             <div class="shell">
@@ -4509,10 +4460,9 @@
                         </a>
                     </article>
                 </div>
-                <p class="blog-todos"><a href="blog.html" class="link-arrow text-white" onclick="registrar('blog', 'todos')">Ver todos los artículos <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a></p>
+                <p class="blog-todos"><a href="blog.html" class="boton-mas text-white" onclick="registrar('blog', 'todos')">Ver todos los artículos <span class="carrusel-mas-ico"><i data-lucide="arrow-right" class="w-4 h-4"></i></span></a></p>
             </div>
         </div>
-        <div class="pausa-scroll blog-pausa" aria-hidden="true"></div>
     </section>
 
     <!-- ============================= CONTACTO ============================= -->
@@ -6817,7 +6767,6 @@
         const PASO_MS = 7000;
         const pasosNombres = ['La llegada', 'La habitación', 'La tarde', 'La mesa'];
         let pasoActual = 0;
-        let recorridoConScroll = false;   // con pantallas, el paso lo decide el desplazamiento (sin avance automático)
         let pasoTimer = null;
         let pasosVisibles = false;
         const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -6861,396 +6810,19 @@
             document.getElementById('step-current').textContent = numero;
             document.getElementById('step-badge').textContent = numero + ' · ' + pasosNombres[pasoActual];
 
-            pintarProgreso(pasoActual, pasosVisibles && !menosMovimiento && !recorridoConScroll);
+            pintarProgreso(pasoActual, pasosVisibles && !menosMovimiento);
 
             if (reiniciarTimer !== false) arrancarPasos();
         }
 
         function stepBy(delta) {
-            if (recorridoConScroll) return irAPasoConScroll(pasoActual + delta);
+            if (delta > 0) document.querySelector('#steps .carrusel-botones').classList.add('en-uso');
             setPaso(pasoActual + delta);
-        }
-
-        /* Con pantallas: el paso sigue al desplazamiento dentro del recorrido */
-        function prepararRecorridoScroll() {
-            const zona = document.querySelector('.recorrido-scroll');
-            if (!zona || !document.documentElement.classList.contains('pantallas')) return;
-            recorridoConScroll = true;
-            zonasConParadas.push(() => zona);
-            detenerPasos();
-            const total = zona.querySelectorAll('.recorrido-marca').length;
-            let pendiente = false;
-            const revisar = () => {
-                pendiente = false;
-                const r = zona.getBoundingClientRect();
-                if (r.bottom < 0 || r.top > innerHeight) return;
-                const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alto-nav')) || 0;
-                const i = Math.max(0, Math.min(total - 1, Math.round((nav - r.top) / (r.height / total))));
-                if (i !== pasoActual) setPaso(i, false);
-            };
-            addEventListener('scroll', () => { if (!pendiente) { pendiente = true; requestAnimationFrame(revisar); } }, { passive: true });
-            addEventListener('resize', revisar);
-            revisar();
-        }
-
-        /* Con pantallas: carruseles que avanzan al bajar (Servicios e "Inspiración del día").
-           Una zona queda fija y cada desplazamiento corre de lado sus carruseles. Hay tantas paradas
-           como hagan falta para que cada objeto quede quieto en pantalla al menos una vez (o las
-           `pasosMinimos`, si son más). Con la última ya se vieron todos; si lo fijo no cabe en la
-           pantalla, el siguiente desplazamiento muestra su final y el que sigue pasa a la siguiente
-           sección. Las paradas son marcas invisibles de una pantalla de alto (.marca-lateral), como en
-           el recorrido del hotel; la pausa (.pausa-scroll) da el espacio para quedarse fijo.
-             partes(enComputador) → { zona, fijo, pausa } según el tamaño de pantalla
-             opciones.carruseles  → carruseles que corren de lado
-             opciones.pasosMinimos→ paradas mínimas
-             opciones.porObjeto   → una parada por objeto (cada desplazamiento = una flecha)
-             opciones.pasos()     → número fijo de paradas (p. ej., una por categoría)
-             opciones.alPaso(i)   → se llama al cambiar de parada (p. ej., mostrar la categoría i) */
-        function prepararDesplazamientoLateral(partes, opciones) {
-            if (!document.documentElement.classList.contains('pantallas')) return;
-            const carruseles = (opciones.carruseles || []).filter(Boolean);
-            if (!carruseles.length && !opciones.alPaso) return;
-            let ultimoPaso = -1;
-            const computador = window.matchMedia('(min-width: 1024px)');
-            let actual = null, pasos = 1, recorrido = 0;
-            zonasConParadas.push(() => actual && actual.zona);
-
-            const medidas = c => {
-                const items = [...c.children].filter(x => x.offsetParent !== null);
-                const paso = items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : c.clientWidth;
-                const porVista = Math.max(1, Math.round(c.clientWidth / (paso || 1)));
-                return { paso, porVista, maximo: Math.max(0, items.length - porVista) };
-            };
-            const altoMenu = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alto-nav')) || 0;
-
-            const mover = () => {
-                if (!actual) return;
-                const inicio = actual.zona.getBoundingClientRect().top + scrollY - altoMenu();
-                const p = recorrido ? Math.min(1, Math.max(0, (scrollY - inicio) / recorrido)) : 0;
-                const tramo = p * (pasos - 1);
-                const k = Math.min(Math.max(pasos - 2, 0), Math.floor(tramo));
-                const t = tramo - k;
-                carruseles.forEach(c => {
-                    const m = medidas(c);
-                    const parada = i => pasos > 1 ? Math.round(i * m.maximo / (pasos - 1)) : 0;
-                    c.scrollLeft = (parada(k) + (parada(k + 1) - parada(k)) * t) * m.paso;
-                });
-                if (opciones.alPaso) {
-                    const i = Math.round(tramo);
-                    if (i !== ultimoPaso) { ultimoPaso = i; opciones.alPaso(i); }
-                }
-            };
-
-            const preparar = () => {
-                // Deja todo como estaba antes de medir de nuevo
-                [true, false].forEach(pc => {
-                    const x = partes(pc);
-                    if (!x.zona) return;
-                    x.zona.querySelectorAll(':scope > .marca-lateral').forEach(m => m.remove());
-                    if (x.pausa) x.pausa.style.height = '';
-                    if (x.fijo) x.fijo.style.top = '';
-                });
-                carruseles.forEach(c => { c.classList.add('al-desplazar'); c.scrollLeft = 0; });
-                actual = partes(computador.matches);
-                const { zona, fijo, pausa } = actual;
-                if (!zona || !fijo || !pausa) { actual = null; return; }
-
-                const nav = altoMenu();
-                const barra = document.querySelector('.m-bar');
-                const altoBarra = barra && getComputedStyle(barra).display !== 'none' ? barra.offsetHeight : 0;
-                const pantalla = window.innerHeight - nav - altoBarra;   // una parada por pantalla
-                pasos = opciones.pasos ? Math.max(1, opciones.pasos())
-                    : Math.max(opciones.pasosMinimos || 1, ...carruseles.map(c => {
-                        const m = medidas(c);
-                        return opciones.porObjeto ? m.maximo + 1 : Math.ceil(m.maximo / m.porVista) + 1;
-                    }));
-                recorrido = (pasos - 1) * pantalla;
-
-                const relleno = parseFloat(getComputedStyle(zona).paddingTop) || 0;
-                const altoFijo = fijo.offsetHeight;
-                const sobra = altoFijo + relleno + (parseFloat(getComputedStyle(zona).paddingBottom) || 0) - pantalla;
-                // Si lo fijo es más bajo que la pantalla, queda centrado mientras avanza
-                const centrado = sobra < 0 ? Math.max(0, (pantalla - altoFijo) / 2 - relleno) : 0;
-                fijo.style.top = (nav + relleno + centrado) + 'px';
-                // Si no cabe, una parada más (una pantalla después de la última) muestra su final
-                const conFinal = sobra > SOBRA_MINIMA;
-                pausa.style.height = (recorrido + centrado + (conFinal ? Math.max(0, pantalla - sobra) : 0)) + 'px';
-
-                const marca = (arriba, final) => {
-                    const m = document.createElement('span');
-                    m.className = 'marca-lateral' + (final ? ' es-final' : '');
-                    m.setAttribute('aria-hidden', 'true');
-                    m.style.height = pantalla + 'px';
-                    if (final) m.style.bottom = '0px'; else m.style.top = arriba + 'px';
-                    zona.appendChild(m);
-                };
-                for (let i = 0; i < pasos; i++) marca(i * pantalla, false);
-                if (conFinal) marca(0, true);
-                mover();
-            };
-
-            // Las flechas llevan la página al paso anterior o siguiente (todo sigue sincronizado)
-            const irAIndice = destino => {
-                if (!actual || pasos < 2) return false;
-                const pantalla = recorrido / (pasos - 1);
-                const inicio = actual.zona.getBoundingClientRect().top + scrollY - altoMenu();
-                destino = Math.min(pasos - 1, Math.max(0, destino));
-                window.scrollTo({ top: inicio + destino * pantalla, behavior: 'smooth' });
-                return true;
-            };
-            const irAPaso = dir => {
-                if (!actual || pasos < 2) return false;
-                const inicio = actual.zona.getBoundingClientRect().top + scrollY - altoMenu();
-                const paso = Math.round(Math.min(1, Math.max(0, (scrollY - inicio) / recorrido)) * (pasos - 1));
-                return irAIndice(paso + dir);
-            };
-            [true, false].forEach(pc => { const z = partes(pc).zona; if (z) z._irAIndice = irAIndice; });   // lo usan los filtros de la galería
-            carruseles.forEach(c => {
-                c._irAPaso = irAPaso;   // lo usa moverTira (flechas de los afiches)
-                const nav = c.nextElementSibling && c.nextElementSibling.classList.contains('carrusel-nav') ? c.nextElementSibling : null;
-                if (!nav) return;
-                nav.addEventListener('click', e => {
-                    const b = e.target.closest('[data-dir]');
-                    if (b && irAPaso(Number(b.dataset.dir))) e.stopImmediatePropagation();
-                }, true);
-            });
-
-            let pendiente = false;
-            addEventListener('scroll', () => { if (!pendiente) { pendiente = true; requestAnimationFrame(() => { pendiente = false; mover(); }); } }, { passive: true });
-            let espera;
-            addEventListener('resize', () => { clearTimeout(espera); espera = setTimeout(preparar, 150); });
-            computador.addEventListener('change', preparar);
-            addEventListener('load', preparar);
-            preparar();
-        }
-
-        /* Servicios: en computador queda fija toda la sección; en celular, la pantalla de las fotos y los servicios */
-        function prepararServiciosAlDesplazar() {
-            const s = document.getElementById('servicios');
-            if (!s) return;
-            prepararDesplazamientoLateral(pc => pc
-                ? { zona: s, fijo: s.querySelector('.servicios-fijo'), pausa: s.querySelector('.servicios-pausa-pc') }
-                : { zona: s.querySelector('.servicios-objetos'), fijo: s.querySelector('.servicios-objetos-fijo'), pausa: s.querySelector('.servicios-pausa-movil') },
-                { carruseles: [document.getElementById('fotos-servicios'), document.getElementById('lista-servicios')] });
-        }
-
-        /* Carta de bebidas de Cabalante: las columnas pasan de lado al bajar */
-        function prepararBebidasAlDesplazar() {
-            const z = document.querySelector('#bar .bebidas-pantalla');
-            if (!z) return;
-            prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.bebidas-fijo'), pausa: z.querySelector('.bebidas-pausa') }),
-                { carruseles: [document.getElementById('bebidas-grid')] });
-        }
-
-        /* Planes: en celular, una tarjeta por desplazamiento (en computador se ven todas juntas) */
-        function prepararPlanesAlDesplazar() {
-            [['planes', 'plans-grid']].forEach(([id, lista]) => {
-                const z = document.getElementById(id);
-                if (!z) return;
-                prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.' + id + '-fijo'), pausa: z.querySelector('.' + id + '-pausa') }),
-                    { carruseles: [document.getElementById(lista)], porObjeto: true });
-            });
-        }
-
-        /* Blog: en celular, un artículo por desplazamiento */
-        function prepararBlogAlDesplazar() {
-            const z = document.getElementById('blog');
-            if (!z) return;
-            prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.blog-fijo'), pausa: z.querySelector('.blog-pausa') }),
-                { carruseles: [document.getElementById('blog-grid')], porObjeto: true });
-        }
-
-        /* "Cabaleón en imágenes": cada desplazamiento muestra la categoría siguiente (Todas, Hotel, Habitaciones…) */
-        function prepararGaleriaAlDesplazar() {
-            const z = document.querySelector('#galeria .galeria-pantalla');
-            if (!z) return;
-            const filtros = () => [...document.querySelectorAll('#gallery-filters .gal-filter')];
-            prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.galeria-fijo'), pausa: z.querySelector('.galeria-pausa') }), {
-                pasos: () => filtros().length,
-                alPaso: i => {
-                    const b = filtros()[i];
-                    if (!b) return;
-                    filtrarGaleria(b.dataset.cat);
-                    document.getElementById('gallery-grid').scrollLeft = 0;
-                }
-            });
-        }
-
-        /* "Un día en Cabaleón": los clips pasan de lado al bajar, de grupo en grupo */
-        function prepararClipsAlDesplazar() {
-            const z = document.querySelector('#galeria .reels-pantalla');
-            if (!z) return;
-            prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.reels-fijo'), pausa: z.querySelector('.reels-pausa') }),
-                { carruseles: [document.getElementById('reels')] });
-        }
-
-        /* "Antes de tu llegada": cada desplazamiento es como tocar la flecha (una tarjeta a la vez) */
-        function prepararInformacionAlDesplazar() {
-            const z1 = document.querySelector('#informacion .info-pantalla');
-            if (z1) prepararDesplazamientoLateral(() => ({ zona: z1, fijo: z1.querySelector('.info-fijo'), pausa: z1.querySelector('.info-pausa') }),
-                { carruseles: [document.getElementById('tarjetas-info')], porObjeto: true });
-            const z2 = document.querySelector('#informacion .guias-pantalla');
-            if (!z2) return;
-            // Guías y folletos: una imagen completa por desplazamiento
-            prepararDesplazamientoLateral(() => ({ zona: z2, fijo: z2.querySelector('.guias-fijo'), pausa: z2.querySelector('.guias-pausa') }),
-                { carruseles: [document.getElementById('guias-info'), z2.querySelector('.notas-info')], porObjeto: true });
-            // Las imágenes se cargan apenas la sección se acerca (no aparecen en blanco al pasar de una a otra)
-            if ('IntersectionObserver' in window) {
-                const cerca = new IntersectionObserver(entradas => {
-                    if (!entradas.some(e => e.isIntersecting)) return;
-                    z2.querySelectorAll('#guias-info img').forEach(img => { img.loading = 'eager'; });
-                    cerca.disconnect();
-                }, { rootMargin: '150% 0px' });
-                cerca.observe(z2);
-            }
-        }
-
-        /* "La carta, como la ves en el restaurante": de a dos afiches; al bajar pasan los demás */
-        function prepararAfichesAlDesplazar() {
-            const z = document.querySelector('#restaurante .afiches-pantalla');
-            if (!z) return;
-            prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.afiches-fijo'), pausa: z.querySelector('.afiches-pausa') }),
-                { carruseles: [document.getElementById('afiches')] });
-        }
-
-        /* "Inspiración del día": los platos pasan de lado; en computador, con dos desplazamientos se llega al último */
-        function prepararCartaAlDesplazar() {
-            const z = document.querySelector('#restaurante .carta-pantalla');
-            if (!z) return;
-            prepararDesplazamientoLateral(() => ({ zona: z, fijo: z.querySelector('.carta-fijo'), pausa: z.querySelector('.carta-pausa') }),
-                { carruseles: [document.getElementById('carta-grid')], pasosMinimos: 3 });
-        }
-
-        /* Con pantallas: las secciones más altas que la pantalla se recorren completas, por páginas.
-           Una sección que no cabe deja de ser un solo punto de parada y recibe marcas invisibles de una
-           pantalla de alto (.pagina-marca), como el recorrido del hotel: cada desplazamiento (rueda o dedo)
-           avanza una página, con un poco de la anterior arriba para no perder el hilo, y la última muestra
-           su final; el siguiente pasa a la siguiente sección. Así funciona igual en computador y en celular
-           (un área de parada más alta que la pantalla deja que el dedo se pase de largo).
-           Se recalcula cuando algo cambia de alto (fotos que cargan, una pregunta abierta, otro tamaño). */
-        const SOBRA_MINIMA = 12;   // px de más a partir de los que una sección se recorre por páginas
-        const SOLAPE_PAGINA = 56;  // px de la página anterior que se siguen viendo arriba
-        const ZONAS_PANTALLA = 'header#inicio, section, .pantalla, .pantalla-movil, .hab-par, .hab-par > .room-card';
-        let revisarPantallasLargas = () => {};   // se reemplaza al preparar (las habitaciones la llaman al cambiar)
-        function prepararPantallasLargas() {
-            if (!document.documentElement.classList.contains('pantallas')) return;
-            const observadas = new WeakSet();
-            const observador = 'ResizeObserver' in window ? new ResizeObserver(() => programar()) : null;
-            let pendiente = false;
-            const revisar = () => {
-                pendiente = false;
-                const zonas = [...document.querySelectorAll(ZONAS_PANTALLA)].filter(z => !z.classList.contains('recorrido-fijo'));
-                if (observador) zonas.forEach(z => { if (!observadas.has(z)) { observadas.add(z); observador.observe(z); } });
-                const nav = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--alto-nav')) || 0;
-                const barra = document.querySelector('.m-bar');
-                const altoBarra = barra && getComputedStyle(barra).display !== 'none' ? barra.offsetHeight : 0;   // barra de acciones del celular
-                const visible = window.innerHeight - altoBarra;   // alto de la ventana sin la barra del celular
-                const pagina = visible - nav;                      // lo que se ve debajo del menú
-                zonas.forEach(zona => {
-                    const margen = zona.matches('header#inicio') ? 0 : nav;
-                    // Se mira la sección tal como es (sin las marcas ni los ajustes de la revisión anterior)
-                    const eraLarga = zona.classList.contains('es-larga');
-                    if (eraLarga) zona.classList.remove('es-larga');
-                    if (zona.dataset.recorte) { zona.style.paddingBottom = ''; delete zona.dataset.recorte; }
-                    const cs = getComputedStyle(zona);
-                    const activa = cs.display !== 'none' && cs.scrollSnapAlign !== 'none';
-                    const alto = zona.offsetHeight;
-                    const sobra = alto + margen - visible;
-                    // Si se pasa por muy poco, se recorta ese poco de su margen inferior y cabe exacta
-                    if (activa && sobra > 0.5 && sobra <= SOBRA_MINIMA) {
-                        const relleno = parseFloat(cs.paddingBottom) || 0;
-                        const recorte = Math.min(Math.ceil(sobra), relleno);
-                        if (recorte > 0) { zona.style.paddingBottom = (relleno - recorte) + 'px'; zona.dataset.recorte = recorte; }
-                    }
-                    const larga = activa && sobra > SOBRA_MINIMA;
-                    const marcas = [...zona.querySelectorAll(':scope > .pagina-marca')];
-                    if (!larga) { marcas.forEach(m => m.remove()); return; }
-
-                    // Posiciones de cada página (medidas desde el borde superior de la sección)
-                    const paradas = [-margen];
-                    const ultima = alto - visible;
-                    while (true) {
-                        const siguiente = paradas[paradas.length - 1] + visible - SOLAPE_PAGINA - nav;
-                        if (siguiente >= ultima - 40) break;
-                        paradas.push(siguiente);
-                    }
-                    paradas.push(ultima);
-
-                    zona.classList.add('es-larga');
-                    if (cs.position === 'static') zona.dataset.relativa = '1';
-                    // overflow: hidden la volvería su propio contenedor de desplazamiento; clip recorta igual sin eso
-                    if (cs.overflowX === 'hidden' || cs.overflowY === 'hidden') zona.dataset.clip = '1';
-                    paradas.forEach((parada, i) => {
-                        let m = marcas[i];
-                        if (!m) {
-                            m = document.createElement('span');
-                            m.className = 'pagina-marca';
-                            m.setAttribute('aria-hidden', 'true');
-                            zona.appendChild(m);
-                        }
-                        m.style.top = (parada + nav) + 'px';
-                        m.style.height = pagina + 'px';
-                    });
-                    marcas.slice(paradas.length).forEach(m => m.remove());
-                });
-            };
-            const programar = () => { if (!pendiente) { pendiente = true; requestAnimationFrame(revisar); } };
-            revisarPantallasLargas = programar;
-            addEventListener('resize', programar);
-            addEventListener('load', programar);
-            revisar();
-        }
-
-        /* El ajuste por paradas (scroll-snap) se enciende solo mientras una zona con efecto cubre la pantalla;
-           al salir de ella y quedar quieto, se apaga y el resto de la página se desplaza libre.
-           (Encendido en toda la página, la rueda saltaría siempre a la parada más cercana.) */
-        const zonasConParadas = [];
-        function prepararParadasEnZonas() {
-            const html = document.documentElement;
-            if (!html.classList.contains('pantallas')) return;
-            const dentro = () => {
-                const nav = parseFloat(getComputedStyle(html).getPropertyValue('--alto-nav')) || 0;
-                const barra = document.querySelector('.m-bar');
-                const abajo = window.innerHeight - (barra && getComputedStyle(barra).display !== 'none' ? barra.offsetHeight : 0);
-                return zonasConParadas.some(zona => {
-                    const z = zona();
-                    if (!z || !z.offsetParent) return false;
-                    const r = z.getBoundingClientRect();
-                    return r.top <= nav + 2 && r.bottom >= abajo - 2;
-                });
-            };
-            let pendiente = false, espera;
-            const revisar = alQuedarQuieto => {
-                pendiente = false;
-                // Solo se toca la clase si cambia: reescribirla hace que el navegador vuelva a ajustar y frena el desplazamiento
-                const activa = html.classList.contains('paradas-activas');
-                if (dentro()) { if (!activa) html.classList.add('paradas-activas'); }
-                else if (alQuedarQuieto && activa) html.classList.remove('paradas-activas');
-            };
-            addEventListener('scroll', () => {
-                if (!pendiente) { pendiente = true; requestAnimationFrame(() => revisar(false)); }
-                clearTimeout(espera);
-                espera = setTimeout(() => revisar(true), 180);
-            }, { passive: true });
-            addEventListener('resize', () => revisar(true));
-            revisar(true);
-        }
-
-        /* Flechas y pestañas: se desplaza hasta la marca del paso (después del último, a la siguiente sección) */
-        function irAPasoConScroll(i) {
-            const marcas = document.querySelectorAll('.recorrido-marca');
-            const suave = menosMovimiento ? 'auto' : 'smooth';
-            if (i >= marcas.length) {
-                const siguiente = document.querySelector('.recorrido-scroll').closest('section').nextElementSibling;
-                if (siguiente) siguiente.scrollIntoView({ behavior: suave, block: 'start' });
-                return;
-            }
-            marcas[Math.max(0, i)].scrollIntoView({ behavior: suave, block: 'start' });
         }
 
         function arrancarPasos() {
             detenerPasos();
-            if (menosMovimiento || !pasosVisibles || recorridoConScroll) return;
+            if (menosMovimiento || !pasosVisibles) return;
             pintarProgreso(pasoActual, true);
             pasoTimer = setInterval(() => setPaso(pasoActual + 1, false), PASO_MS);
         }
@@ -7417,7 +6989,6 @@
                 '</div>').join('');
             grid.hidden = false;
             if (window.lucide) lucide.createIcons();
-            revisarPantallasLargas();
         }
 
         function tarjetaHabitacion(key, i) {
@@ -7511,33 +7082,48 @@
             cifras.forEach(el => { el.textContent = '0'; obs.observe(el); });
         }
 
+        /* Carruseles: debajo de cada uno, el avance por grupos ("01 / 03" y un filo dorado), la flecha
+           para volver y "Ver más", que pasa al grupo siguiente (lo que cabe en una vista) */
+        const dosCifras = n => String(n).padStart(2, '0');
         function prepararCarruseles() {
             document.querySelectorAll('.carrusel, .carrusel-movil').forEach(c => {
                 if (c.dataset.listo) return;
                 c.dataset.listo = '1';
                 const nav = document.createElement('div');
                 nav.className = 'carrusel-nav';
-                nav.innerHTML = '<span class="carrusel-puntos" aria-hidden="true"></span>' +
-                    '<span class="flex items-center gap-3"><span class="carrusel-cuenta"></span>' +
-                    '<button type="button" class="carrusel-flecha" data-dir="-1" aria-label="Anterior">' + icono('arrow-left', 'w-4 h-4') + '</button>' +
-                    '<button type="button" class="carrusel-flecha" data-dir="1" aria-label="Siguiente">' + icono('arrow-right', 'w-4 h-4') + '</button></span>';
+                nav.innerHTML = '<button type="button" class="carrusel-flecha" data-dir="-1" aria-label="Anterior">' + icono('arrow-left', 'w-4 h-4') + '</button>' +
+                    '<span class="carrusel-avance" aria-hidden="true"><span class="carrusel-cuenta"></span><span class="carrusel-linea"><span></span></span></span>' +
+                    '<button type="button" class="carrusel-mas" data-dir="1">Ver más <span class="carrusel-mas-ico">' + icono('arrow-right', 'w-4 h-4') + '</span></button>';
                 c.after(nav);
                 const items = () => [...c.children].filter(x => x.offsetParent !== null);
                 const paso = () => { const i = items(); return i.length > 1 ? i[1].offsetLeft - i[0].offsetLeft : c.clientWidth; };
+                // Grupo actual y total de grupos (el último puede quedar incompleto)
+                const grupos = () => {
+                    const ancho = paso() || 1;
+                    const vista = Math.max(1, Math.round(c.clientWidth / ancho));
+                    const total = Math.max(1, Math.ceil((items().length - vista) / vista) + 1);
+                    const alFinal = c.scrollLeft >= c.scrollWidth - c.clientWidth - 4;
+                    const actual = alFinal ? total - 1 : Math.min(total - 1, Math.round(c.scrollLeft / (ancho * vista)));
+                    return { ancho, vista, total, actual };
+                };
                 const pintar = () => {
-                    const lista = items();
-                    const porVista = Math.max(1, Math.round(c.clientWidth / (paso() || 1)));
-                    const total = Math.max(1, lista.length - porVista + 1);
-                    const actual = Math.min(total - 1, Math.round(c.scrollLeft / (paso() || 1)));
+                    const { total, actual } = grupos();
                     nav.classList.toggle('is-vacio', c.scrollWidth <= c.clientWidth + 4);
-                    nav.querySelector('.carrusel-cuenta').textContent = (actual + 1) + ' / ' + total;
-                    nav.querySelector('.carrusel-puntos').innerHTML = total > 10 ? '' : Array.from({ length: total }, (_, k) => '<span class="' + (k === actual ? 'is-actual' : '') + '"></span>').join('');
+                    // Fondo oscuro (texto claro): los botones van en blanco
+                    const [r, g, b] = (getComputedStyle(nav).color.match(/\d+/g) || [0, 0, 0]).map(Number);
+                    nav.classList.toggle('en-oscuro', (r * 299 + g * 587 + b * 114) / 1000 > 160);
+                    if (actual > 0) nav.classList.add('en-uso');   // ya lo usó: la flecha deja de asomarse
+                    nav.querySelector('.carrusel-cuenta').textContent = dosCifras(actual + 1) + ' / ' + dosCifras(total);
+                    nav.querySelector('.carrusel-linea > span').style.width = ((actual + 1) / total * 100) + '%';
                     nav.querySelector('[data-dir="-1"]').disabled = actual <= 0;
                     nav.querySelector('[data-dir="1"]').disabled = actual >= total - 1;
                 };
                 nav.addEventListener('click', e => {
                     const b = e.target.closest('[data-dir]');
-                    if (b) c.scrollBy({ left: Number(b.dataset.dir) * paso(), behavior: 'smooth' });
+                    if (!b) return;
+                    const { ancho, vista, total, actual } = grupos();
+                    const destino = Math.min(total - 1, Math.max(0, actual + Number(b.dataset.dir)));
+                    c.scrollTo({ left: Math.min(c.scrollWidth - c.clientWidth, destino * vista * ancho), behavior: 'smooth' });
                 });
                 let espera;
                 c.addEventListener('scroll', () => { clearTimeout(espera); espera = setTimeout(pintar, 60); }, { passive: true });
@@ -7545,6 +7131,36 @@
                 new MutationObserver(pintar).observe(c, { childList: true });
                 pintar();
             });
+        }
+
+        /* Afiches y clips: sus botones se apagan en los extremos de la tira */
+        function prepararBotonesTiras() {
+            document.querySelectorAll('.carrusel-botones[data-tira]').forEach(caja => {
+                const tira = document.getElementById(caja.dataset.tira);
+                if (!tira) return;
+                const pintar = () => {
+                    caja.querySelector('[data-dir="-1"]').disabled = tira.scrollLeft <= 2;
+                    caja.querySelector('[data-dir="1"]').disabled = tira.scrollLeft >= tira.scrollWidth - tira.clientWidth - 2;
+                    if (tira.scrollLeft > 2) caja.classList.add('en-uso');
+                };
+                let espera;
+                tira.addEventListener('scroll', () => { clearTimeout(espera); espera = setTimeout(pintar, 60); }, { passive: true });
+                new ResizeObserver(pintar).observe(tira);
+                new MutationObserver(pintar).observe(tira, { childList: true });
+                pintar();
+            });
+        }
+
+        /* Guías y folletos: las imágenes se cargan apenas la sección se acerca (no aparecen en blanco al pasar de una a otra) */
+        function prepararGuias() {
+            const guias = document.getElementById('guias-info');
+            if (!guias || !('IntersectionObserver' in window)) return;
+            const cerca = new IntersectionObserver(entradas => {
+                if (!entradas.some(e => e.isIntersecting)) return;
+                guias.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+                cerca.disconnect();
+            }, { rootMargin: '150% 0px' });
+            cerca.observe(guias);
         }
 
         /* --- Ficha de la habitación (con enlace propio: #habitacion-suite, etc.) --- */
@@ -7704,7 +7320,6 @@
            ========================================================= */
         function moverTira(id, dir) {
             const tira = document.getElementById(id);
-            if (tira._irAPaso && tira._irAPaso(dir)) return;   // con pantallas, avanza la página (y con ella la tira)
             tira.scrollBy({ left: dir * tira.clientWidth * 0.8, behavior: 'smooth' });
         }
 
@@ -8127,7 +7742,6 @@
 
         function moverClips(dir) {
             const reels = document.getElementById('reels');
-            if (reels._irAPaso && reels._irAPaso(dir)) return;   // con pantallas, avanza la página (y con ella los clips)
             reels.scrollBy({ left: dir * reels.clientWidth * 0.8, behavior: 'smooth' });
         }
 
@@ -9253,6 +8867,8 @@
             if (document.documentElement.classList.contains('pantallas')) galeriaCompleta = true;
             renderGaleria();
             prepararCarruseles();
+            prepararBotonesTiras();
+            prepararGuias();
             document.querySelectorAll('[data-tarifa="mascota"]').forEach(el => { el.textContent = COP(TARIFA_MASCOTA); });
             const valoresNoche = Object.values(TARIFAS).flatMap(t => [t.finde, t.semana]);
             document.querySelectorAll('[data-tarifa="desde"]').forEach(el => { el.textContent = COP(Math.min(...valoresNoche)); });
@@ -9357,19 +8973,10 @@
             /* --- Recorrido en 4 pasos --- */
             document.querySelectorAll('.step-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
-                    const i = parseInt(tab.dataset.step, 10);
-                    if (recorridoConScroll) irAPasoConScroll(i); else setPaso(i);
+                    setPaso(parseInt(tab.dataset.step, 10));
                 });
             });
 
-            prepararRecorridoScroll();
-            prepararPantallasLargas();
-            prepararServiciosAlDesplazar();
-            prepararCartaAlDesplazar();
-            prepararBebidasAlDesplazar();
-            prepararInformacionAlDesplazar();
-            prepararPlanesAlDesplazar();
-            prepararParadasEnZonas();
             const zonaPasos = document.getElementById('steps');
             if (zonaPasos) {
                 zonaPasos.addEventListener('mouseenter', detenerPasos);
@@ -9461,10 +9068,8 @@
             });
 
             /* --- Filtro de la galería --- */
-            document.querySelectorAll('#gallery-filters .gal-filter').forEach((btn, i) => {
+            document.querySelectorAll('#gallery-filters .gal-filter').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const z = document.querySelector('#galeria .galeria-pantalla');
-                    if (z && z._irAIndice && z._irAIndice(i)) return;   // con pantallas: va a la parada de esa categoría
                     filtrarGaleria(btn.dataset.cat);
                 });
             });
