@@ -212,9 +212,33 @@
         .est-tabla th { text-align: left; font-size: 0.54rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: rgba(10,33,46,.45); padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--line); }
         .est-tabla td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
 
-        /* Pestañas de Estadísticas: una por apartado, con desplazamiento lateral en celular */
-        .est-tabs { display: flex; gap: 0.15rem; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
-        .est-tabs::-webkit-scrollbar { display: none; }
+        /* Apartados de Estadísticas: cinco categorías siempre a la vista y, debajo, los apartados de la
+           categoría elegida. Nada queda escondido fuera de la pantalla, ni en celular. */
+        .est-nav { scroll-margin-top: 6rem; }   /* deja libre la barra de arriba, que queda fija */
+        .est-cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.5rem; }   /* 5 por fila si caben; si no, 3 o 4 */
+        .est-cat {
+            display: flex; align-items: flex-start; gap: 0.7rem; min-width: 0; padding: 0.85rem 0.95rem; text-align: left;
+            background: #fff; border: 1px solid var(--line); transition: background-color .3s, border-color .3s, box-shadow .3s;
+        }
+        .est-cat:hover { border-color: rgba(201, 160, 99, 0.7); }
+        .est-cat svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 0.15rem; color: #A8834A; transition: color .3s; }
+        .est-cat-txt { min-width: 0; }
+        .est-cat strong { display: block; font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.15rem; font-weight: 500; line-height: 1.15; color: var(--ink); }
+        .est-cat small { display: block; margin-top: 0.25rem; font-size: 0.72rem; line-height: 1.35; color: rgba(32, 41, 46, 0.68); }
+        .est-cat.is-active { background: var(--ink); border-color: var(--ink); box-shadow: inset 0 -2px 0 var(--brass); }
+        .est-cat.is-active svg { color: var(--brass); }
+        .est-cat.is-active strong { color: #fff; }
+        .est-cat.is-active small { color: rgba(255, 255, 255, 0.7); }
+        .est-cat:focus-visible, .est-tab:focus-visible { outline: 1px solid var(--brass); outline-offset: 2px; }
+        @media (max-width: 639px) {
+            .est-cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .est-cat:last-child { grid-column: 1 / -1; }
+            .est-cat { padding: 0.75rem 0.8rem; gap: 0.55rem; }
+            .est-cat strong { font-size: 1.05rem; }
+        }
+        .est-tabs { display: flex; flex-wrap: wrap; gap: 0.15rem 0.35rem; margin-top: 0.85rem; border-bottom: 1px solid var(--line); }
+        .est-tab:not(.es-de-la-cat) { display: none; }   /* solo los apartados de la categoría elegida */
+        .est-nav.es-unica .est-tabs { display: none; }   /* categoría de un solo apartado: basta el botón de arriba */
         .est-tab {
             display: inline-flex; align-items: center; gap: 0.5rem; flex-shrink: 0;
             padding: 0.85rem 0.95rem; margin-bottom: -1px; white-space: nowrap;
@@ -617,6 +641,18 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Pedido anticipado y solicitudes de los próximos días, para cocina, bar y recepción -->
+                    <div class="card mt-6">
+                        <div class="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-line">
+                            <div>
+                                <h3 class="font-display text-xl text-ink">Para preparar</h3>
+                                <p class="text-[0.7rem] text-graphite/45 mt-0.5">Pedidos anticipados de Mangolé y Cabalante, celebraciones y llegadas · próximos 7 días · reservas pagadas, confirmadas o por confirmar</p>
+                            </div>
+                            <button type="button" class="chip inline-flex items-center gap-1.5" onclick="imprimirPreparar()"><i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir</button>
+                        </div>
+                        <div id="preparar-body" class="divide-y divide-line"></div>
+                    </div>
                 </section>
 
                 <!-- ---------- RESERVAS ---------- -->
@@ -700,18 +736,28 @@
                     </div>
                     <p id="est-aviso" class="hidden mb-5 p-4 bg-white border border-line text-[0.8rem] text-graphite/65 leading-relaxed"></p>
 
-                    <div class="est-tabs mb-6" id="est-tabs" role="tablist" aria-label="Apartados de estadísticas">
-                        <button class="est-tab is-active" role="tab" aria-selected="true" data-est-tab="resumen"><i data-lucide="layout-grid"></i> Resumen</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="visitas"><i data-lucide="footprints"></i> Visitas una a una</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="origen"><i data-lucide="compass"></i> De dónde llegan</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="secciones"><i data-lucide="panels-top-left"></i> Secciones: dónde se quedan</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="blog"><i data-lucide="newspaper"></i> Blog</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="reservas"><i data-lucide="calendar-check"></i> Reservas y ventas</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="habitaciones"><i data-lucide="bed-double"></i> Habitaciones y servicios</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="audiencia"><i data-lucide="users"></i> Audiencia</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="asistente"><i data-lucide="message-square"></i> Asistente</button>
-                        <button class="est-tab" role="tab" aria-selected="false" data-est-tab="enlaces"><i data-lucide="link"></i> Enlaces</button>
-                    </div>
+                    <!-- Apartados agrupados en cinco categorías: arriba la categoría, debajo sus apartados -->
+                    <nav class="est-nav es-unica mb-6" id="est-nav" aria-label="Apartados de estadísticas">
+                        <div class="est-cats" role="group" aria-label="Categorías">
+                            <button type="button" class="est-cat is-active" data-est-cat="resumen" aria-pressed="true"><i data-lucide="layout-grid"></i><span class="est-cat-txt"><strong>Resumen</strong><small>Lo más importante del período</small></span></button>
+                            <button type="button" class="est-cat" data-est-cat="visitantes" aria-pressed="false"><i data-lucide="users"></i><span class="est-cat-txt"><strong>Visitantes</strong><small>De dónde llegan y quiénes son</small></span></button>
+                            <button type="button" class="est-cat" data-est-cat="interes" aria-pressed="false"><i data-lucide="eye"></i><span class="est-cat-txt"><strong>Qué les interesa</strong><small>Lo que miran, leen y preguntan</small></span></button>
+                            <button type="button" class="est-cat" data-est-cat="ventas" aria-pressed="false"><i data-lucide="wallet"></i><span class="est-cat-txt"><strong>Ventas</strong><small>Reservas, pagos y habitaciones</small></span></button>
+                            <button type="button" class="est-cat" data-est-cat="enlaces" aria-pressed="false"><i data-lucide="link"></i><span class="est-cat-txt"><strong>Enlaces</strong><small>Para pegar en tus redes</small></span></button>
+                        </div>
+                        <div class="est-tabs" id="est-tabs" role="tablist" aria-label="Apartados de la categoría">
+                            <button class="est-tab is-active es-de-la-cat" role="tab" aria-selected="true" data-est-tab="resumen" data-cat="resumen"><i data-lucide="layout-grid"></i> Resumen</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="origen" data-cat="visitantes"><i data-lucide="compass"></i> De dónde llegan</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="audiencia" data-cat="visitantes"><i data-lucide="users"></i> Audiencia</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="visitas" data-cat="visitantes"><i data-lucide="footprints"></i> Visitas una a una</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="secciones" data-cat="interes"><i data-lucide="panels-top-left"></i> Secciones: dónde se quedan</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="blog" data-cat="interes"><i data-lucide="newspaper"></i> Blog</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="asistente" data-cat="interes"><i data-lucide="message-square"></i> Asistente</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="reservas" data-cat="ventas"><i data-lucide="calendar-check"></i> Reservas y ventas</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="habitaciones" data-cat="ventas"><i data-lucide="bed-double"></i> Habitaciones y servicios</button>
+                            <button class="est-tab" role="tab" aria-selected="false" data-est-tab="enlaces" data-cat="enlaces"><i data-lucide="link"></i> Enlaces</button>
+                        </div>
+                    </nav>
 
                     <div id="est-contenido" class="transition-opacity duration-300">
 
@@ -1297,7 +1343,7 @@
                 metodo_pago: estado === 'pagada' ? 'PSE' : null, nombre, tipo_documento: 'CC', documento: '1000000000',
                 celular: '3000000000', correo: '', notas: null
             });
-            return [
+            const lista = [
                 r(1, -2, 3, 'Alexi García', { suite: 1 }, 2, 'whatsapp', 'confirmada', 810000, 70),
                 r(2, 1, 2, 'Diana Alarcón Roa', { triple: 1 }, 3, 'bold', 'pagada', 500000, 3),
                 r(3, 4, 3, 'German Manrique', { cuadruple: 1 }, 4, 'whatsapp', 'pendiente', 780000, 6),
@@ -1307,6 +1353,94 @@
                 r(7, 18, 3, 'Mónica Salazar', { suite: 1 }, 2, 'bold', 'pagada', 810000, 2),
                 r(8, 19, 1, 'Andrés Beltrán', { triple: 1 }, 3, 'whatsapp', 'pendiente', 250000, 9)
             ];
+            /* Pedido anticipado y solicitudes de ejemplo */
+            const plato = (id, nombre, cantidad, precio, dia, momento) => ({ id, nombre, cantidad, precio, dia, momento });
+            const d2 = lista[1], d5 = lista[4];
+            d2.extras = { items: [plato('churrasco', 'Churrasco Mangolé con chimichurri de la casa', 2, 60000, d2.llegada, 'cena'),
+                plato('b-cerveza-club-colombia-330-cm3', 'Cerveza Club Colombia 330 cm³', 2, 7000, d2.llegada, 'cena')],
+                total: 134000, llegada: 'Entre 3:00 y 6:00 p. m.', ocasion: 'Aniversario', notas: 'Uno de nosotros es vegetariano' };
+            d2.total += 134000; d2.monto = Math.round(d2.total / 2); d2.pagado = d2.monto;
+            d5.extras = { items: [plato('pasta-cabaleon', 'Pasta Cabaleón al ajo y parmesano', 3, 32000, sumarDias(d5.llegada, 1), 'almuerzo'),
+                plato('hamburguesa', 'Hamburguesa artesanal sencilla', 2, 36000, sumarDias(d5.llegada, 1), 'almuerzo')],
+                total: 168000, llegada: 'Después de las 9:00 p. m.', ocasion: '', notas: '' };
+            d5.total += 168000; d5.monto = Math.round(d5.total / 2); d5.pagado = d5.monto;
+            return lista;
+        }
+
+        /* --- Extras de la reserva (pedido anticipado y solicitudes) --- */
+        const MOMENTOS = { almuerzo: 'Almuerzo · 12:30 – 3:00 p. m.', cena: 'Cena · 6:00 – 7:30 p. m.' };
+        const itemsExtras = r => (r.extras && Array.isArray(r.extras.items) ? r.extras.items : []);
+        const tieneExtras = r => !!(r.extras && (itemsExtras(r).length || r.extras.llegada || r.extras.ocasion || r.extras.notas));
+
+        /* Pedido agrupado por día y momento, para el detalle de una reserva */
+        function htmlPedido(r) {
+            const items = itemsExtras(r).slice().sort((a, b) => String(a.dia).localeCompare(String(b.dia)) || (a.momento === b.momento ? 0 : a.momento === 'almuerzo' ? -1 : 1));
+            let grupo = '';
+            return items.map(x => {
+                const g = x.dia + '|' + x.momento;
+                const cabeza = g !== grupo ? `<li class="pt-3 pb-1 text-[0.72rem] font-medium text-ink">${fechaLarga(x.dia)} · ${esc(MOMENTOS[x.momento] || x.momento)}</li>` : '';
+                grupo = g;
+                return cabeza + `<li class="flex justify-between gap-4 py-1 text-[0.8rem] text-graphite/80"><span>${esc(x.cantidad)} × ${esc(x.nombre)}</span><span class="whitespace-nowrap">${COP(x.cantidad * x.precio)}</span></li>`;
+            }).join('');
+        }
+
+        function htmlSolicitudes(e) {
+            return [
+                e.llegada ? ['clock', 'Llegada estimada', e.llegada] : null,
+                e.ocasion ? ['party-popper', 'Celebra', e.ocasion] : null,
+                e.notas ? ['message-square-text', 'Notas del huésped', e.notas] : null
+            ].filter(Boolean).map(([ic, t, v]) => `<li class="flex items-start gap-2.5 text-[0.8rem] text-graphite/80"><i data-lucide="${ic}" class="w-3.5 h-3.5 text-brass shrink-0 mt-0.5"></i><span><span class="text-ink font-medium">${t}:</span> ${esc(v)}</span></li>`).join('');
+        }
+
+        /* Para preparar: próximos 7 días, por día; en cada día, lo que se pide en almuerzo y cena
+           (sumado por plato) y las llegadas con hora o celebración */
+        function renderPreparar() {
+            const cuerpo = document.getElementById('preparar-body');
+            if (!cuerpo) return;
+            const hoy = hoyISO();
+            const fin = sumarDias(hoy, 6);
+            const vigentes = reservas.filter(r => VIGENTES.includes(r.estado) && r.salida >= hoy && r.llegada <= fin);
+            const dias = [];
+            for (let dia = hoy; dia <= fin; dia = sumarDias(dia, 1)) {
+                const momentos = ['almuerzo', 'cena'].map(m => {
+                    const porPlato = {};
+                    vigentes.forEach(r => itemsExtras(r).filter(x => x.dia === dia && x.momento === m).forEach(x => {
+                        const k = x.id || x.nombre;
+                        porPlato[k] = porPlato[k] || { nombre: x.nombre, cantidad: 0, huespedes: [] };
+                        porPlato[k].cantidad += Number(x.cantidad) || 0;
+                        porPlato[k].huespedes.push({ id: r.id, texto: (r.nombre || '').split(' ')[0] + ' ×' + x.cantidad + (r.estado === 'pendiente' ? ' (por confirmar)' : '') });
+                    }));
+                    return { m, platos: Object.values(porPlato).sort((a, b) => b.cantidad - a.cantidad) };
+                }).filter(x => x.platos.length);
+                const llegan = vigentes.filter(r => r.llegada === dia && r.extras && (r.extras.llegada || r.extras.ocasion || r.extras.notas));
+                if (momentos.length || llegan.length) dias.push({ dia, momentos, llegan });
+            }
+            cuerpo.innerHTML = dias.length ? dias.map(d => `<div class="p-5 grid grid-cols-1 lg:grid-cols-[11rem_1fr_1fr] gap-4 lg:gap-6">
+                    <div><span class="micro text-brass-deep">${d.dia === hoy ? 'Hoy' : d.dia === sumarDias(hoy, 1) ? 'Mañana' : ''}</span>
+                        <span class="block font-display text-lg text-ink leading-tight">${fechaLarga(d.dia)}</span></div>
+                    <div class="space-y-3">${d.momentos.map(x => `<div>
+                        <span class="micro text-graphite/40 block mb-1.5">${esc(MOMENTOS[x.m])}</span>
+                        <ul class="space-y-1">${x.platos.map(pl => `<li class="text-[0.82rem] text-ink"><span class="font-medium">${pl.cantidad} × ${esc(pl.nombre)}</span>
+                            <span class="block text-[0.7rem] text-graphite/50">${pl.huespedes.map(h => `<button type="button" class="hover:text-ink underline decoration-brass/40" onclick="abrirReserva('${esc(h.id)}')">${esc(h.texto)}</button>`).join(' · ')}</span></li>`).join('')}</ul>
+                    </div>`).join('') || '<p class="text-[0.78rem] text-graphite/45">Sin pedidos anticipados.</p>'}</div>
+                    <div>${d.llegan.length ? `<span class="micro text-graphite/40 block mb-1.5">Llegadas con solicitudes</span><ul class="space-y-2">${d.llegan.map(r => `<li class="text-[0.8rem]">
+                        <button type="button" class="text-ink font-medium hover:text-brass-deep" onclick="abrirReserva('${esc(r.id)}')">${esc(r.nombre)}</button>
+                        <ul class="mt-1 space-y-1">${htmlSolicitudes(r.extras)}</ul></li>`).join('')}</ul>` : ''}</div>
+                </div>`).join('')
+                : '<p class="p-5 text-[0.8rem] text-graphite/45">No hay pedidos anticipados ni solicitudes para los próximos 7 días.</p>';
+        }
+
+        function imprimirPreparar() {
+            const v = window.open('', '_blank');
+            if (!v) return toast('Permite las ventanas emergentes para imprimir.');
+            v.document.write('<!doctype html><meta charset="utf-8"><title>Para preparar · Hotel Cabaleón</title>' +
+                '<style>body{font:13px/1.5 system-ui,sans-serif;color:#0A212E;margin:24px}h1{font-size:20px;margin:0 0 12px}button{all:unset}' +
+                '.micro{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6b7280;display:block;margin-top:8px}ul{list-style:none;padding:0;margin:4px 0}li{margin:2px 0}' +
+                'div.p-5{border-top:1px solid #ddd;padding:12px 0}svg{display:none}</style>' +
+                '<h1>Para preparar · próximos 7 días</h1>' + document.getElementById('preparar-body').innerHTML);
+            v.document.close();
+            v.focus();
+            v.print();
         }
 
         async function cargarReservas() {
@@ -1820,7 +1954,7 @@
                     return fa ? a.llegada.localeCompare(b.llegada) : b.llegada.localeCompare(a.llegada);
                 });
             document.getElementById('reservas-body').innerHTML = filas.map(r => `<tr class="fila" onclick="abrirReserva('${esc(r.id)}')">
-                <td class="celda-principal"><span class="block text-ink">${esc(r.nombre)}</span><span class="block text-[0.66rem] text-graphite/40">${esc(r.orden)}</span></td>
+                <td class="celda-principal"><span class="block text-ink">${esc(r.nombre)}</span><span class="block text-[0.66rem] text-graphite/40">${esc(r.orden)}${itemsExtras(r).length ? ' · <span class="text-brass-deep">con pedido anticipado</span>' : tieneExtras(r) ? ' · <span class="text-brass-deep">con solicitudes</span>' : ''}</span></td>
                 <td class="text-graphite/70" data-titulo="Habitación">${esc(textoHabitaciones(r.habitaciones))}</td>
                 <td class="text-graphite/70" data-titulo="Fechas">${fechaCorta(r.llegada)} – ${fechaCorta(r.salida)}</td>
                 <td class="text-graphite/70" data-titulo="Huéspedes">${r.huespedes}</td>
@@ -1881,12 +2015,20 @@
                     ${dato('Salida', fechaLarga(r.salida) + ' · hasta 2:00 p. m.')}
                     ${dato('Habitaciones', esc(textoHabitaciones(r.habitaciones)) + ' · ' + plural(r.noches, 'noche', 'noches'))}
                     ${dato('Huéspedes', plural(r.huespedes, 'huésped', 'huéspedes') + (r.mascotas ? ' · ' + plural(r.mascotas, 'mascota', 'mascotas') : ''))}
-                    ${dato('Total de la estadía', COP(r.total) + (r.codigo ? ' · código ' + esc(r.codigo) : ''))}
+                    ${dato('Total de la reserva', COP(r.total) + (itemsExtras(r).length ? ' · incluye extras por ' + COP(r.extras.total) : '') + (r.codigo ? ' · código ' + esc(r.codigo) : ''))}
                     ${dato('Pago', pago + (r.metodo_pago ? ' · ' + esc(r.metodo_pago) : ''))}
                     ${dato('Documento', esc([r.tipo_documento, r.documento].filter(Boolean).join(' ')))}
                     ${dato('Celular', tel ? `<a href="${wa}" target="_blank" rel="noopener" class="border-b border-brass hover:text-brass-deep">${esc(r.celular)}</a>` : '')}
                     ${dato('Correo', r.correo ? `<a href="mailto:${esc(r.correo)}" class="border-b border-brass hover:text-brass-deep break-all">${esc(r.correo)}</a>` : '')}
                 </dl>
+                ${tieneExtras(r) ? `<div class="mx-6 sm:mx-8 mb-6 border border-brass/40 bg-bone/60">
+                    ${itemsExtras(r).length ? `<div class="px-4 pt-3 pb-3 ${r.extras.llegada || r.extras.ocasion || r.extras.notas ? 'border-b border-line' : ''}">
+                        <div class="flex items-center justify-between gap-3"><span class="micro text-brass-deep flex items-center gap-2"><i data-lucide="concierge-bell" class="w-3.5 h-3.5"></i> Pedido anticipado</span>
+                        <span class="font-display text-lg text-ink">${COP(r.extras.total)}</span></div>
+                        <ul>${htmlPedido(r)}</ul></div>` : ''}
+                    ${r.extras.llegada || r.extras.ocasion || r.extras.notas ? `<div class="px-4 py-3"><span class="micro text-brass-deep flex items-center gap-2 mb-2"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Solicitudes para el equipo</span>
+                        <ul class="space-y-1.5">${htmlSolicitudes(r.extras)}</ul></div>` : ''}
+                </div>` : ''}
                 ${r.estado === 'pagada' ? '<p class="mx-6 sm:mx-8 mb-5 p-3 bg-bone border border-line text-[0.74rem] text-graphite/60">Si cancelas una reserva pagada, el dinero no se devuelve solo: la devolución se hace desde el panel de Bold.</p>' : ''}
                 <div class="px-6 sm:px-8 pb-6">
                     <label class="field-label" for="r-notas">Notas internas</label>
@@ -2209,6 +2351,7 @@
 
         function renderTodo() {
             renderResumen();
+            renderPreparar();
             renderReservas();
             renderCalendario();
             if (!CONECTADO) renderMensajes();
@@ -2334,7 +2477,7 @@
             ['anuncio', 'Anuncio pagado en redes', 'facebook', 'cpc', 'anuncio', 'Como enlace de destino del anuncio.']
         ];
         /* Los enlaces siempre llevan a la página publicada, aunque el panel se abra desde otra dirección */
-        const SITIO_PUBLICO = 'https://hotelcabaleon.com/';
+        const SITIO_PUBLICO = 'https://www.cabaleonhotel.com/';
 
         const num = n => Math.round(Number(n) || 0).toLocaleString('es-CO');
         const pct = (a, b) => (b ? Math.round(100 * (a || 0) / b) : 0);
@@ -2463,17 +2606,40 @@
             if (filtros.getBoundingClientRect().top < 0) window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        /* ---------- Pestañas ---------- */
+        /* ---------- Pestañas ----------
+           Cada apartado (data-est-tab) pertenece a una categoría (data-cat). Al elegir un apartado se
+           marca su categoría y se muestran solo los apartados de ella; cada categoría recuerda el último. */
+        const ultimoDeCategoria = {};
         function mostrarPestana(nombre) {
+            const elegida = document.querySelector('.est-tab[data-est-tab="' + nombre + '"]') || document.querySelector('.est-tab');
+            nombre = elegida.dataset.estTab;
+            const cat = elegida.dataset.cat;
+            ultimoDeCategoria[cat] = nombre;
+            document.querySelectorAll('.est-cat').forEach(c => {
+                const si = c.dataset.estCat === cat;
+                c.classList.toggle('is-active', si);
+                c.setAttribute('aria-pressed', String(si));
+            });
+            let enLaCat = 0;
             document.querySelectorAll('.est-tab').forEach(t => {
                 const si = t.dataset.estTab === nombre;
+                const deLaCat = t.dataset.cat === cat;
+                if (deLaCat) enLaCat++;
                 t.classList.toggle('is-active', si);
+                t.classList.toggle('es-de-la-cat', deLaCat);
                 t.setAttribute('aria-selected', String(si));
-                if (si) t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
             });
+            const nav = document.getElementById('est-nav');
+            nav.classList.toggle('es-unica', enLaCat < 2);
             document.querySelectorAll('.est-panel').forEach(p => p.classList.toggle('is-active', p.dataset.estPanel === nombre));
             ocultarTip();
             try { sessionStorage.setItem('cabaleon-est-pestana', nombre); } catch (e) { /* sin almacenamiento */ }
+            // Si se cambia desde más abajo (por ejemplo, con "Ver todas"), vuelve al menú: el apartado se ve desde el principio
+            if (nav.getBoundingClientRect().top < 0) nav.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function mostrarCategoria(cat) {
+            const primera = document.querySelector('.est-tab[data-cat="' + cat + '"]');
+            if (primera) mostrarPestana(ultimoDeCategoria[cat] || primera.dataset.estTab);
         }
 
         /* ---------- Tarjetas de cifras ---------- */
@@ -3980,6 +4146,8 @@
                 if (seccion) return abrirSeccion(seccion.dataset.seccion);
                 const art = e.target.closest('[data-articulo]');
                 if (art) return abrirArticulo(art.dataset.articulo);
+                const cat = e.target.closest('[data-est-cat]');
+                if (cat) return mostrarCategoria(cat.dataset.estCat);
                 const tab = e.target.closest('[data-est-tab], [data-ir-tab]');
                 if (tab) return mostrarPestana(tab.dataset.estTab || tab.dataset.irTab);
             });
@@ -4063,7 +4231,7 @@
             return enlaceDe(l, campana);
         }
         function enlaceDe(l, campana) {
-            const base = /(^|\.)hotelcabaleon\.com$/.test(location.hostname) ? location.origin + '/' : SITIO_PUBLICO;
+            const base = SITIO_PUBLICO;
             return base + '?utm_source=' + l[2] + '&utm_medium=' + l[3] + '&utm_campaign=' + (campana || l[4]);
         }
         /* Lista de enlaces listos: uno por red, con dónde pegarlo y su botón de copiar */
@@ -4268,7 +4436,8 @@
 
         /* Blog de ejemplo: lectores, tiempo, hasta dónde leen y qué hacen después */
         function blogDeEjemplo(base, parte, azar, factor) {
-            const ART = [['pasadia', 0.09, 0.32, 0.034], ['como-llegar', 0.07, 0.6, 0.012], ['plan-fin-de-semana', 0.05, 0.22, 0.02], ['que-llevar', 0.035, 0.4, 0.008]];
+            const ART = [['pasadia', 0.09, 0.32, 0.034], ['que-hacer-en-tena', 0.08, 0.7, 0.014], ['como-llegar', 0.07, 0.6, 0.012], ['plan-fin-de-semana', 0.05, 0.22, 0.02],
+                ['puentes-festivos-2027', 0.045, 0.8, 0.01], ['pueblos-clima-calido', 0.04, 0.75, 0.009], ['que-llevar', 0.035, 0.4, 0.008], ['laguna-pedro-palo', 0.03, 0.8, 0.006]];
             const articulos = ART.map(([nombre, p, entra, conv]) => {
                 const lectores = parte(p);
                 const medidos = Math.round(lectores * 0.92);

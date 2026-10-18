@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
-Sitemap: https://hotelcabaleon.com/sitemap.xml
+Sitemap: https://www.cabaleonhotel.com/sitemap.xml
