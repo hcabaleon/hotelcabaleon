@@ -536,6 +536,9 @@
                 <a class="nav-item" data-view="disponibilidad"><i data-lucide="calendar-days" class="w-4 h-4"></i> Disponibilidad</a>
                 <a class="nav-item" data-view="estadisticas"><i data-lucide="chart-no-axes-combined" class="w-4 h-4"></i> Estadísticas</a>
                 <span class="block px-5 pb-2 pt-5 micro text-white/30">Hotel</span>
+                <a class="nav-item" data-view="precios"><i data-lucide="tag" class="w-4 h-4"></i> Precios</a>
+                <a class="nav-item" data-view="bloqueos"><i data-lucide="calendar-x" class="w-4 h-4"></i> Bloquear fechas</a>
+                <a class="nav-item" data-view="fotos"><i data-lucide="images" class="w-4 h-4"></i> Fotos</a>
                 <a class="nav-item" data-view="mensajes" data-modo="ejemplo"><i data-lucide="message-square" class="w-4 h-4"></i> Mensajes <span class="ml-auto pill pill-amber">3</span></a>
                 <a class="nav-item" data-view="ajustes"><i data-lucide="settings" class="w-4 h-4"></i> Ajustes</a>
             </nav>
@@ -703,7 +706,7 @@
                             <span class="flex items-center gap-2"><span class="w-3 h-3 border border-line bg-white"></span> Disponible</span>
                             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-[rgba(201,160,99,.3)]"></span> Ocupación parcial</span>
                             <span class="flex items-center gap-2"><span class="w-3 h-3 bg-[rgba(160,60,60,.25)]"></span> Completo</span>
-                            <span class="text-graphite/40">Cuentan las reservas pagadas o confirmadas.</span>
+                            <span class="text-graphite/40">Cuentan las reservas pagadas o confirmadas y las fechas bloqueadas.</span>
                         </div>
                         <div id="cal-detalle" class="mt-6 pt-6 border-t border-line"></div>
                     </div>
@@ -1165,6 +1168,81 @@
                     </div>
                 </section>
 
+                <!-- ---------- PRECIOS ---------- -->
+                <section class="view" data-view="precios">
+                    <p data-aviso-hotel class="hidden mb-5 p-4 bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] text-[0.8rem] text-[#8a6a34]" role="status"></p>
+                    <div class="card p-4 sm:p-5 mb-5 flex gap-3 text-[0.8rem] text-graphite/70 leading-relaxed">
+                        <i data-lucide="info" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
+                        <p>Un precio por noche para cada tipo de habitación, con impuestos y desayuno incluidos. Al guardar, la página y el cobro usan el precio nuevo para las <strong class="font-medium text-ink">reservas nuevas</strong>. Las reservas que ya existen conservan el precio con el que se hicieron.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="precios-body"></div>
+                </section>
+
+                <!-- ---------- BLOQUEAR FECHAS ---------- -->
+                <section class="view" data-view="bloqueos">
+                    <p data-aviso-hotel class="hidden mb-5 p-4 bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] text-[0.8rem] text-[#8a6a34]" role="status"></p>
+                    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
+                        <form id="form-bloqueo" class="card p-5 sm:p-7 xl:col-span-3" novalidate>
+                            <h3 class="font-display text-2xl text-ink mb-1">Cerrar fechas en la página</h3>
+                            <p class="text-[0.78rem] text-graphite/55 mb-6">Úsalo cuando vendas por Booking, por teléfono o cuando una habitación no se pueda usar. La página deja de ofrecerla esas noches.</p>
+
+                            <span class="field-label">1 · ¿Qué habitaciones?</span>
+                            <div class="space-y-2" id="bq-habs"></div>
+
+                            <span class="field-label mt-6">2 · ¿Qué noches?</span>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="field-label !tracking-[0.12em]" for="bq-desde">Desde la noche del</label><input id="bq-desde" type="date" class="field-input"></div>
+                                <div><label class="field-label !tracking-[0.12em]" for="bq-hasta">Hasta la noche del</label><input id="bq-hasta" type="date" class="field-input"></div>
+                            </div>
+                            <p class="text-[0.72rem] text-graphite/50 mt-2">Para una sola noche, pon la misma fecha en las dos. Ej.: la noche del 31 de diciembre (salen el 1 de enero).</p>
+
+                            <label class="field-label mt-6" for="bq-motivo">3 · Motivo <span class="normal-case tracking-normal font-normal text-graphite/40">(opcional, solo lo ves tú)</span></label>
+                            <input id="bq-motivo" class="field-input" maxlength="120" autocomplete="off" placeholder="Ej.: Reservada por Booking">
+                            <div class="flex flex-wrap gap-2 mt-2" id="bq-motivos">
+                                <button type="button" class="chip" data-motivo="Reservada por Booking">Reservada por Booking</button>
+                                <button type="button" class="chip" data-motivo="Reserva por teléfono">Reserva por teléfono</button>
+                                <button type="button" class="chip" data-motivo="Mantenimiento">Mantenimiento</button>
+                            </div>
+
+                            <div id="bq-resumen" class="mt-6 p-4 bg-bone border border-line text-[0.8rem] text-graphite/75 leading-relaxed"></div>
+                            <p id="bq-aviso" class="hidden text-[0.76rem] text-[#8a6a34] bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] px-3 py-2 mt-3"></p>
+                            <p id="bq-error" class="hidden text-[0.78rem] text-[#8a3d3d] mt-3" role="alert"></p>
+                            <button type="submit" id="bq-boton" class="btn btn-ink w-full mt-5"><i data-lucide="calendar-x" class="w-4 h-4"></i> Bloquear fechas</button>
+                        </form>
+
+                        <div class="card xl:col-span-2">
+                            <div class="p-5 border-b border-line">
+                                <h3 class="font-display text-xl text-ink">Fechas bloqueadas</h3>
+                                <p class="text-[0.7rem] text-graphite/45 mt-0.5">De hoy en adelante. Al quitar un bloqueo, esas noches vuelven a ofrecerse en la página.</p>
+                            </div>
+                            <ul id="bloqueos-body" class="divide-y divide-line"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ---------- FOTOS ---------- -->
+                <section class="view" data-view="fotos">
+                    <p data-aviso-hotel class="hidden mb-5 p-4 bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] text-[0.8rem] text-[#8a6a34]" role="status"></p>
+                    <div class="flex flex-wrap gap-2 mb-5" id="fotos-tipos" role="group" aria-label="Habitación"></div>
+                    <div class="card p-5 sm:p-7">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+                            <div class="min-w-0">
+                                <h3 id="fotos-titulo" class="font-display text-2xl text-ink">—</h3>
+                                <p class="text-[0.75rem] text-graphite/55 mt-1 max-w-xl">La primera es la <strong class="font-medium text-ink">foto principal</strong>: la que se ve en la tarjeta de la página. Toca una foto para cambiarla de lugar, reemplazarla o borrarla.</p>
+                            </div>
+                            <label id="fotos-subir-boton" class="btn btn-ink btn-sm shrink-0 cursor-pointer">
+                                <i data-lucide="image-plus" class="w-3.5 h-3.5"></i> Subir fotos
+                                <input type="file" id="fotos-subir" accept="image/jpeg,image/png,image/webp" multiple class="sr-only">
+                            </label>
+                        </div>
+                        <p id="fotos-progreso" class="hidden mb-4 p-3 bg-bone border border-line text-[0.8rem] text-ink flex items-center gap-2" role="status"></p>
+                        <div id="fotos-errores" class="hidden mb-4 p-3 border border-[rgba(160,60,60,.3)] bg-[rgba(160,60,60,.06)] text-[0.78rem] text-[#8a3d3d]" role="alert"></div>
+                        <div id="fotos-body" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+                        <p class="text-[0.7rem] text-graphite/45 mt-5">JPG, PNG o WEBP de hasta 15 MB, máximo 12 por habitación. Al subirlas se achican solas (1600 px y una versión liviana) para que la página cargue rápido.</p>
+                        <input type="file" id="fotos-reemplazo" accept="image/jpeg,image/png,image/webp" class="sr-only" tabindex="-1" aria-hidden="true">
+                    </div>
+                </section>
+
                 <!-- ---------- MENSAJES (solo en el modo de ejemplo) ---------- -->
                 <section class="view" data-view="mensajes">
                     <div class="card divide-y divide-line" id="mensajes-body"></div>
@@ -1247,8 +1325,9 @@
         };
         const CONECTADO = !!(CONEXION.supabase.trim() && CONEXION.llavePublica.trim());
 
-        /* Habitaciones. Tarifas, unidades y festivos se leen de index.html
-           (TARIFAS, UNIDADES y FESTIVOS); estos valores son solo de respaldo. */
+        /* Habitaciones. Unidades y festivos se leen de index.html (UNIDADES y FESTIVOS) y el
+           precio por noche, de la tabla tarifas (Precios, en este panel); estos valores son
+           solo de respaldo. */
         const NOMBRES = { suite: 'Suite Cabaleón', cabana: 'Cabaña Cabaleón', cuadruple: 'Habitación Familiar Cuádruple', triple: 'Habitación Estándar Triple' };
         const CORTOS = { suite: 'Suite', cabana: 'Cabaña', cuadruple: 'Familiar Cuádruple', triple: 'Estándar Triple' };
         const CAPACIDAD = { suite: 4, cabana: 2, cuadruple: 4, triple: 3 };
@@ -1331,6 +1410,11 @@
            Reservas: de Supabase o, sin conexión, de ejemplo
            ========================================================= */
         let reservas = [];
+        /* Fechas bloqueadas, precios y fotos de las habitaciones (Bloquear fechas, Precios y Fotos) */
+        let bloqueos = [];
+        let fotos = [];
+        let tarifasPanel = {};          // tipo → fila de la tabla tarifas (precio y cuándo se cambió)
+        let faltaBaseHotel = false;     // la base aún no tiene las tablas tarifas, bloqueos y fotos
 
         function reservasDeEjemplo() {
             const hoy = hoyISO();
@@ -1445,7 +1529,21 @@
 
         async function cargarReservas() {
             if (!CONECTADO) return;
-            reservas = await api('GET', 'reservas?select=*&salida=gte.' + sumarDias(hoyISO(), -400) + '&order=llegada.asc&limit=2000') || [];
+            const [filas] = await Promise.all([
+                api('GET', 'reservas?select=*&salida=gte.' + sumarDias(hoyISO(), -400) + '&order=llegada.asc&limit=2000'),
+                cargarBloqueos()
+            ]);
+            reservas = filas || [];
+        }
+
+        /* Habitaciones de cada tipo bloqueadas en el panel la noche de un día */
+        function bloqueadasLaNoche(dia) {
+            const bloq = {};
+            bloqueos.forEach(b => {
+                if (!(b.desde <= dia && dia <= b.hasta)) return;
+                bloq[b.tipo] = (bloq[b.tipo] || 0) + (b.unidades == null ? (UNIDADES[b.tipo] || 0) : Number(b.unidades) || 0);
+            });
+            return bloq;
         }
 
         /* Habitaciones de cada tipo ocupadas la noche de un día */
@@ -1458,11 +1556,13 @@
             return occ;
         }
 
+        /* Lo que queda libre en la noche más llena: reservas pagadas o confirmadas y fechas bloqueadas */
         function libresEntre(llegada, salida, excluirId) {
             const libres = { ...UNIDADES };
             for (let noche = llegada; noche < salida; noche = sumarDias(noche, 1)) {
                 const occ = ocupadasLaNoche(noche, excluirId);
-                Object.keys(UNIDADES).forEach(k => { libres[k] = Math.min(libres[k], Math.max(0, UNIDADES[k] - (occ[k] || 0))); });
+                const bloq = bloqueadasLaNoche(noche);
+                Object.keys(UNIDADES).forEach(k => { libres[k] = Math.min(libres[k], Math.max(0, UNIDADES[k] - (occ[k] || 0) - (bloq[k] || 0))); });
             }
             return libres;
         }
@@ -1649,7 +1749,7 @@
                 throw new Error('Este correo no tiene acceso al panel. Hay que agregarlo en la tabla panel_acceso de Supabase.');
             }
             await leerTarifasDelSitio();
-            await cargarReservas();
+            await Promise.all([cargarReservas(), cargarDatosHotel().catch(() => { /* se reintenta al abrir Precios o Fotos */ })]);
             document.getElementById('password').value = '';
             enterPanel(sesion.email);
             marcarActualizado();
@@ -1665,6 +1765,7 @@
             document.getElementById('view-date').textContent = capitalize(
                 new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
             );
+            prepararFormBloqueo();
             renderTodo();
             window.scrollTo(0, 0);
         }
@@ -1682,7 +1783,7 @@
             }
             borrarSesion();
             clearInterval(temporizador);
-            if (CONECTADO) reservas = [];
+            if (CONECTADO) { reservas = []; bloqueos = []; fotos = []; }
             cerrarModal();
             mostrarLogin();
         }
@@ -1812,6 +1913,9 @@
             reservas: 'Reservas',
             disponibilidad: 'Disponibilidad',
             estadisticas: 'Estadísticas',
+            precios: 'Precios',
+            bloqueos: 'Bloquear fechas',
+            fotos: 'Fotos de las habitaciones',
             mensajes: 'Mensajes',
             ajustes: 'Ajustes'
         };
@@ -1825,6 +1929,7 @@
             if (window.innerWidth < 1024) closeSidebar();
             window.scrollTo(0, 0);
             if (view === 'estadisticas') cargarEstadisticas();
+            if (view === 'precios' || view === 'bloqueos' || view === 'fotos') abrirVistaHotel(view);
         }
 
         document.querySelectorAll('.nav-item[data-view]').forEach(n => {
@@ -2274,7 +2379,8 @@
             for (let d = 1; d <= dias; d++) {
                 const dia = iso(new Date(y, m, d));
                 const occ = ocupadasLaNoche(dia);
-                const ocupadas = Object.keys(UNIDADES).reduce((s, k) => s + Math.min(UNIDADES[k], occ[k] || 0), 0);
+                const bloq = bloqueadasLaNoche(dia);
+                const ocupadas = Object.keys(UNIDADES).reduce((s, k) => s + Math.min(UNIDADES[k], (occ[k] || 0) + (bloq[k] || 0)), 0);
                 const libres = total - ocupadas;
                 let cls = 'cal-day';
                 let tag = '';
@@ -2295,14 +2401,19 @@
                 return;
             }
             const occ = ocupadasLaNoche(diaElegido);
+            const bloq = bloqueadasLaNoche(diaElegido);
             const esaNoche = r => r.llegada <= diaElegido && diaElegido < r.salida;
             const hospedados = reservas.filter(r => OCUPAN.includes(r.estado) && esaNoche(r));
             const pendientes = reservas.filter(r => r.estado === 'pendiente' && esaNoche(r));
+            const bloqueadas = bloqueos.filter(b => b.desde <= diaElegido && diaElegido <= b.hasta);
             cont.innerHTML = `
-                <h4 class="font-display text-xl text-ink mb-4">Noche del ${fechaLarga(diaElegido).toLowerCase()}</h4>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <h4 class="font-display text-xl text-ink">Noche del ${fechaLarga(diaElegido).toLowerCase()}</h4>
+                    ${diaElegido >= hoyISO() ? `<button type="button" class="btn btn-outline btn-sm" onclick="irABloquear('${diaElegido}')"><i data-lucide="calendar-x" class="w-3.5 h-3.5"></i> Bloquear esta noche</button>` : ''}
+                </div>
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
                     ${Object.keys(UNIDADES).map(k => {
-                        const libres = Math.max(0, UNIDADES[k] - (occ[k] || 0));
+                        const libres = Math.max(0, UNIDADES[k] - (occ[k] || 0) - (bloq[k] || 0));
                         return `<div class="border border-line p-3">
                             <span class="block text-[0.72rem] text-graphite/55">${CORTOS[k] || k}</span>
                             <span class="font-display text-2xl ${libres ? 'text-ink' : 'text-[#8a3d3d]'}">${libres}</span>
@@ -2317,8 +2428,722 @@
                                <span class="text-ink">${esc(r.nombre)}</span><span class="text-graphite/50 text-right">${esc(textoHabitaciones(r.habitaciones))}</span>
                            </li>`).join('')}</ul>`
                     : '<p class="text-[0.78rem] text-graphite/50">Nadie hospedado esa noche.</p>'}
-                ${pendientes.length ? `<p class="text-[0.72rem] text-[#8a6a34] mt-3">${plural(pendientes.length, 'reserva pendiente', 'reservas pendientes')} de pago para esa noche (no apartan habitación).</p>` : ''}`;
+                ${pendientes.length ? `<p class="text-[0.72rem] text-[#8a6a34] mt-3">${plural(pendientes.length, 'reserva pendiente', 'reservas pendientes')} de pago para esa noche (no apartan habitación).</p>` : ''}
+                ${bloqueadas.length ? `<span class="micro text-graphite/40 block mt-5 mb-2">Bloqueadas esa noche</span>
+                    <ul class="divide-y divide-line border-y border-line">${bloqueadas.map(b => `
+                        <li class="py-2.5 flex justify-between gap-3 text-[0.8rem]">
+                            <span class="text-ink">${esc(textoBloqueo(b))}${b.motivo ? `<span class="block text-[0.7rem] text-graphite/50">${esc(b.motivo)}</span>` : ''}</span>
+                            <button type="button" class="text-[0.72rem] text-brass-deep border-b border-brass/50 hover:text-ink self-start" onclick="quitarBloqueo('${esc(b.id)}')">Quitar</button>
+                        </li>`).join('')}</ul>` : ''}`;
         }
+
+        /* =========================================================
+           Precios, fechas bloqueadas y fotos de las habitaciones
+           Tablas tarifas, bloqueos y fotos de Supabase y archivos en Supabase
+           Storage (bucket habitaciones), creados por supabase-reservas.sql. Las
+           reglas de la base dejan leerlos y cambiarlos solo a los correos de
+           panel_acceso. La página los recibe del servidor de reservas
+           (GET /catalogo, el cupo y el calendario).
+           ========================================================= */
+        const VERSION_SERVIDOR_HOTEL = '2026-10-20';   // servidor-pagos-bold.js que ya usa precios, fotos y bloqueos
+        const BUCKET_FOTOS = 'habitaciones';
+        const MAX_FOTOS = 12;              // por habitación
+        const MAX_MB_FOTO = 15;            // antes de achicarla
+        const LADO_FOTO = 1600;            // px del lado más largo: foto grande…
+        const LADO_MINI = 800;             // …y versión liviana (como las foto-*-sm.jpg)
+        /* Fotos que tenía la página (las mismas con que supabase-reservas.sql llena la tabla fotos) */
+        const FOTOS_INICIALES = {
+            suite: ['suite-pareja', 'suite-cama', 'suite-sala'],
+            cabana: ['cabana-vista', 'cabana-amplia', 'cabana-cama', 'cabana-arreglo', 'cabana-pareja'],
+            cuadruple: ['cuadruple'],
+            triple: ['triple-familia', 'triple-descanso', 'triple-balcon']
+        };
+        let servidorHotel = null;          // null: sin revisar · true: listo · false: falta publicar el servidor nuevo
+        const esFaltaDeTabla = e => /schema cache|does not exist|could not find the table/i.test((e && e.message) || '');
+        const textoFaltaBase = 'Falta un paso: en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.';
+
+        function bloqueosDeEjemplo() {
+            const hoy = hoyISO();
+            return [{ id: 'ejemplo-b1', creado: new Date().toISOString(), tipo: 'cuadruple', unidades: 2, desde: sumarDias(hoy, 8), hasta: sumarDias(hoy, 9), motivo: 'Reservada por Booking' }];
+        }
+
+        function fotosDeEjemplo() {
+            return Object.keys(FOTOS_INICIALES).flatMap(k => FOTOS_INICIALES[k].map((s, i) => ({
+                id: 'ejemplo-f-' + k + '-' + i, tipo: k, orden: i + 1, grande: 'foto-' + s + '.jpg', mini: 'foto-' + s + '-sm.jpg', rutas: [], creada: ''
+            })));
+        }
+
+        /* Fechas bloqueadas desde hace 400 días (como las reservas) */
+        async function cargarBloqueos() {
+            if (!CONECTADO) return;
+            try {
+                bloqueos = await api('GET', 'bloqueos?select=*&hasta=gte.' + sumarDias(hoyISO(), -400) + '&order=desde.asc&limit=2000') || [];
+            } catch (e) {
+                if (esFaltaDeTabla(e)) faltaBaseHotel = true;
+                /* otro error: quedan los de antes y se reintenta en la próxima actualización */
+            }
+        }
+
+        /* Precio por noche (también para "Nueva" reserva) y fotos guardados en el panel */
+        async function cargarDatosHotel() {
+            if (!CONECTADO) return;
+            try {
+                const [filasTarifas, filasFotos] = await Promise.all([
+                    api('GET', 'tarifas?select=*'),
+                    api('GET', 'fotos?select=*&order=orden.asc,creada.asc')
+                ]);
+                tarifasPanel = {};
+                (filasTarifas || []).forEach(f => {
+                    tarifasPanel[f.tipo] = f;
+                    if (TARIFAS[f.tipo] && f.precio > 0) TARIFAS[f.tipo] = { finde: f.precio, semana: f.precio };
+                });
+                fotos = filasFotos || [];
+                faltaBaseHotel = false;
+            } catch (e) {
+                if (!esFaltaDeTabla(e)) throw e;
+                faltaBaseHotel = true;
+            }
+        }
+
+        /* Al abrir Precios, Bloquear fechas o Fotos: se pinta lo que hay y se trae lo último de la base */
+        async function abrirVistaHotel(view) {
+            pintarVistaHotel(view);
+            revisarServidorHotel();
+            if (!CONECTADO) return;
+            try {
+                if (view === 'bloqueos') await cargarBloqueos(); else await cargarDatosHotel();
+            } catch (e) {
+                toast(e.message);
+            }
+            if (vistaActual !== view) return;
+            if (view === 'bloqueos') renderTodo();   // la lista y también Disponibilidad
+            pintarVistaHotel(view);
+        }
+
+        function pintarVistaHotel(view) {
+            if (view === 'precios') renderPrecios();
+            if (view === 'bloqueos') { renderBloqueos(); actualizarFormBloqueo(); }
+            if (view === 'fotos') renderFotos();
+            pintarAvisosHotel();
+            lucide.createIcons();
+        }
+
+        function pintarAvisosHotel() {
+            const texto = faltaBaseHotel ? textoFaltaBase
+                : servidorHotel === false ? 'Falta publicar el servidor nuevo en Cloudflare (servidor-pagos-bold.js). Lo que guardes aquí queda listo, pero hasta entonces la página sigue con los precios y las fotos de antes y no respeta las fechas bloqueadas.'
+                : !CONECTADO ? 'Modo de ejemplo: los cambios se ven en esta pantalla, pero no se guardan.' : '';
+            document.querySelectorAll('[data-aviso-hotel]').forEach(el => {
+                el.textContent = texto;
+                el.classList.toggle('hidden', !texto);
+            });
+        }
+
+        /* ¿El servidor de Cloudflare ya respeta precios, fotos y bloqueos? (consulta una sola vez) */
+        async function revisarServidorHotel() {
+            if (servidorHotel !== null || !CONECTADO || !CONEXION.servidor.trim()) return;
+            try {
+                const j = await (await fetch(CONEXION.servidor.trim().replace(/\/+$/, '') + '/', { cache: 'no-store' })).json();
+                servidorHotel = String(j.version || '') >= VERSION_SERVIDOR_HOTEL;
+            } catch (e) { servidorHotel = undefined; /* no se pudo revisar: no se avisa */ }
+            pintarAvisosHotel();
+        }
+
+        /* --- Precios --- */
+        const fotosDe = k => fotos.filter(f => f.tipo === k)
+            .sort((a, b) => (a.orden - b.orden) || String(a.creada).localeCompare(String(b.creada)));
+
+        function notaPrecio(k) {
+            const fila = tarifasPanel[k];
+            return 'Precio actual: ' + COP(TARIFAS[k] ? TARIFAS[k].semana : 0) + ' por noche' +
+                (fila && fila.actualizada ? ' · cambiado ' + haceCuanto(fila.actualizada) : '');
+        }
+
+        function renderPrecios() {
+            document.getElementById('precios-body').innerHTML = Object.keys(UNIDADES).map(k => {
+                const foto = fotosDe(k)[0];
+                const precio = TARIFAS[k] ? TARIFAS[k].semana : 0;
+                return `<form class="card p-5 sm:p-6" data-precio="${k}" novalidate>
+                    <div class="flex items-center gap-4">
+                        ${foto ? `<img src="${esc(foto.mini)}" alt="" class="w-16 h-16 object-cover shrink-0 bg-bone">`
+                            : '<span class="w-16 h-16 bg-bone flex items-center justify-center shrink-0"><i data-lucide="bed-double" class="w-5 h-5 text-graphite/30"></i></span>'}
+                        <div class="min-w-0">
+                            <h3 class="font-display text-xl text-ink leading-tight">${esc(NOMBRES[k] || k)}</h3>
+                            <span class="block text-[0.7rem] text-graphite/45 mt-1">${plural(UNIDADES[k], 'habitación', 'habitaciones')} · hasta ${CAPACIDAD[k] || '—'} huéspedes</span>
+                        </div>
+                    </div>
+                    <label class="field-label mt-5" for="precio-${k}">Precio por noche (COP)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-graphite/45 text-lg">$</span>
+                        <input id="precio-${k}" class="field-input pl-8 text-lg" inputmode="numeric" autocomplete="off" maxlength="15" value="${precio ? precio.toLocaleString('es-CO') : ''}">
+                    </div>
+                    <p class="text-[0.72rem] text-graphite/50 mt-2" data-precio-nota>${esc(notaPrecio(k))}</p>
+                    <p class="hidden text-[0.76rem] text-[#8a3d3d] mt-2" role="alert" data-precio-error></p>
+                    <button type="submit" class="btn btn-ink btn-sm mt-4 w-full sm:w-auto"><i data-lucide="save" class="w-3.5 h-3.5"></i> Guardar precio</button>
+                </form>`;
+            }).join('');
+        }
+
+        /* "270.000", "$ 270000" o "270000,00" → { precio: 270000 }; si no sirve, { error } */
+        function validarPrecio(texto) {
+            const limpio = String(texto || '').replace(/[\s$]/g, '').replace(/,\d{1,2}$/, '');
+            if (!limpio) return { error: 'Escribe el precio por noche.' };
+            if (!/^\d+$/.test(limpio) && !/^\d{1,3}([.,]\d{3})+$/.test(limpio)) return { error: 'Escribe solo el número, sin decimales. Ejemplo: 270000' };
+            const precio = parseInt(limpio.replace(/[.,]/g, ''), 10);
+            if (!(precio > 0)) return { error: 'El precio debe ser mayor que 0.' };
+            if (precio > 100000000) return { error: 'Revisa el precio: es demasiado alto.' };
+            return { precio };
+        }
+
+        function previsualizarPrecio(form) {
+            const k = form.dataset.precio;
+            const v = validarPrecio(form.querySelector('input').value);
+            const nota = form.querySelector('[data-precio-nota]');
+            const nuevo = v.precio && TARIFAS[k] && v.precio !== TARIFAS[k].semana;
+            nota.textContent = nuevo ? 'Nuevo precio: ' + COP(v.precio) + ' por noche (antes ' + COP(TARIFAS[k].semana) + '). Toca «Guardar precio».' : notaPrecio(k);
+            nota.classList.toggle('text-ink', !!nuevo);
+            form.querySelector('[data-precio-error]').classList.add('hidden');
+        }
+
+        async function guardarPrecio(form) {
+            const k = form.dataset.precio;
+            const input = form.querySelector('input');
+            const error = form.querySelector('[data-precio-error]');
+            const fallo = texto => { error.textContent = texto; error.classList.remove('hidden'); };
+            error.classList.add('hidden');
+            const v = validarPrecio(input.value);
+            if (v.error) return fallo(v.error);
+            const antes = TARIFAS[k] ? TARIFAS[k].semana : 0;
+            if (v.precio === antes && tarifasPanel[k]) {
+                input.value = v.precio.toLocaleString('es-CO');
+                return toast('Ese ya es el precio de ' + (NOMBRES[k] || k) + '.');
+            }
+            /* Un cero de más o de menos se nota: se pide confirmar los cambios muy grandes */
+            if (antes && (v.precio >= antes * 3 || v.precio * 3 <= antes || v.precio < 10000) &&
+                !confirm('¿Seguro que el precio de ' + (NOMBRES[k] || k) + ' pasa de ' + COP(antes) + ' a ' + COP(v.precio) + ' por noche?')) return;
+            const boton = form.querySelector('button[type="submit"]');
+            boton.disabled = true;
+            try {
+                if (CONECTADO) {
+                    const filas = await api('POST', 'tarifas?on_conflict=tipo', { tipo: k, precio: v.precio }, { Prefer: 'resolution=merge-duplicates,return=representation' });
+                    if (!filas || !filas.length) throw new Error('No se pudo guardar el precio. Vuelve a cargar el panel.');
+                    tarifasPanel[k] = filas[0];
+                } else {
+                    tarifasPanel[k] = { tipo: k, precio: v.precio, actualizada: new Date().toISOString() };
+                }
+                TARIFAS[k] = { finde: v.precio, semana: v.precio };
+                input.value = v.precio.toLocaleString('es-CO');
+                previsualizarPrecio(form);
+                toast(!CONECTADO ? 'Modo de ejemplo: el precio no se guarda.'
+                    : servidorHotel === false ? 'Guardado. Falta publicar el servidor nuevo para que la página lo use.'
+                    : 'Guardado. Las reservas nuevas de ' + (CORTOS[k] || k) + ' ya usan ' + COP(v.precio) + ' por noche.');
+            } catch (e) {
+                fallo(esFaltaDeTabla(e) ? textoFaltaBase : e.message);
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        document.getElementById('precios-body').addEventListener('input', e => {
+            const form = e.target.closest('form[data-precio]');
+            if (form) previsualizarPrecio(form);
+        });
+        document.getElementById('precios-body').addEventListener('submit', e => {
+            e.preventDefault();
+            guardarPrecio(e.target);
+        });
+
+        /* --- Fechas bloqueadas --- */
+        const conAno = s => (s.slice(0, 4) !== hoyISO().slice(0, 4) ? ' de ' + s.slice(0, 4) : '');
+
+        /* "Suite Cabaleón · 1 de 2", "Habitación Familiar Cuádruple · todas (6)" o "Cabaña Cabaleón" */
+        const textoBloqueo = b => (NOMBRES[b.tipo] || b.tipo) + (UNIDADES[b.tipo] > 1
+            ? ' · ' + (b.unidades == null || b.unidades >= UNIDADES[b.tipo] ? 'todas (' + UNIDADES[b.tipo] + ')' : b.unidades + ' de ' + UNIDADES[b.tipo]) : '');
+
+        /* "Noche del jueves, 31 de diciembre · salen el viernes, 1 de enero" o "Del … al … · 3 noches, salen el …" */
+        function textoNoches(desde, hasta) {
+            const n = nochesEntre(desde, hasta) + 1;
+            const salida = fechaLarga(sumarDias(hasta, 1)).toLowerCase();
+            return n === 1
+                ? 'Noche del ' + fechaLarga(desde).toLowerCase() + conAno(desde) + ' · salen el ' + salida
+                : 'Del ' + fechaLarga(desde).toLowerCase() + ' al ' + fechaLarga(hasta).toLowerCase() + conAno(hasta) + ' · ' + plural(n, 'noche', 'noches') + ', salen el ' + salida;
+        }
+
+        function prepararFormBloqueo() {
+            document.getElementById('bq-habs').innerHTML = Object.keys(UNIDADES).map(k => `
+                <div class="border border-line p-3 flex items-center gap-3 transition-colors" data-bq-fila="${k}">
+                    <label class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer py-1">
+                        <input type="checkbox" data-bq-hab="${k}" class="accent-ink w-5 h-5 shrink-0">
+                        <span class="min-w-0">
+                            <span class="block text-[0.86rem] text-ink leading-snug">${esc(NOMBRES[k] || k)}</span>
+                            <span class="block text-[0.68rem] text-graphite/45">${UNIDADES[k] > 1 ? 'Hay ' + UNIDADES[k] : 'Unidad única'}</span>
+                        </span>
+                    </label>
+                    ${UNIDADES[k] > 1 ? `<select data-bq-cuantas="${k}" class="field-input !w-auto py-2 pl-2 pr-1 text-[0.8rem]" aria-label="Cuántas ${esc(CORTOS[k] || k)} bloquear">
+                        <option value="">Todas (${UNIDADES[k]})</option>
+                        ${Array.from({ length: UNIDADES[k] - 1 }, (_, i) => `<option value="${i + 1}">${i + 1} de ${UNIDADES[k]}</option>`).join('')}
+                    </select>` : ''}
+                </div>`).join('');
+            const hoy = hoyISO();
+            ['bq-desde', 'bq-hasta'].forEach(id => {
+                const el = document.getElementById(id);
+                el.min = hoy;
+                if (!el.value || el.value < hoy) el.value = hoy;
+            });
+            actualizarFormBloqueo();
+        }
+
+        function leerFormBloqueo() {
+            const tipos = [...document.querySelectorAll('#bq-habs [data-bq-hab]:checked')].map(c => {
+                const k = c.dataset.bqHab;
+                const cuantas = document.querySelector('#bq-habs [data-bq-cuantas="' + k + '"]');
+                return { tipo: k, unidades: cuantas && cuantas.value ? parseInt(cuantas.value, 10) : null };
+            });
+            return {
+                tipos,
+                desde: document.getElementById('bq-desde').value,
+                hasta: document.getElementById('bq-hasta').value,
+                motivo: document.getElementById('bq-motivo').value.trim().replace(/\s+/g, ' ').slice(0, 120)
+            };
+        }
+
+        function errorFormBloqueo(d) {
+            if (!d.tipos.length) return 'Elige al menos una habitación.';
+            if (!d.desde || !d.hasta) return 'Elige las noches que quieres bloquear.';
+            if (d.desde < hoyISO()) return 'La primera noche ya pasó. Elige una fecha de hoy en adelante.';
+            if (d.hasta < d.desde) return 'La última noche debe ser la misma o después de la primera.';
+            if (nochesEntre(d.desde, d.hasta) >= 366) return 'Bloquea máximo un año de una vez.';
+            return '';
+        }
+
+        /* Tipos en los que esas noches ya tienen reservas o bloqueos y el bloqueo nuevo dejaría más
+           habitaciones ocupadas de las que hay (solo se revisan los primeros 3 meses) */
+        function choquesBloqueo(d) {
+            return d.tipos.filter(t => {
+                const bloquea = t.unidades == null ? UNIDADES[t.tipo] : t.unidades;
+                for (let n = d.desde, i = 0; n <= d.hasta && i < 92; n = sumarDias(n, 1), i++) {
+                    const ya = (ocupadasLaNoche(n)[t.tipo] || 0) + (bloqueadasLaNoche(n)[t.tipo] || 0);
+                    if (ya && ya + bloquea > UNIDADES[t.tipo]) return true;
+                }
+                return false;
+            }).map(t => CORTOS[t.tipo] || t.tipo);
+        }
+
+        /* Lo que se va a bloquear, en palabras, y el aviso si esas noches ya están ocupadas */
+        function actualizarFormBloqueo(e) {
+            const desde = document.getElementById('bq-desde');
+            const hasta = document.getElementById('bq-hasta');
+            if (desde.value) {
+                hasta.min = desde.value;
+                if (e && e.target === desde && (!hasta.value || hasta.value < desde.value)) hasta.value = desde.value;
+            }
+            document.querySelectorAll('#bq-habs [data-bq-fila]').forEach(fila => {
+                const marcada = fila.querySelector('[data-bq-hab]').checked;
+                fila.classList.toggle('border-ink', marcada);
+                fila.classList.toggle('bg-bone', marcada);
+            });
+            const d = leerFormBloqueo();
+            const falta = errorFormBloqueo(d);
+            document.getElementById('bq-resumen').innerHTML = falta
+                ? '<span class="text-graphite/50">' + esc(falta) + '</span>'
+                : '<span class="micro text-brass-deep block mb-1.5">Vas a bloquear</span>' +
+                  d.tipos.map(t => '<span class="block text-ink">' + esc(textoBloqueo(t)) + '</span>').join('') +
+                  '<span class="block mt-1.5">' + esc(textoNoches(d.desde, d.hasta)) + '</span>';
+            const choques = falta ? [] : choquesBloqueo(d);
+            const aviso = document.getElementById('bq-aviso');
+            aviso.textContent = choques.length ? 'Ojo: esas noches ya tienen reservas o bloqueos en ' + choques.join(', ') +
+                '. Con este bloqueo quedarían más habitaciones ocupadas de las que hay. Revisa esas reservas en Reservas o en Disponibilidad.' : '';
+            aviso.classList.toggle('hidden', !choques.length);
+            document.getElementById('bq-error').classList.add('hidden');
+        }
+
+        async function guardarBloqueo(e) {
+            e.preventDefault();
+            const d = leerFormBloqueo();
+            const error = document.getElementById('bq-error');
+            const fallo = texto => { error.textContent = texto; error.classList.remove('hidden'); };
+            const falta = errorFormBloqueo(d);
+            if (falta) return fallo(falta);
+            const choques = choquesBloqueo(d);
+            if (choques.length && !confirm('Esas noches ya tienen reservas o bloqueos en ' + choques.join(', ') + '. ¿Bloquear de todas formas?')) return;
+            const filas = d.tipos.map(t => ({ tipo: t.tipo, unidades: t.unidades, desde: d.desde, hasta: d.hasta, motivo: d.motivo || null }));
+            const boton = document.getElementById('bq-boton');
+            boton.disabled = true;
+            try {
+                if (CONECTADO) {
+                    const nuevas = await api('POST', 'bloqueos', filas, { Prefer: 'return=representation' });
+                    if (!nuevas || nuevas.length !== filas.length) throw new Error('No se pudo guardar el bloqueo. Vuelve a cargar el panel.');
+                    bloqueos.push(...nuevas);
+                } else {
+                    const ahora = new Date().toISOString();
+                    bloqueos.push(...filas.map((f, i) => ({ ...f, id: 'ejemplo-b' + Date.now() + i, creado: ahora })));
+                }
+                document.querySelectorAll('#bq-habs [data-bq-hab]').forEach(c => { c.checked = false; });
+                document.querySelectorAll('#bq-habs [data-bq-cuantas]').forEach(s => { s.value = ''; });
+                document.getElementById('bq-motivo').value = '';
+                renderTodo();
+                actualizarFormBloqueo();
+                toast(!CONECTADO ? 'Modo de ejemplo: el bloqueo no se guarda.'
+                    : servidorHotel === false ? 'Guardado. Falta publicar el servidor nuevo para que la página lo respete.'
+                    : 'Guardado. La página ya no ofrece esas noches.');
+            } catch (err) {
+                fallo(esFaltaDeTabla(err) ? textoFaltaBase : err.message);
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        function renderBloqueos() {
+            const hoy = hoyISO();
+            const orden = Object.keys(UNIDADES);
+            const activos = bloqueos.filter(b => b.hasta >= hoy)
+                .sort((a, b) => a.desde.localeCompare(b.desde) || a.hasta.localeCompare(b.hasta) || orden.indexOf(a.tipo) - orden.indexOf(b.tipo));
+            document.getElementById('bloqueos-body').innerHTML = activos.length ? activos.map(b => `
+                <li class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                        <span class="w-9 h-9 bg-bone flex items-center justify-center shrink-0"><i data-lucide="calendar-x" class="w-4 h-4 text-brass-deep"></i></span>
+                        <div class="min-w-0">
+                            <span class="block text-[0.86rem] text-ink">${esc(textoBloqueo(b))}</span>
+                            <span class="block text-[0.76rem] text-graphite/65 mt-0.5">${esc(textoNoches(b.desde, b.hasta))}</span>
+                            ${b.motivo ? `<span class="block text-[0.72rem] text-graphite/45 mt-0.5">${esc(b.motivo)}</span>` : ''}
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-sm shrink-0" onclick="quitarBloqueo('${esc(b.id)}')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Quitar</button>
+                </li>`).join('')
+                : '<li class="p-5 text-[0.8rem] text-graphite/45">No hay fechas bloqueadas de hoy en adelante.</li>';
+        }
+
+        async function quitarBloqueo(id) {
+            const b = bloqueos.find(x => String(x.id) === String(id));
+            if (!b) return;
+            if (!confirm('¿Seguro que quieres quitar este bloqueo?\n\n' + textoBloqueo(b) + '\n' + textoNoches(b.desde, b.hasta) +
+                '\n\nEsas noches vuelven a ofrecerse en la página.')) return;
+            try {
+                if (CONECTADO) {
+                    const filas = await api('DELETE', 'bloqueos?id=eq.' + encodeURIComponent(id), null, { Prefer: 'return=representation' });
+                    if (!filas || !filas.length) throw new Error('No se pudo quitar el bloqueo. Vuelve a cargar el panel.');
+                }
+                bloqueos = bloqueos.filter(x => String(x.id) !== String(id));
+                renderTodo();
+                actualizarFormBloqueo();
+                toast(CONECTADO ? 'Bloqueo quitado. Esas noches vuelven a estar disponibles.' : 'Modo de ejemplo: el cambio no se guarda.');
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        /* Desde Disponibilidad: el formulario queda listo con esa noche */
+        function irABloquear(dia) {
+            nav('bloqueos');
+            document.getElementById('bq-desde').value = dia;
+            document.getElementById('bq-hasta').value = dia;
+            actualizarFormBloqueo();
+        }
+
+        const formBloqueo = document.getElementById('form-bloqueo');
+        formBloqueo.addEventListener('change', e => {
+            /* Elegir cuántas también marca la habitación */
+            if (e.target.matches('[data-bq-cuantas]')) document.querySelector('#bq-habs [data-bq-hab="' + e.target.dataset.bqCuantas + '"]').checked = true;
+            actualizarFormBloqueo(e);
+        });
+        formBloqueo.addEventListener('input', e => { if (e.target.id === 'bq-motivo') document.getElementById('bq-error').classList.add('hidden'); });
+        formBloqueo.addEventListener('submit', guardarBloqueo);
+        document.getElementById('bq-motivos').addEventListener('click', e => {
+            const chip = e.target.closest('[data-motivo]');
+            if (chip) document.getElementById('bq-motivo').value = chip.dataset.motivo;
+        });
+
+        /* --- Fotos de cada habitación ---
+           Al subirla, la foto se achica en el navegador (grande de LADO_FOTO px y una liviana de
+           LADO_MINI px, en JPG) y las dos versiones van a Supabase Storage. La tabla fotos guarda
+           sus direcciones y el orden; la primera es la principal. */
+        let tipoFotos = 'suite';
+        let fotoAReemplazar = null;
+        const porIdFoto = id => fotos.find(f => String(f.id) === String(id));
+        const urlPublicaFoto = ruta => urlSupabase('/storage/v1/object/public/' + BUCKET_FOTOS + '/' + ruta);
+
+        function elegirTipoFotos(k) {
+            tipoFotos = k;
+            renderFotos();
+            lucide.createIcons();
+        }
+
+        function renderFotos() {
+            if (!UNIDADES[tipoFotos]) tipoFotos = Object.keys(UNIDADES)[0];
+            document.getElementById('fotos-tipos').innerHTML = Object.keys(UNIDADES).map(k =>
+                `<button type="button" class="chip ${k === tipoFotos ? 'is-active' : ''}" aria-pressed="${k === tipoFotos}" onclick="elegirTipoFotos('${k}')">${esc(CORTOS[k] || k)} · ${fotosDe(k).length}</button>`).join('');
+            const lista = fotosDe(tipoFotos);
+            document.getElementById('fotos-titulo').textContent = (NOMBRES[tipoFotos] || tipoFotos) + ' · ' + plural(lista.length, 'foto', 'fotos');
+            document.getElementById('fotos-body').innerHTML = lista.length ? lista.map((f, i) => `
+                <button type="button" class="group text-left border border-line bg-white hover:border-ink transition-colors" onclick="abrirFoto('${esc(f.id)}')"
+                        aria-label="Foto ${i + 1}${i === 0 ? ', principal' : ''}: cambiar de lugar, reemplazar o borrar">
+                    <span class="relative block aspect-[4/3] bg-bone overflow-hidden">
+                        <img src="${esc(f.mini)}" alt="" class="w-full h-full object-cover" loading="lazy">
+                        ${i === 0 ? '<span class="absolute top-2 left-2 bg-ink text-white text-[0.56rem] font-semibold tracking-[0.12em] uppercase px-2 py-1 flex items-center gap-1"><i data-lucide="star" class="w-3 h-3 text-brass"></i> Principal</span>' : ''}
+                    </span>
+                    <span class="flex items-center justify-between gap-2 px-3 py-2.5 text-[0.72rem] text-graphite/60">
+                        <span>Foto ${i + 1}</span><span class="text-brass-deep group-hover:text-ink">Opciones</span>
+                    </span>
+                </button>`).join('')
+                : '<p class="col-span-full text-[0.8rem] text-graphite/45 py-8 text-center">Esta habitación no tiene fotos: en la página se ve «Fotografías en camino». Toca «Subir fotos».</p>';
+        }
+
+        /* Ventana de una foto: verla en grande y lo que se puede hacer con ella */
+        function abrirFoto(id) {
+            const f = porIdFoto(id);
+            if (!f) return;
+            const lista = fotosDe(f.tipo);
+            const i = lista.indexOf(f);
+            const idSeguro = esc(f.id);
+            const boton = (texto, accion, clase, icono, apagado) =>
+                `<button type="button" onclick="${accion}" class="btn ${clase} btn-sm w-full"${apagado ? ' disabled' : ''}><i data-lucide="${icono}" class="w-3.5 h-3.5"></i> ${texto}</button>`;
+            abrirModal(`
+                <div class="p-6 sm:p-8">
+                    <span class="micro text-brass-deep">${esc(NOMBRES[f.tipo] || f.tipo)} · foto ${i + 1} de ${lista.length}</span>
+                    <h3 class="font-display text-2xl text-ink mt-2 mb-4 pr-10">${i === 0 ? 'Foto principal' : 'Foto ' + (i + 1)}</h3>
+                    <img src="${esc(f.grande)}" alt="" class="w-full max-h-[46vh] object-contain bg-bone">
+                    <p class="text-[0.75rem] text-graphite/55 mt-3">${i === 0 ? 'Es la primera que se ve en la página, en la tarjeta de la habitación.' : 'Con «Hacer principal» pasa a ser la primera que se ve en la página.'}</p>
+                    <div class="grid grid-cols-2 gap-2 mt-5">
+                        ${i > 0 ? `<div class="col-span-2">${boton('Hacer principal', `moverFoto('${idSeguro}', 'principal')`, 'btn-ink', 'star')}</div>` : ''}
+                        ${boton('Mover antes', `moverFoto('${idSeguro}', -1)`, 'btn-outline', 'arrow-left', i === 0)}
+                        ${boton('Mover después', `moverFoto('${idSeguro}', 1)`, 'btn-outline', 'arrow-right', i === lista.length - 1)}
+                        ${boton('Reemplazar', `elegirReemplazo('${idSeguro}')`, 'btn-outline', 'replace')}
+                        ${boton('Borrar', `borrarFoto('${idSeguro}')`, 'btn-peligro', 'trash-2')}
+                    </div>
+                </div>`);
+        }
+
+        function progresoFotos(texto) {
+            const el = document.getElementById('fotos-progreso');
+            el.innerHTML = texto ? '<i data-lucide="loader-circle" class="w-4 h-4 text-brass animate-spin shrink-0"></i><span>' + esc(texto) + '</span>' : '';
+            el.classList.toggle('hidden', !texto);
+            if (texto) lucide.createIcons();
+        }
+
+        function erroresFotos(lista) {
+            const el = document.getElementById('fotos-errores');
+            el.innerHTML = lista.map(t => '<p>' + esc(t) + '</p>').join('');
+            el.classList.toggle('hidden', !lista.length);
+        }
+
+        /* Revisa tipo y peso, y la deja en JPG de LADO_FOTO px más una versión liviana */
+        async function prepararFoto(archivo) {
+            const nombre = '«' + (archivo.name || 'La foto') + '»';
+            if (!/^image\/(jpeg|png|webp|heic|heif)$/i.test(archivo.type || '')) throw new Error(nombre + ' no es una foto en JPG, PNG o WEBP.');
+            if (archivo.size > MAX_MB_FOTO * 1048576) throw new Error(nombre + ' pesa más de ' + MAX_MB_FOTO + ' MB. Elige una más liviana.');
+            const img = await new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(archivo);
+                const im = new Image();
+                im.onload = () => { URL.revokeObjectURL(url); resolve(im); };
+                im.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No pudimos abrir ' + nombre + '. Usa una foto JPG, PNG o WEBP.')); };
+                im.src = url;
+            });
+            if (Math.max(img.naturalWidth, img.naturalHeight) < LADO_MINI) {
+                throw new Error(nombre + ' es muy pequeña (' + img.naturalWidth + ' × ' + img.naturalHeight + ' px) y se vería borrosa. Usa una de al menos ' + LADO_MINI + ' px.');
+            }
+            return { grande: await achicarFoto(img, LADO_FOTO, 0.82), mini: await achicarFoto(img, LADO_MINI, 0.8) };
+        }
+
+        function achicarFoto(img, lado, calidad) {
+            const escala = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+            const lienzo = document.createElement('canvas');
+            lienzo.width = Math.round(img.naturalWidth * escala);
+            lienzo.height = Math.round(img.naturalHeight * escala);
+            const ctx = lienzo.getContext('2d');
+            ctx.fillStyle = '#fff';   // las PNG transparentes quedan sobre blanco
+            ctx.fillRect(0, 0, lienzo.width, lienzo.height);
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, lienzo.width, lienzo.height);
+            return new Promise((resolve, reject) => lienzo.toBlob(b => (b ? resolve(b) : reject(new Error('No pudimos preparar la foto. Intenta con otra.'))), 'image/jpeg', calidad));
+        }
+
+        /* Supabase Storage (API REST, como la base): sube o borra archivos del bucket de fotos */
+        async function storage(metodo, ruta, cuerpo, tipo) {
+            const token = await tokenVigente();
+            let r;
+            try {
+                r = await fetch(urlSupabase('/storage/v1/object/' + ruta), {
+                    method: metodo,
+                    headers: { apikey: CONEXION.llavePublica.trim(), Authorization: 'Bearer ' + token, 'Content-Type': tipo,
+                        ...(metodo === 'POST' ? { 'cache-control': 'max-age=31536000', 'x-upsert': 'false' } : {}) },
+                    body: cuerpo
+                });
+            } catch (e) {
+                throw new Error('No hay conexión para guardar la foto. Revisa tu internet.');
+            }
+            const texto = await r.text();
+            let j = {};
+            try { j = texto ? JSON.parse(texto) : {}; } catch (e) { /* respuesta sin JSON */ }
+            if (r.ok) return j;
+            const m = String(j.message || j.error || '');
+            if (/jwt/i.test(m)) { sesionVencida(); throw new Error('Tu sesión terminó. Vuelve a entrar.'); }
+            if (/bucket not found/i.test(m)) throw new Error('Falta crear el espacio de las fotos. ' + textoFaltaBase);
+            if (/row-level security|unauthorized|not allowed/i.test(m)) throw new Error('Tu usuario no tiene permiso para guardar fotos. ' + textoFaltaBase);
+            if (r.status === 413 || /too large|exceeded the maximum/i.test(m)) throw new Error('La foto quedó demasiado pesada. Prueba con otra.');
+            throw new Error('No se pudo guardar la foto (' + (m || 'error ' + r.status) + ').');
+        }
+        const borrarArchivos = rutas => storage('DELETE', BUCKET_FOTOS, JSON.stringify({ prefixes: rutas }), 'application/json');
+
+        /* Sube la versión grande y la liviana; si algo falla, no deja archivos sueltos */
+        async function subirPar(tipo, grande, mini) {
+            const base = tipo + '/' + Date.now().toString(36) + '-' + aleatorio(6).toLowerCase();
+            const rutas = [base + '.jpg', base + '-sm.jpg'];
+            await storage('POST', BUCKET_FOTOS + '/' + rutas[0], grande, 'image/jpeg');
+            try {
+                await storage('POST', BUCKET_FOTOS + '/' + rutas[1], mini, 'image/jpeg');
+            } catch (e) {
+                borrarArchivos(rutas).catch(() => {});
+                throw e;
+            }
+            return { grande: urlPublicaFoto(rutas[0]), mini: urlPublicaFoto(rutas[1]), rutas };
+        }
+
+        /* Una foto nueva, al final de la lista */
+        async function subirUnaFoto(k, archivo) {
+            const { grande, mini } = await prepararFoto(archivo);
+            const orden = Math.max(0, ...fotosDe(k).map(f => f.orden)) + 1;
+            if (!CONECTADO) {
+                return { id: 'ejemplo-f' + Date.now() + aleatorio(3), tipo: k, orden, grande: URL.createObjectURL(grande), mini: URL.createObjectURL(mini), rutas: [], creada: new Date().toISOString() };
+            }
+            const par = await subirPar(k, grande, mini);
+            try {
+                const filas = await api('POST', 'fotos', { tipo: k, orden, ...par }, { Prefer: 'return=representation' });
+                if (!filas || !filas.length) throw new Error('No se pudo guardar la foto. Vuelve a cargar el panel.');
+                return filas[0];
+            } catch (e) {
+                borrarArchivos(par.rutas).catch(() => {});
+                throw esFaltaDeTabla(e) ? new Error(textoFaltaBase) : e;
+            }
+        }
+
+        async function subirFotos(archivos) {
+            if (!archivos.length) return;
+            const k = tipoFotos;
+            const caben = MAX_FOTOS - fotosDe(k).length;
+            const errores = [];
+            if (caben <= 0) return erroresFotos(['Ya hay ' + MAX_FOTOS + ' fotos de ' + (NOMBRES[k] || k) + ', el máximo. Borra alguna antes de subir otra.']);
+            if (archivos.length > caben) errores.push('Solo cabían ' + plural(caben, 'foto más', 'fotos más') + ' (máximo ' + MAX_FOTOS + ' por habitación): las demás no se subieron.');
+            erroresFotos([]);
+            const entrada = document.getElementById('fotos-subir');
+            entrada.disabled = true;
+            const cola = archivos.slice(0, caben);
+            let listas = 0;
+            for (let i = 0; i < cola.length; i++) {
+                progresoFotos('Subiendo ' + (cola.length > 1 ? 'foto ' + (i + 1) + ' de ' + cola.length : 'la foto') + '… No cierres esta página.');
+                try {
+                    fotos.push(await subirUnaFoto(k, cola[i]));
+                    listas++;
+                    renderFotos();
+                    lucide.createIcons();
+                } catch (e) {
+                    errores.push(e.message);
+                }
+            }
+            entrada.disabled = false;
+            progresoFotos('');
+            erroresFotos(errores);
+            if (listas) toast(CONECTADO ? 'Guardado: ' + plural(listas, 'foto nueva', 'fotos nuevas') + ' en ' + (NOMBRES[k] || k) + '.' : 'Modo de ejemplo: las fotos no se guardan.');
+        }
+
+        function elegirReemplazo(id) {
+            fotoAReemplazar = id;
+            document.getElementById('fotos-reemplazo').click();
+        }
+
+        /* La foto nueva queda en el mismo lugar; los archivos de la anterior se borran */
+        async function reemplazarFoto(id, archivo) {
+            const f = porIdFoto(id);
+            if (!f) return;
+            cerrarModal();
+            erroresFotos([]);
+            progresoFotos('Reemplazando la foto… No cierres esta página.');
+            try {
+                const { grande, mini } = await prepararFoto(archivo);
+                if (CONECTADO) {
+                    const par = await subirPar(f.tipo, grande, mini);
+                    let filas;
+                    try {
+                        filas = await api('PATCH', 'fotos?id=eq.' + encodeURIComponent(id), par, { Prefer: 'return=representation' });
+                        if (!filas || !filas.length) throw new Error('No se pudo guardar la foto. Vuelve a cargar el panel.');
+                    } catch (e) {
+                        borrarArchivos(par.rutas).catch(() => {});
+                        throw e;
+                    }
+                    const anteriores = f.rutas || [];
+                    Object.assign(f, filas[0]);
+                    if (anteriores.length) borrarArchivos(anteriores).catch(() => {});
+                } else {
+                    Object.assign(f, { grande: URL.createObjectURL(grande), mini: URL.createObjectURL(mini) });
+                }
+                renderFotos();
+                abrirFoto(id);
+                toast(CONECTADO ? 'Guardado: foto reemplazada.' : 'Modo de ejemplo: la foto no se guarda.');
+            } catch (e) {
+                erroresFotos([e.message]);
+            } finally {
+                progresoFotos('');
+            }
+        }
+
+        async function borrarFoto(id) {
+            const f = porIdFoto(id);
+            if (!f) return;
+            const lista = fotosDe(f.tipo);
+            const nota = lista.length === 1 ? '\n\nEs la única foto de esta habitación: en la página se verá «Fotografías en camino».'
+                : lista[0] === f ? '\n\nEs la foto principal: la siguiente pasa a ser la principal.' : '';
+            if (!confirm('¿Seguro que quieres borrar esta foto?' + nota)) return;
+            try {
+                if (CONECTADO) {
+                    const filas = await api('DELETE', 'fotos?id=eq.' + encodeURIComponent(id), null, { Prefer: 'return=representation' });
+                    if (!filas || !filas.length) throw new Error('No se pudo borrar la foto. Vuelve a cargar el panel.');
+                    if ((f.rutas || []).length) borrarArchivos(f.rutas).catch(() => {});
+                }
+                fotos = fotos.filter(x => x !== f);
+                cerrarModal();
+                renderFotos();
+                lucide.createIcons();
+                toast(CONECTADO ? 'Foto borrada.' : 'Modo de ejemplo: el cambio no se guarda.');
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        /* Mover antes (-1), después (1) o al primer lugar ('principal') */
+        async function moverFoto(id, a) {
+            const f = porIdFoto(id);
+            if (!f) return;
+            const lista = fotosDe(f.tipo);
+            const i = lista.indexOf(f);
+            const j = a === 'principal' ? 0 : i + a;
+            if (j < 0 || j >= lista.length || j === i) return;
+            lista.splice(i, 1);
+            lista.splice(j, 0, f);
+            const cambios = lista.map((x, n) => ({ x, orden: n + 1 })).filter(c => c.x.orden !== c.orden);
+            try {
+                if (CONECTADO) {
+                    const res = await Promise.all(cambios.map(c =>
+                        api('PATCH', 'fotos?id=eq.' + encodeURIComponent(c.x.id), { orden: c.orden }, { Prefer: 'return=representation' })));
+                    if (res.some(filas => !filas || !filas.length)) throw new Error('No se pudo guardar el orden. Vuelve a cargar el panel.');
+                }
+                cambios.forEach(c => { c.x.orden = c.orden; });
+                toast(!CONECTADO ? 'Modo de ejemplo: el cambio no se guarda.' : a === 'principal' ? 'Guardado: es la foto principal.' : 'Guardado: orden cambiado.');
+            } catch (e) {
+                toast(e.message);
+                await cargarDatosHotel().catch(() => {});
+            }
+            renderFotos();
+            abrirFoto(id);
+        }
+
+        document.getElementById('fotos-subir').addEventListener('change', e => {
+            const archivos = [...e.target.files];
+            e.target.value = '';
+            subirFotos(archivos);
+        });
+        document.getElementById('fotos-reemplazo').addEventListener('change', e => {
+            const archivo = e.target.files[0];
+            e.target.value = '';
+            if (archivo && fotoAReemplazar) reemplazarFoto(fotoAReemplazar, archivo);
+        });
 
         /* =========================================================
            Mensajes (solo modo de ejemplo: los mensajes reales llegan al WhatsApp del hotel)
@@ -2354,6 +3179,7 @@
             renderPreparar();
             renderReservas();
             renderCalendario();
+            renderBloqueos();
             if (!CONECTADO) renderMensajes();
             lucide.createIcons();
         }
@@ -4507,6 +5333,8 @@
 
         if (!CONECTADO) {
             reservas = reservasDeEjemplo();
+            bloqueos = bloqueosDeEjemplo();
+            fotos = fotosDeEjemplo();
             leerTarifasDelSitio().then(() => { if (document.getElementById('app').classList.contains('is-shown')) renderTodo(); });
         } else if (!revisarEnlaceDeRecuperacion()) {
             sesion = leerSesion();

@@ -1743,6 +1743,9 @@
         .cal-dia.es-inicio.es-hoy > span::after, .cal-dia.es-fin.es-hoy > span::after { background: var(--brass); }
         .cal-leyenda { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.45rem; margin-top: 0.4rem; font-size: 0.75rem; color: rgba(32, 41, 46, 0.7); }
         .cal-leyenda-festivo { width: 6px; height: 6px; border-radius: 9999px; background: var(--brass); }
+        /* Noches sin cupo (reservadas o bloqueadas por el hotel): número tachado */
+        .cal-dia.sin-cupo > span, .cal-leyenda-tachado { text-decoration: line-through; text-decoration-color: rgba(139, 47, 47, 0.75); }
+        .cal-dia.sin-cupo:not(.es-inicio):not(.es-fin) > span, .cal-leyenda-tachado { color: rgba(32, 41, 46, 0.45); }
         @media (max-width: 639px) { .cal-leyenda-extra { display: none; } }
 
         /* Contadores (huéspedes, mascotas, cantidades) */
@@ -4736,7 +4739,7 @@
                                 <div id="calendario" class="cal" aria-label="Calendario de la reserva"></div>
                             </div>
                             <div class="f-pie">
-                                <p class="cal-leyenda"><span class="cal-leyenda-festivo"></span> Festivo en Colombia<span class="cal-leyenda-extra"> <span class="cal-leyenda-sep">·</span> Desayuno, parqueadero, wifi e impuestos incluidos</span></p>
+                                <p class="cal-leyenda"><span class="cal-leyenda-festivo"></span> Festivo en Colombia<span id="cal-leyenda-sin" hidden> <span class="cal-leyenda-sep">·</span> <span class="cal-leyenda-tachado">12</span> <span data-sin-texto>Sin cupo</span></span><span class="cal-leyenda-extra"> <span class="cal-leyenda-sep">·</span> Desayuno, parqueadero, wifi e impuestos incluidos</span></p>
                                 <details class="vr-promo" id="vr-promo">
                                     <summary><i data-lucide="ticket-percent"></i> <span class="txt-largo">¿Tienes un código promocional?</span><span class="txt-corto">¿Código promocional?</span></summary>
                                     <div class="vr-promo-campo">
@@ -5975,9 +5978,12 @@
 
         /* ---------------------------------------------------------
            Tarifas por noche (COP · impuestos y desayuno incluidos)
-           Es el único lugar donde se cambian los precios: tarjetas,
-           ficha de cada habitación, valor estimado de la reserva y
-           asistente leen de aquí.
+           El precio de cada habitación se cambia en el panel del hotel
+           (admin.html › Precios): al cargar, la página lo pide al
+           servidor de reservas (GET /catalogo) y lo pone aquí, y el
+           cobro usa ese mismo valor. Estos números quedan de respaldo
+           por si el servidor no responde. Tarjetas, ficha de cada
+           habitación, valor estimado de la reserva y asistente leen de aquí.
              finde  → noches de viernes, sábado y víspera de festivo
              semana → noches de domingo a jueves
            Hoy cada habitación cobra lo mismo todos los días, así que finde
@@ -6729,6 +6735,7 @@
             if (calMes < primero) calMes = primero;
             if (calMes > sumarMeses(ultimo, 1 - visibles)) calMes = sumarMeses(ultimo, 1 - visibles);
             const tope = eligiendoSalida ? addDays(booking.checkin, MAX_NOCHES) : '';
+            const limite = eligiendoSalida ? salidaMaxima() : '';
             const rango = !eligiendoSalida && booking.checkin < booking.checkout;
             const semana = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'].map(d => '<span>' + d + '</span>').join('');
             let html = '';
@@ -6743,13 +6750,17 @@
                     const festivo = FESTIVOS.has(f);
                     const inicio = f === booking.checkin;
                     const fin = rango && f === booking.checkout;
+                    const sinCupo = f >= hoy && nocheSinCupo(f);
                     const clases = ['cal-dia',
-                        f === hoy ? 'es-hoy' : '', festivo ? 'es-festivo' : '',
+                        f === hoy ? 'es-hoy' : '', festivo ? 'es-festivo' : '', sinCupo ? 'sin-cupo' : '',
                         inicio ? 'es-inicio' : '', inicio && rango ? 'con-rango' : '', fin ? 'es-fin' : '',
                         rango && f > booking.checkin && f < booking.checkout ? 'en-rango' : ''].filter(Boolean).join(' ');
-                    const apagado = f < hoy || (eligiendoSalida && f > tope);
+                    /* Una noche sin ninguna habitación libre no sirve de llegada, y la estadía no puede pasar
+                       por ella (ese día sí se puede salir) */
+                    const apagado = f < hoy || (eligiendoSalida && f > tope) ||
+                        (eligiendoSalida && f > booking.checkin ? !!limite && f > limite : nocheLlena(f));
                     celdas += '<button type="button" class="' + clases + '" data-dia="' + f + '"' + (apagado ? ' disabled' : '') +
-                        ' aria-label="' + formatLong(f) + (festivo ? ', festivo' : '') + (inicio ? ', llegada' : fin ? ', salida' : '') + '"' +
+                        ' aria-label="' + formatLong(f) + (festivo ? ', festivo' : '') + (sinCupo ? ', sin cupo' : '') + (inicio ? ', llegada' : fin ? ', salida' : '') + '"' +
                         ' aria-pressed="' + (inicio || fin) + '"><span>' + dia + '</span></button>';
                 }
                 html += '<div class="cal-mes">' +
@@ -6764,6 +6775,54 @@
             }
             cal.innerHTML = html;
             cal.dataset.meses = visibles;
+            const leyenda = document.getElementById('cal-leyenda-sin');
+            leyenda.hidden = !cal.querySelector('.sin-cupo');
+            leyenda.querySelector('[data-sin-texto]').textContent = habitacionesElegidas().length ? 'Sin cupo para tu habitación' : 'Sin habitaciones libres';
+            consultarCalendario();
+        }
+
+        /* --- Noches sin cupo en el calendario ---
+           El servidor de reservas dice, noche por noche, cuántas habitaciones de cada tipo
+           quedan (reservas y noches bloqueadas en el panel). Se pide solo con la ventana de
+           reserva abierta, para los meses a la vista y el siguiente. */
+        const cuposCalendario = {};      // 'AAAA-MM-DD' → { suite: 2, cabana: 0, … }
+        const mesesCalendario = {};      // 'AAAA-MM' → cuándo se consultó
+        const MINUTOS_CALENDARIO = 2;
+
+        function consultarCalendario() {
+            if (!BOLD_ACTIVO || !ventanaAbierta || !calMes) return;
+            const ahora = Date.now();
+            const faltan = [0, 1, 2].map(i => sumarMeses(calMes, i))
+                .filter(m => !(ahora - (mesesCalendario[m] || 0) < MINUTOS_CALENDARIO * 60000));
+            if (!faltan.length) return;
+            faltan.forEach(m => { mesesCalendario[m] = ahora; });
+            fetch(urlServidorBold('/calendario?desde=' + faltan[0] + '-01&hasta=' + sumarMeses(faltan[faltan.length - 1], 1) + '-01'))
+                .then(r => (r.ok ? r.json() : null))
+                .then(j => {
+                    if (!j || !j.noches) return;
+                    Object.assign(cuposCalendario, j.noches);
+                    if (ventanaAbierta) renderCalendario();
+                })
+                .catch(() => { faltan.forEach(m => { delete mesesCalendario[m]; }); });
+        }
+
+        /* Noche sin ninguna habitación libre */
+        const nocheLlena = f => !!cuposCalendario[f] && Object.keys(habitaciones).every(k => !cuposCalendario[f][k]);
+
+        /* Noche sin cupo para las habitaciones de la reserva (o sin ninguna libre, si aún no elige) */
+        function nocheSinCupo(f) {
+            const libres = cuposCalendario[f];
+            if (!libres) return false;
+            const elegidas = habitacionesElegidas();
+            return elegidas.length ? elegidas.some(k => (libres[k] || 0) < booking.habitaciones[k]) : nocheLlena(f);
+        }
+
+        /* Mientras se elige la salida: la primera noche llena desde la llegada es el último día posible */
+        function salidaMaxima() {
+            for (let i = 0, f = booking.checkin; i <= MAX_NOCHES; i++, f = addDays(f, 1)) {
+                if (nocheLlena(f)) return f;
+            }
+            return '';
         }
 
         function elegirDiaCalendario(f) {
@@ -7611,6 +7670,7 @@
                 document.body.classList.add('no-scroll', 'vr-abierta');
                 cerrarCarrito();
                 consultarServidor();
+                consultarCalendario();
                 if (history.state !== 'reserva') history.pushState('reserva', '', '#reservar');
                 /* Para las estadísticas: la visita llegó a Reservar y su tiempo cuenta ahí */
                 registrarUnaVez('seccion', 'reservar');
@@ -8109,9 +8169,18 @@
                     fetch(urlServidorBold('/reserva'), {
                         method: 'POST',
                         keepalive: true,
-                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },   // envío simple: no espera respuesta
-                        body: JSON.stringify({ ...datosReserva(titular), orden })
-                    }).catch(() => {});
+                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },   // envío simple: WhatsApp no espera la respuesta
+                        body: JSON.stringify({ ...datosReserva(titular), orden, excluir: ordenEnCurso() })
+                    })
+                        .then(r => (r.status === 409 ? r.json() : null))
+                        .then(p => {
+                            /* Sin cupo en esas fechas (otra reserva o noches bloqueadas por el hotel): no quedó guardada */
+                            if (!p || !p.error) return;
+                            estadoFactura = null;
+                            if (p.libres) aplicarCupos(p.libres); else renderBooking();
+                            mensajeReserva(p.error, 'paso-habitaciones');
+                        })
+                        .catch(() => {});
                     estadoFactura = { clave: claveReserva(), numero: orden, sello: '', proceso: false };
                     renderFactura(est);
                 }
@@ -8576,8 +8645,45 @@
             }
         };
 
-        /* Las fotos foto-*.jpg tienen una versión liviana terminada en -sm.jpg */
-        const miniatura = src => (src.indexOf('foto-') === 0 ? src.replace(/\.jpg$/, '-sm.jpg') : src);
+        /* Las fotos foto-*.jpg tienen una versión liviana terminada en -sm.jpg; las que se
+           suben desde el panel traen la suya (MINIATURAS, de GET /catalogo) */
+        const MINIATURAS = {};
+        const miniatura = src => MINIATURAS[src] || (src.indexOf('foto-') === 0 ? src.replace(/\.jpg$/, '-sm.jpg') : src);
+
+        /* Precios escritos en el texto de la página: "desde", "hasta" y Pet Friendly */
+        function pintarTarifasTexto() {
+            document.querySelectorAll('[data-tarifa="mascota"]').forEach(el => { el.textContent = COP(TARIFA_MASCOTA); });
+            const valoresNoche = Object.values(TARIFAS).flatMap(t => [t.finde, t.semana]);
+            document.querySelectorAll('[data-tarifa="desde"]').forEach(el => { el.textContent = COP(Math.min(...valoresNoche)); });
+            document.querySelectorAll('[data-tarifa="hasta"]').forEach(el => { el.textContent = COP(Math.max(...valoresNoche)); });
+        }
+
+        /* Precio por noche y fotos de cada habitación como los deja el hotel en el panel
+           (servidor de reservas › GET /catalogo). Sin respuesta, quedan los de esta página. */
+        const urlFotoValida = u => typeof u === 'string' && /^(https:\/\/[^\s"'<>()\\]+|[\w-]+\.(jpe?g|png|webp))$/i.test(u);
+        function cargarCatalogo() {
+            if (!BOLD_ACTIVO) return;
+            fetch(urlServidorBold('/catalogo'))
+                .then(r => (r.ok ? r.json() : null))
+                .then(c => {
+                    if (!c || (!c.tarifas && !c.fotos)) return;
+                    if (c.tarifas) Object.keys(TARIFAS).forEach(k => {
+                        const precio = Number(c.tarifas[k]);
+                        if (Number.isInteger(precio) && precio > 0) { TARIFAS[k].finde = precio; TARIFAS[k].semana = precio; }
+                    });
+                    if (c.fotos) Object.keys(habitaciones).forEach(k => {
+                        const lista = (c.fotos[k] || []).filter(f => f && urlFotoValida(f.grande));
+                        habitaciones[k].fotos = lista.map(f => f.grande);
+                        lista.forEach(f => { if (urlFotoValida(f.mini)) MINIATURAS[f.grande] = f.mini; });
+                    });
+                    pintarTarifasTexto();
+                    if (document.querySelector('#rooms-grid .room-card')) renderHabitaciones();
+                    renderReservaHabitaciones();
+                    renderBooking();
+                    lucide.createIcons();
+                })
+                .catch(() => { /* sin conexión: quedan los precios y las fotos de esta página */ });
+        }
 
         /* Íconos Lucide por nombre; los que empiezan con # son del sprite propio (p. ej. #i-balcon) */
         const icono = (nombre, clases) => nombre.charAt(0) === '#'
@@ -9685,7 +9791,8 @@
         const TXT_NO_PUB = 'Ese dato todavía no está publicado en la web. El equipo del hotel te lo confirma al instante por WhatsApp, donde siempre responde una persona del hotel.';
         const ACC_WA = [{ t: 'Preguntar por WhatsApp', wa: true }];
 
-        /* Texto de tarifas para el asistente (sale de TARIFAS) */
+        /* Texto de tarifas para el asistente (sale de TARIFAS). Las respuestas con precio
+           son "get respuesta()": se arman al preguntar, con el precio vigente del panel */
         const tarifaTxt = key => tarifaUnica(key)
             ? '<strong>' + COP(TARIFAS[key].semana) + '</strong> la noche'
             : '<strong>' + COP(TARIFAS[key].semana) + '</strong> de domingo a jueves y <strong>' + COP(TARIFAS[key].finde) + '</strong> fin de semana y festivos';
@@ -9733,10 +9840,12 @@
             {
                 id: 'precios',
                 clave: ['precio', 'precios', 'tarifa', 'tarifas', 'cuanto cuesta', 'cuanto vale', 'cuanto sale', 'cuanto es', 'cuanto por noche', 'valor', 'cuesta', 'cobran', 'costo', 'costos', 'economico', 'barato', 'presupuesto', 'plata', 'cop'],
-                respuesta: 'Tarifas <strong>por noche</strong>, con impuestos y desayuno incluidos:<ul>' +
+                get respuesta() {
+                    return 'Tarifas <strong>por noche</strong>, con impuestos y desayuno incluidos:<ul>' +
                            Object.keys(habitaciones).map(k => '<li>' + habitaciones[k].nombre + ' — ' + tarifaTxt(k) + '</li>').join('') +
                            '</ul>' + (DOS_TARIFAS ? 'Las noches de viernes, sábado y víspera de festivo tienen tarifa de fin de semana. ' : '') +
-                           'En el formulario de reserva te calculamos el valor de tu estadía al instante.',
+                           'En el formulario de reserva te calculamos el valor de tu estadía al instante.';
+                },
                 acciones: [{ t: 'Ver habitaciones', h: '#habitaciones' }, { t: 'Calcular mi estadía', h: '#reservar' }],
                 rel: ['¿Qué incluye la tarifa?', '¿Tienen planes o promociones?', '¿Cómo se paga?']
             },
@@ -9800,45 +9909,53 @@
             {
                 id: 'suite',
                 clave: ['suite', 'la suite', 'suite cabaleon', 'precio suite', 'cuesta la suite', 'vale la suite', 'habitacion mas grande', 'la mas grande', 'la mas amplia', 'sala independiente', 'sofa cama', 'minibar'],
-                respuesta: '<strong>Suite Cabaleón</strong> — la estadía más amplia y privada:<ul>' +
+                get respuesta() {
+                    return '<strong>Suite Cabaleón</strong> — la estadía más amplia y privada:<ul>' +
                            '<li>40 m² · hasta 4 huéspedes</li>' +
                            '<li>Cama king y sala independiente con sofá cama</li>' +
                            '<li>Nevera minibar, cajilla de seguridad y clóset amplio</li>' +
                            '<li>' + tarifaTxt('suite') + '</li>' +
-                           '</ul>Ideal para parejas o huéspedes que desean una experiencia superior.',
+                           '</ul>Ideal para parejas o huéspedes que desean una experiencia superior.';
+                },
                 acciones: [{ t: 'Ver la suite', h: '#habitacion-suite' }, { t: 'Reservar', wa: true }]
             },
             {
                 id: 'cabana',
                 clave: ['cabana', 'la cabana', 'cabana cabaleon', 'cabanas', 'precio cabana', 'cuesta la cabana', 'privacidad', 'mas privada', 'entre arboles', 'cuentame de la cabana'],
-                respuesta: '<strong>Cabaña Cabaleón</strong> — íntima y reservada:<ul>' +
+                get respuesta() {
+                    return '<strong>Cabaña Cabaleón</strong> — íntima y reservada:<ul>' +
                            '<li>32 m² · hasta 2 huéspedes</li>' +
                            '<li>Cama king, rodeada de un entorno arbóreo</li>' +
                            '<li>Nevera minibar, cajilla de seguridad y clóset amplio</li>' +
                            '<li>' + tarifaTxt('cabana') + '</li>' +
-                           '</ul>Ideal para parejas o viajeros que buscan privacidad.',
+                           '</ul>Ideal para parejas o viajeros que buscan privacidad.';
+                },
                 acciones: [{ t: 'Ver la cabaña', h: '#habitacion-cabana' }, { t: 'Reservar', wa: true }]
             },
             {
                 id: 'triple',
                 clave: ['triple', 'la triple', 'estandar triple', 'habitacion estandar', 'estandar', 'precio triple', 'cuesta la triple', 'habitacion triple', 'para tres', 'para 3', 'somos tres', 'somos 3'],
-                respuesta: '<strong>Habitación Estándar Triple</strong>:<ul>' +
+                get respuesta() {
+                    return '<strong>Habitación Estándar Triple</strong>:<ul>' +
                            '<li>24 m² · hasta 3 huéspedes</li>' +
                            '<li>1 cama doble + 1 sencilla</li>' +
                            '<li>Balcón con vista natural, clóset amplio y cajilla de seguridad</li>' +
                            '<li>' + tarifaTxt('triple') + '</li>' +
-                           '</ul>Ideal para parejas, familias pequeñas o amigos.',
+                           '</ul>Ideal para parejas, familias pequeñas o amigos.';
+                },
                 acciones: [{ t: 'Ver la triple', h: '#habitacion-triple' }, { t: 'Reservar', wa: true }]
             },
             {
                 id: 'cuadruple',
                 clave: ['cuadruple', 'la cuadruple', 'familiar cuadruple', 'habitacion familiar', 'precio cuadruple', 'cuesta la cuadruple', 'para cuatro', 'para 4', 'somos cuatro', 'somos 4', 'habitacion cuadruple'],
-                respuesta: '<strong>Habitación Familiar Cuádruple</strong>:<ul>' +
+                get respuesta() {
+                    return '<strong>Habitación Familiar Cuádruple</strong>:<ul>' +
                            '<li>25 m² · hasta 4 huéspedes</li>' +
                            '<li>1 cama doble + 2 sencillas</li>' +
                            '<li>Balcón con vista natural, clóset amplio y cajilla de seguridad</li>' +
                            '<li>' + tarifaTxt('cuadruple') + '</li>' +
-                           '</ul>Pensada para compartir en familia sin renunciar al confort.',
+                           '</ul>Pensada para compartir en familia sin renunciar al confort.';
+                },
                 acciones: [{ t: 'Ver la cuádruple', h: '#habitacion-cuadruple' }, { t: 'Reservar', wa: true }]
             },
             {
@@ -10670,10 +10787,7 @@
             renderGaleria();
             prepararCarruseles();
             prepararBotonesTiras();
-            document.querySelectorAll('[data-tarifa="mascota"]').forEach(el => { el.textContent = COP(TARIFA_MASCOTA); });
-            const valoresNoche = Object.values(TARIFAS).flatMap(t => [t.finde, t.semana]);
-            document.querySelectorAll('[data-tarifa="desde"]').forEach(el => { el.textContent = COP(Math.min(...valoresNoche)); });
-            document.querySelectorAll('[data-tarifa="hasta"]').forEach(el => { el.textContent = COP(Math.max(...valoresNoche)); });
+            pintarTarifasTexto();
 
             lucide.createIcons();
 
@@ -10725,6 +10839,7 @@
             iniciarMedicion();
             prepararReserva();
             revisarRetornoBold();
+            cargarCatalogo();
 
             /* --- Navegación: fondo sólido al bajar --- */
             const nav = document.getElementById('nav');
