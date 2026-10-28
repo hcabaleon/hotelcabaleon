@@ -167,6 +167,49 @@
         .cal-day.is-past { opacity: .45; }
         .cal-day.is-elegido { box-shadow: inset 0 0 0 2px var(--brass); }
 
+        /* Calendario de precios (Precios) */
+        .pc-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+        .pc-dow { text-align: center; font-size: 0.55rem; font-weight: 600; letter-spacing: 0.14em; color: rgba(10,33,46,.4); padding-bottom: 4px; }
+        .pc-dia {
+            position: relative; min-height: 3.6rem; padding: 0.3rem 0.15rem 0.25rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1px;
+            border: 1px solid var(--line); background: #fff; color: var(--ink); font-family: inherit;
+            cursor: pointer; overflow: hidden; transition: border-color .2s, box-shadow .2s, background-color .2s;
+        }
+        .pc-dia:hover:not(:disabled) { border-color: var(--ink); }
+        .pc-dia:focus-visible { outline: 2px solid var(--brass); outline-offset: 1px; }
+        .pc-num { font-size: 0.68rem; font-weight: 500; color: rgba(10,33,46,.6); line-height: 1.2; }
+        .pc-precio { font-size: 0.74rem; font-weight: 600; color: var(--ink); line-height: 1.2; letter-spacing: -0.01em; }
+        .pc-tag { max-width: 100%; font-size: 0.5rem; font-weight: 600; letter-spacing: 0.02em; line-height: 1.2; color: rgba(10,33,46,.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px; }
+        .pc-finde { background: rgba(201,160,99,.13); }
+        .pc-puente { background: rgba(78,107,79,.15); }
+        .pc-puente .pc-tag { color: #3d5a3e; }
+        .pc-especial { background: color-mix(in srgb, var(--pc-color) 14%, #fff); }
+        .pc-especial::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--pc-color); }
+        .pc-especial .pc-tag { color: var(--pc-color); }
+        .pc-dia.is-festivo .pc-num, .pc-num-festivo { color: #a0522d; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+        .pc-dia.is-hoy { border-color: var(--brass); }
+        .pc-dia.is-past { opacity: .38; cursor: default; }
+        .pc-dia.is-sel { box-shadow: inset 0 0 0 2px var(--ink); border-color: var(--ink); }
+        .pc-dia.is-sel::after { content: ""; position: absolute; inset: 0; background: rgba(10,33,46,.07); pointer-events: none; }
+        .pc-muestra { display: inline-block; position: relative; width: 14px; height: 14px; border: 1px solid var(--line); background: #fff; overflow: hidden; }
+        .pc-muestra.pc-especial::before { height: 3px; }
+        .pc-fila { border: 1px solid var(--line); padding: 0.85rem; }
+        .pc-fila.is-off { background: var(--bone); }
+        .pc-fila.is-off .pc-precios { opacity: .35; pointer-events: none; }
+        .pc-mini { display: block; font-size: 0.52rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(10,33,46,.45); margin-bottom: 0.3rem; }
+        .pc-input { width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 2px; padding: 0.55rem 0.6rem; font-size: 0.85rem; color: var(--ink); }
+        .pc-input:focus { outline: none; border-color: var(--brass); }
+        .pc-input.is-error { border-color: #8a3d3d; }
+        .pc-tabla-base td { vertical-align: middle; }
+        .pc-tabla-base .pc-input { min-width: 8.5rem; }
+        @media (max-width: 639px) {
+            .pc-dia { min-height: 3.2rem; }
+            .pc-precio { font-size: 0.66rem; }
+            .pc-tag { display: none; }
+            .pc-especial .pc-tag, .pc-puente .pc-tag { display: block; font-size: 0.45rem; }
+        }
+
         #app { display: none; }
         #app.is-shown { display: block; }
         @media (min-width: 1024px) {
@@ -1173,9 +1216,128 @@
                     <p data-aviso-hotel class="hidden mb-5 p-4 bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] text-[0.8rem] text-[#8a6a34]" role="status"></p>
                     <div class="card p-4 sm:p-5 mb-5 flex gap-3 text-[0.8rem] text-graphite/70 leading-relaxed">
                         <i data-lucide="info" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
-                        <p>Un precio por noche para cada tipo de habitación, con impuestos y desayuno incluidos. Al guardar, la página y el cobro usan el precio nuevo para las <strong class="font-medium text-ink">reservas nuevas</strong>. Las reservas que ya existen conservan el precio con el que se hicieron.</p>
+                        <p>Precios por noche con impuestos y desayuno incluidos. Cada noche cobra, en este orden: su <strong class="font-medium text-ink">precio especial</strong> del calendario (temporada alta, Navidad…), el de <strong class="font-medium text-ink">puente</strong>, el de <strong class="font-medium text-ink">fin de semana</strong> o el de <strong class="font-medium text-ink">entre semana</strong>. Los cambios valen para las reservas nuevas; las que ya existen conservan su precio.</p>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="precios-body"></div>
+
+                    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-6 items-start">
+                        <!-- Calendario de precios -->
+                        <div class="card min-w-0">
+                            <div class="p-5 sm:p-6 border-b border-line">
+                                <div class="flex flex-wrap items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <h3 class="font-display text-2xl text-ink">Calendario de precios</h3>
+                                        <p class="text-[0.75rem] text-graphite/55 mt-1 max-w-xl">Toca un día para cambiar su precio. Para varios días, toca el primero y después el último, o arrastra sobre ellos.</p>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 shrink-0">
+                                        <button type="button" class="btn btn-outline btn-sm !px-3" id="pc-anterior" aria-label="Mes anterior"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                        <button type="button" class="btn btn-outline btn-sm" id="pc-hoy">Hoy</button>
+                                        <button type="button" class="btn btn-outline btn-sm !px-3" id="pc-siguiente" aria-label="Mes siguiente"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                    </div>
+                                </div>
+                                <span class="field-label mt-5">Ver precios de</span>
+                                <div class="flex flex-wrap gap-2" id="pc-tipos" role="group" aria-label="Habitación"></div>
+                            </div>
+                            <div class="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-8 select-none" id="pc-meses"></div>
+                            <div class="px-5 sm:px-6 pb-5 flex flex-wrap gap-x-5 gap-y-2 text-[0.68rem] text-graphite/60" id="pc-leyenda">
+                                <span class="flex items-center gap-1.5"><span class="pc-muestra"></span> Entre semana</span>
+                                <span class="flex items-center gap-1.5"><span class="pc-muestra pc-finde"></span> Fin de semana</span>
+                                <span class="flex items-center gap-1.5"><span class="pc-muestra pc-puente"></span> Puente</span>
+                                <span class="flex items-center gap-1.5"><span class="pc-muestra pc-especial" style="--pc-color:#B5654A"></span> Precio especial</span>
+                                <span class="flex items-center gap-1.5"><span class="pc-num-festivo">8</span> Festivo</span>
+                            </div>
+                            <!-- En pantallas angostas el editor queda abajo: esta barra lleva a él -->
+                            <div id="pc-barra" class="hidden xl:!hidden sticky bottom-0 border-t border-line bg-white px-5 py-3 flex items-center justify-between gap-3">
+                                <span class="text-[0.78rem] text-ink min-w-0 truncate" id="pc-barra-texto"></span>
+                                <a href="#pc-editor" class="btn btn-ink btn-sm shrink-0">Cambiar precio</a>
+                            </div>
+                        </div>
+
+                        <!-- Editor de las noches elegidas -->
+                        <form id="pc-editor" class="card p-5 sm:p-6 xl:sticky xl:top-6 scroll-mt-6" novalidate>
+                            <div id="pc-vacio">
+                                <h3 class="font-display text-2xl text-ink mb-2">Cambiar precios</h3>
+                                <p class="text-[0.8rem] text-graphite/65 leading-relaxed">Elige en el calendario las noches que quieres cambiar: un día, una semana o toda una temporada.</p>
+                                <ul class="mt-5 space-y-3 text-[0.78rem] text-graphite/70">
+                                    <li class="flex gap-2.5"><i data-lucide="mouse-pointer-click" class="w-4 h-4 text-brass shrink-0"></i><span>Toca un día para elegirlo. Toca otro y quedan elegidos todos los del medio.</span></li>
+                                    <li class="flex gap-2.5"><i data-lucide="calendar-range" class="w-4 h-4 text-brass shrink-0"></i><span>Para Navidad y fin de año pasa al mes siguiente con la flecha y toca el último día.</span></li>
+                                    <li class="flex gap-2.5"><i data-lucide="tag" class="w-4 h-4 text-brass shrink-0"></i><span>Ponle un nombre (Temporada alta, Navidad…): lo verás en el calendario y tus huéspedes en su factura.</span></li>
+                                </ul>
+                            </div>
+                            <div id="pc-con-seleccion" class="hidden">
+                                <div class="flex items-start justify-between gap-3">
+                                    <h3 class="font-display text-2xl text-ink">Cambiar precio</h3>
+                                    <button type="button" id="pc-cancelar" class="text-[0.72rem] text-graphite/55 border-b border-line hover:text-ink mt-2 shrink-0">Cancelar</button>
+                                </div>
+                                <p class="text-[0.8rem] text-ink mt-1" id="pc-rango-texto"></p>
+
+                                <div class="grid grid-cols-2 gap-3 mt-4">
+                                    <div><label class="field-label !tracking-[0.12em]" for="pc-desde">Desde la noche del</label><input id="pc-desde" type="date" class="field-input !py-2.5"></div>
+                                    <div><label class="field-label !tracking-[0.12em]" for="pc-hasta">Hasta la noche del</label><input id="pc-hasta" type="date" class="field-input !py-2.5"></div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mt-2.5" id="pc-ampliar">
+                                    <button type="button" class="chip" data-ampliar="1">+1 noche</button>
+                                    <button type="button" class="chip" data-ampliar="7">+1 semana</button>
+                                    <button type="button" class="chip" data-ampliar="mes">Hasta fin de mes</button>
+                                    <button type="button" class="chip" data-ampliar="dia">Solo el primer día</button>
+                                </div>
+                                <p class="text-[0.72rem] text-graphite/55 mt-3" id="pc-clases"></p>
+
+                                <label class="field-label mt-6" for="pc-etiqueta">Nombre <span class="normal-case tracking-normal font-normal text-graphite/40">(opcional)</span></label>
+                                <input id="pc-etiqueta" class="field-input !py-2.5" maxlength="40" autocomplete="off" placeholder="Ej.: Temporada alta">
+                                <div class="flex flex-wrap gap-2 mt-2" id="pc-etiquetas">
+                                    <button type="button" class="chip" data-etiqueta="Temporada alta">Temporada alta</button>
+                                    <button type="button" class="chip" data-etiqueta="Temporada baja">Temporada baja</button>
+                                    <button type="button" class="chip" data-etiqueta="Navidad">Navidad</button>
+                                    <button type="button" class="chip" data-etiqueta="Fin de año">Fin de año</button>
+                                    <button type="button" class="chip" data-etiqueta="Semana Santa">Semana Santa</button>
+                                    <button type="button" class="chip" data-etiqueta="Puente festivo">Puente festivo</button>
+                                </div>
+
+                                <span class="field-label mt-6">Precio por noche (COP)</span>
+                                <p class="text-[0.7rem] text-graphite/50 -mt-1 mb-3">Vacío: esas noches quedan como están.</p>
+                                <div id="pc-filas" class="space-y-4"></div>
+                                <label id="pc-respetar-caja" class="hidden flex items-start gap-2.5 mt-4 p-3 bg-bone border border-line text-[0.76rem] text-graphite/75 cursor-pointer">
+                                    <input type="checkbox" id="pc-respetar" class="w-4 h-4 mt-0.5 shrink-0 accent-[#0A212E]" checked>
+                                    <span id="pc-respetar-texto"></span>
+                                </label>
+
+                                <p id="pc-error" class="hidden text-[0.78rem] text-[#8a3d3d] mt-4" role="alert"></p>
+                                <button type="submit" id="pc-guardar" class="btn btn-ink w-full mt-5"><i data-lucide="save" class="w-4 h-4"></i> Guardar precios</button>
+                                <button type="button" id="pc-quitar" class="btn btn-outline w-full mt-2"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Volver al precio normal</button>
+                                <p class="text-[0.7rem] text-graphite/45 mt-2 text-center">«Volver al precio normal» quita el precio especial de las habitaciones marcadas.</p>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Precio normal: entre semana, fin de semana y puente -->
+                    <form id="pc-base" class="card mt-6" novalidate>
+                        <div class="p-5 sm:p-6 border-b border-line">
+                            <h3 class="font-display text-2xl text-ink">Precio normal</h3>
+                            <p class="text-[0.75rem] text-graphite/55 mt-1 max-w-3xl">El que se cobra cuando la noche no tiene precio especial. <strong class="font-medium text-graphite/75">Entre semana:</strong> noches de domingo a jueves. <strong class="font-medium text-graphite/75">Fin de semana:</strong> viernes, sábado y víspera de festivo. <strong class="font-medium text-graphite/75">Puente:</strong> las noches de un fin de semana largo con festivo (por ejemplo viernes, sábado y domingo antes de un lunes festivo). Si dejas vacío fin de semana, se cobra como entre semana; si dejas vacío puente, como fin de semana.</p>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="data-table pc-tabla-base">
+                                <thead><tr><th>Habitación</th><th>Entre semana</th><th>Fin de semana</th><th>Puente</th></tr></thead>
+                                <tbody id="pc-base-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-5 sm:p-6 border-t border-line flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <p class="text-[0.72rem] text-graphite/55" id="pc-puentes"></p>
+                            <div class="flex flex-col items-stretch sm:items-end gap-2 shrink-0">
+                                <p id="pc-base-error" class="hidden text-[0.78rem] text-[#8a3d3d]" role="alert"></p>
+                                <button type="submit" id="pc-base-guardar" class="btn btn-ink"><i data-lucide="save" class="w-4 h-4"></i> Guardar precio normal</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Fechas con precio especial -->
+                    <div class="card mt-6">
+                        <div class="p-5 sm:p-6 border-b border-line">
+                            <h3 class="font-display text-2xl text-ink">Fechas con precio especial</h3>
+                            <p class="text-[0.75rem] text-graphite/55 mt-1">De hoy en adelante. «Editar» las marca en el calendario para cambiarlas.</p>
+                        </div>
+                        <ul id="pc-especiales" class="divide-y divide-line"></ul>
+                    </div>
                 </section>
 
                 <!-- ---------- BLOQUEAR FECHAS ---------- -->
@@ -1325,9 +1487,9 @@
         };
         const CONECTADO = !!(CONEXION.supabase.trim() && CONEXION.llavePublica.trim());
 
-        /* Habitaciones. Unidades y festivos se leen de index.html (UNIDADES y FESTIVOS) y el
-           precio por noche, de la tabla tarifas (Precios, en este panel); estos valores son
-           solo de respaldo. */
+        /* Habitaciones. Unidades y festivos se leen de index.html (UNIDADES y FESTIVOS) y los
+           precios, de las tablas tarifas y precios_noche (Precios, en este panel); estos valores
+           son solo de respaldo. TARIFAS[k]: { semana, finde, puente } (puente null: como finde). */
         const NOMBRES = { suite: 'Suite Cabaleón', cabana: 'Cabaña Cabaleón', cuadruple: 'Habitación Familiar Cuádruple', triple: 'Habitación Estándar Triple' };
         const CORTOS = { suite: 'Suite', cabana: 'Cabaña', cuadruple: 'Familiar Cuádruple', triple: 'Estándar Triple' };
         const CAPACIDAD = { suite: 4, cabana: 2, cuadruple: 4, triple: 3 };
@@ -1337,8 +1499,9 @@
             cuadruple: { finde: 260000, semana: 260000 },
             triple:    { finde: 250000, semana: 250000 }
         };
-        let UNIDADES = { suite: 2, cabana: 1, cuadruple: 6, triple: 7 };
+        let UNIDADES = { suite: 3, cabana: 1, cuadruple: 2, triple: 10 };
         let FESTIVOS = new Set();
+        let preciosNoche = {};          // tipo → { 'AAAA-MM-DD': { precio, etiqueta } } (calendario de precios)
 
         const ESTADOS = {
             pendiente:  { txt: 'Pendiente',      pill: 'pill-amber', icono: 'calendar-plus', accion: 'Nueva reserva de ' },
@@ -1413,8 +1576,9 @@
         /* Fechas bloqueadas, precios y fotos de las habitaciones (Bloquear fechas, Precios y Fotos) */
         let bloqueos = [];
         let fotos = [];
-        let tarifasPanel = {};          // tipo → fila de la tabla tarifas (precio y cuándo se cambió)
+        let tarifasPanel = {};          // tipo → fila de la tabla tarifas (precios y cuándo se cambiaron)
         let faltaBaseHotel = false;     // la base aún no tiene las tablas tarifas, bloqueos y fotos
+        let faltaBasePrecios = false;   // …o aún no tiene la tabla precios_noche y las columnas de fin de semana y puente
 
         function reservasDeEjemplo() {
             const hoy = hoyISO();
@@ -1574,13 +1738,40 @@
                 .map(k => (CORTOS[k] || k) + ' (' + quedan(libres[k] || 0) + ')');
         }
 
-        /* Mismo cálculo de la página: viernes, sábado y víspera de festivo con tarifa de fin de semana */
+        /* Precio de cada noche: mismo cálculo que precioNoche() en index.html y en el servidor.
+           "noche" es la fecha en que se llega a dormir. Manda el precio especial del calendario;
+           si no hay, el de puente (el día siguiente es parte de 3 o más días seguidos de descanso
+           con al menos un festivo), el de fin de semana (viernes, sábado y víspera de festivo) o
+           el de entre semana. */
+        const esDescanso = dia => { const d = fechaD(dia).getDay(); return d === 0 || d === 6 || FESTIVOS.has(dia); };
+
+        function claseNoche(noche) {
+            const manana = sumarDias(noche, 1);
+            if (esDescanso(manana)) {
+                let primero = manana, ultimo = manana, conFestivo = FESTIVOS.has(manana);
+                for (let i = 0; i < 10 && esDescanso(sumarDias(primero, -1)); i++) { primero = sumarDias(primero, -1); conFestivo = conFestivo || FESTIVOS.has(primero); }
+                for (let i = 0; i < 10 && esDescanso(sumarDias(ultimo, 1)); i++) { ultimo = sumarDias(ultimo, 1); conFestivo = conFestivo || FESTIVOS.has(ultimo); }
+                if (conFestivo && nochesEntre(primero, ultimo) >= 2) return 'puente';
+            }
+            const dia = fechaD(noche).getDay();
+            return dia === 5 || dia === 6 || FESTIVOS.has(manana) ? 'finde' : 'semana';
+        }
+
+        function precioBase(k, noche) {
+            const p = TARIFAS[k];
+            if (!p) return 0;
+            const clase = claseNoche(noche);
+            if (clase === 'puente' && p.puente) return p.puente;
+            return clase === 'semana' ? p.semana : p.finde;
+        }
+
+        const especialDe = (k, noche) => (preciosNoche[k] && preciosNoche[k][noche]) || null;
+        const precioNoche = (k, noche) => { const e = especialDe(k, noche); return e ? e.precio : precioBase(k, noche); };
+
         function estimarTotal(llegada, salida, habs) {
             let total = 0;
             for (let noche = llegada; noche < salida; noche = sumarDias(noche, 1)) {
-                const dia = fechaD(noche).getDay();
-                const finde = dia === 5 || dia === 6 || FESTIVOS.has(sumarDias(noche, 1));
-                Object.keys(habs).forEach(k => { if (TARIFAS[k]) total += habs[k] * (finde ? TARIFAS[k].finde : TARIFAS[k].semana); });
+                Object.keys(habs).forEach(k => { if (TARIFAS[k]) total += habs[k] * precioNoche(k, noche); });
             }
             return total;
         }
@@ -2445,7 +2636,7 @@
            panel_acceso. La página los recibe del servidor de reservas
            (GET /catalogo, el cupo y el calendario).
            ========================================================= */
-        const VERSION_SERVIDOR_HOTEL = '2026-10-20';   // servidor-pagos-bold.js que ya usa precios, fotos y bloqueos
+        const VERSION_SERVIDOR_HOTEL = '2026-10-28';   // servidor-pagos-bold.js que ya usa precios por fecha, fotos y bloqueos
         const BUCKET_FOTOS = 'habitaciones';
         const MAX_FOTOS = 12;              // por habitación
         const MAX_MB_FOTO = 15;            // antes de achicarla
@@ -2459,6 +2650,7 @@
             triple: ['triple-familia', 'triple-descanso', 'triple-balcon']
         };
         let servidorHotel = null;          // null: sin revisar · true: listo · false: falta publicar el servidor nuevo
+        let versionServidor = '';          // la que tiene publicada Cloudflare
         const esFaltaDeTabla = e => /schema cache|does not exist|could not find the table/i.test((e && e.message) || '');
         const textoFaltaBase = 'Falta un paso: en Supabase abre SQL Editor, pega el archivo supabase-reservas.sql y toca Run. No borra datos.';
 
@@ -2484,25 +2676,54 @@
             }
         }
 
-        /* Precio por noche (también para "Nueva" reserva) y fotos guardados en el panel */
+        /* Precios (también para "Nueva" reserva) y fotos guardados en el panel */
         async function cargarDatosHotel() {
             if (!CONECTADO) return;
             try {
                 const [filasTarifas, filasFotos] = await Promise.all([
                     api('GET', 'tarifas?select=*'),
-                    api('GET', 'fotos?select=*&order=orden.asc,creada.asc')
+                    api('GET', 'fotos?select=*&order=orden.asc,creada.asc'),
+                    cargarPreciosNoche()
                 ]);
                 tarifasPanel = {};
                 (filasTarifas || []).forEach(f => {
                     tarifasPanel[f.tipo] = f;
-                    if (TARIFAS[f.tipo] && f.precio > 0) TARIFAS[f.tipo] = { finde: f.precio, semana: f.precio };
+                    if (TARIFAS[f.tipo] && f.precio > 0) TARIFAS[f.tipo] = tarifaDeFila(f);
                 });
+                /* La base aún no tiene las columnas de fin de semana y puente */
+                if ((filasTarifas || []).length && !('precio_finde' in filasTarifas[0])) faltaBasePrecios = true;
                 fotos = filasFotos || [];
                 faltaBaseHotel = false;
             } catch (e) {
                 if (!esFaltaDeTabla(e)) throw e;
                 faltaBaseHotel = true;
             }
+        }
+
+        const tarifaDeFila = f => ({
+            semana: f.precio,
+            finde: f.precio_finde > 0 ? f.precio_finde : f.precio,
+            puente: f.precio_puente > 0 ? f.precio_puente : null
+        });
+
+        /* Noches con precio especial desde hace un mes (en páginas de 1000 filas) */
+        async function cargarPreciosNoche() {
+            const filas = [];
+            try {
+                for (let desde = 0; desde < 20000; desde += 1000) {
+                    const pagina = await api('GET', 'precios_noche?select=tipo,noche,precio,etiqueta&noche=gte.' + sumarDias(hoyISO(), -31) +
+                        '&order=noche.asc,tipo.asc&limit=1000&offset=' + desde) || [];
+                    filas.push(...pagina);
+                    if (pagina.length < 1000) break;
+                }
+            } catch (e) {
+                if (!esFaltaDeTabla(e)) throw e;
+                faltaBasePrecios = true;
+                return;
+            }
+            faltaBasePrecios = false;
+            preciosNoche = {};
+            filas.forEach(f => { (preciosNoche[f.tipo] = preciosNoche[f.tipo] || {})[f.noche] = { precio: f.precio, etiqueta: f.etiqueta || '' }; });
         }
 
         /* Al abrir Precios, Bloquear fechas o Fotos: se pinta lo que hay y se trae lo último de la base */
@@ -2529,58 +2750,556 @@
         }
 
         function pintarAvisosHotel() {
-            const texto = faltaBaseHotel ? textoFaltaBase
-                : servidorHotel === false ? 'Falta publicar el servidor nuevo en Cloudflare (servidor-pagos-bold.js). Lo que guardes aquí queda listo, pero hasta entonces la página sigue con los precios y las fotos de antes y no respeta las fechas bloqueadas.'
-                : !CONECTADO ? 'Modo de ejemplo: los cambios se ven en esta pantalla, pero no se guardan.' : '';
+            /* Servidor anterior al 20 de octubre: no usa nada del panel; del 20 al 28: no usa los precios por fecha */
+            const servidorViejo = versionServidor && versionServidor < '2026-10-20';
             document.querySelectorAll('[data-aviso-hotel]').forEach(el => {
+                const enPrecios = !!el.closest('[data-view="precios"]');
+                const texto = faltaBaseHotel || (enPrecios && faltaBasePrecios) ? textoFaltaBase
+                    : servidorHotel === false && (servidorViejo || enPrecios)
+                        ? 'Falta publicar el servidor nuevo en Cloudflare (servidor-pagos-bold.js). Lo que guardes aquí queda listo, pero hasta entonces ' +
+                          (servidorViejo ? 'la página sigue con los precios y las fotos de antes y no respeta las fechas bloqueadas.'
+                              : 'la página y el cobro usan un solo precio por noche: no aplican fin de semana, puentes ni precios especiales.')
+                    : !CONECTADO ? 'Modo de ejemplo: los cambios se ven en esta pantalla, pero no se guardan.' : '';
                 el.textContent = texto;
                 el.classList.toggle('hidden', !texto);
             });
         }
 
-        /* ¿El servidor de Cloudflare ya respeta precios, fotos y bloqueos? (consulta una sola vez) */
+        /* ¿El servidor de Cloudflare ya usa los precios por fecha, las fotos y los bloqueos? (consulta una sola vez) */
         async function revisarServidorHotel() {
             if (servidorHotel !== null || !CONECTADO || !CONEXION.servidor.trim()) return;
             try {
                 const j = await (await fetch(CONEXION.servidor.trim().replace(/\/+$/, '') + '/', { cache: 'no-store' })).json();
-                servidorHotel = String(j.version || '') >= VERSION_SERVIDOR_HOTEL;
+                versionServidor = String(j.version || '');
+                servidorHotel = versionServidor >= VERSION_SERVIDOR_HOTEL;
             } catch (e) { servidorHotel = undefined; /* no se pudo revisar: no se avisa */ }
             pintarAvisosHotel();
         }
 
-        /* --- Precios --- */
+        /* --- Precios ---
+           Calendario de precios: cada día muestra lo que cuesta esa noche en la habitación que
+           se está viendo. Se elige un día o varios (tocar el primero y el último, arrastrar o
+           Mayús + clic) y en el editor se pone el precio de cada habitación para las noches entre
+           semana, de fin de semana y de puente que hay en lo elegido. Cada noche queda en la
+           tabla precios_noche (tipo, noche, precio, etiqueta): lo último que se guarda manda.
+           "Volver al precio normal" borra esas filas. El precio normal (entre semana, fin de
+           semana y puente) está en la tabla tarifas. */
         const fotosDe = k => fotos.filter(f => f.tipo === k)
             .sort((a, b) => (a.orden - b.orden) || String(a.creada).localeCompare(String(b.creada)));
 
-        function notaPrecio(k) {
-            const fila = tarifasPanel[k];
-            return 'Precio actual: ' + COP(TARIFAS[k] ? TARIFAS[k].semana : 0) + ' por noche' +
-                (fila && fila.actualizada ? ' · cambiado ' + haceCuanto(fila.actualizada) : '');
+        const CLASES = { semana: 'Entre semana', finde: 'Fin de semana', puente: 'Puente' };
+        const CLASES_TEXTO = { semana: 'entre semana', finde: 'de fin de semana', puente: 'de puente' };
+        const MAX_NOCHES_PRECIO = 400;
+        const precioCorto = n => (n % 1000 ? (n / 1000).toFixed(1).replace('.', ',') : String(n / 1000)) + 'k';
+        const nombreEtiqueta = e => e || 'Precio especial';
+        const limpiarEtiqueta = s => String(s || '').replace(/[<>"'`\\]/g, '').replace(/\s+/g, ' ').trim().slice(0, 40);
+        const mesSiguiente = (ym, n) => iso(new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1 + n, 1)).slice(0, 7);
+        const finDeMes = s => iso(new Date(+s.slice(0, 4), +s.slice(5, 7), 0));
+        const rango = (a, b) => (a <= b ? { desde: a, hasta: b } : { desde: b, hasta: a });
+
+        /* Color de cada nombre en el calendario: los de siempre, fijos; los demás, según el nombre */
+        const COLORES_ETIQUETA = { 'temporada alta': '#B5654A', 'temporada baja': '#3F7F74', 'navidad': '#2F6B45', 'fin de ano': '#A8834A', 'semana santa': '#7A5A9E', 'puente festivo': '#4E6B8A' };
+        const PALETA_ETIQUETAS = ['#B5654A', '#4E6B8A', '#7A5A9E', '#A8834A', '#3F7F74', '#9A4E6E'];
+        function colorEtiqueta(e) {
+            const n = normalizar(e).trim();
+            if (COLORES_ETIQUETA[n]) return COLORES_ETIQUETA[n];
+            let h = 0;
+            for (const c of n) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+            return PALETA_ETIQUETAS[h % PALETA_ETIQUETAS.length];
         }
 
+        let pcTipo = 'suite';                    // habitación que muestra el calendario
+        let pcMes = hoyISO().slice(0, 7);        // primer mes a la vista ('AAAA-MM')
+        let pcSel = null;                        // { desde, hasta }: noches elegidas, las dos incluidas
+        let pcAncla = null;                      // primer día tocado (para Mayús + clic)
+        let pcArrastre = null;                   // { inicio, movido } mientras se arrastra con el mouse
+        let pcIgnorarClic = false;
+        let pcEscrito = {};                      // lo escrito en el editor: 'tipo|clase' → precio, etiqueta, off (habitaciones sin marcar)
+        let pcGrupos = [];                       // fechas con precio especial, como se ven en la lista
+
         function renderPrecios() {
-            document.getElementById('precios-body').innerHTML = Object.keys(UNIDADES).map(k => {
-                const foto = fotosDe(k)[0];
-                const precio = TARIFAS[k] ? TARIFAS[k].semana : 0;
-                return `<form class="card p-5 sm:p-6" data-precio="${k}" novalidate>
-                    <div class="flex items-center gap-4">
-                        ${foto ? `<img src="${esc(foto.mini)}" alt="" class="w-16 h-16 object-cover shrink-0 bg-bone">`
-                            : '<span class="w-16 h-16 bg-bone flex items-center justify-center shrink-0"><i data-lucide="bed-double" class="w-5 h-5 text-graphite/30"></i></span>'}
-                        <div class="min-w-0">
-                            <h3 class="font-display text-xl text-ink leading-tight">${esc(NOMBRES[k] || k)}</h3>
-                            <span class="block text-[0.7rem] text-graphite/45 mt-1">${plural(UNIDADES[k], 'habitación', 'habitaciones')} · hasta ${CAPACIDAD[k] || '—'} huéspedes</span>
-                        </div>
-                    </div>
-                    <label class="field-label mt-5" for="precio-${k}">Precio por noche (COP)</label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-graphite/45 text-lg">$</span>
-                        <input id="precio-${k}" class="field-input pl-8 text-lg" inputmode="numeric" autocomplete="off" maxlength="15" value="${precio ? precio.toLocaleString('es-CO') : ''}">
-                    </div>
-                    <p class="text-[0.72rem] text-graphite/50 mt-2" data-precio-nota>${esc(notaPrecio(k))}</p>
-                    <p class="hidden text-[0.76rem] text-[#8a3d3d] mt-2" role="alert" data-precio-error></p>
-                    <button type="submit" class="btn btn-ink btn-sm mt-4 w-full sm:w-auto"><i data-lucide="save" class="w-3.5 h-3.5"></i> Guardar precio</button>
-                </form>`;
+            if (!TARIFAS[pcTipo]) pcTipo = Object.keys(UNIDADES).find(k => TARIFAS[k]) || pcTipo;
+            pintarTiposPrecios();
+            renderCalendarioPrecios();
+            renderEditorPrecios();
+            renderPrecioBase();
+            renderEspeciales();
+        }
+
+        function pintarTiposPrecios() {
+            document.getElementById('pc-tipos').innerHTML = Object.keys(UNIDADES).filter(k => TARIFAS[k]).map(k =>
+                `<button type="button" class="chip${k === pcTipo ? ' is-active' : ''}" data-pc-ver="${k}" aria-pressed="${k === pcTipo}">${esc(CORTOS[k] || k)}</button>`).join('');
+        }
+
+        /* --- Calendario: dos meses (uno en el celular) --- */
+        function renderCalendarioPrecios() {
+            const mesHoy = hoyISO().slice(0, 7);
+            if (pcMes < mesHoy) pcMes = mesHoy;
+            document.getElementById('pc-anterior').disabled = pcMes <= mesHoy;
+            document.getElementById('pc-meses').innerHTML = [0, 1].map(i => mesDePrecios(mesSiguiente(pcMes, i), i)).join('');
+        }
+
+        function mesDePrecios(ym, i) {
+            const hoy = hoyISO();
+            const primero = ym + '-01';
+            const vacios = (fechaD(primero).getDay() + 6) % 7;     // la semana empieza el lunes
+            const dias = +finDeMes(primero).slice(8);
+            let celdas = '<span></span>'.repeat(vacios);
+            for (let d = 1; d <= dias; d++) {
+                const noche = ym + '-' + String(d).padStart(2, '0');
+                const clase = claseNoche(noche);
+                const esp = especialDe(pcTipo, noche);
+                const precio = precioNoche(pcTipo, noche);
+                const pasado = noche < hoy;
+                const sel = !!pcSel && noche >= pcSel.desde && noche <= pcSel.hasta;
+                const festivo = FESTIVOS.has(noche);
+                const tag = esp ? nombreEtiqueta(esp.etiqueta) : clase === 'puente' ? 'Puente' : '';
+                const titulo = fechaLarga(noche) + (festivo ? ' (festivo)' : '') + ' · ' + COP(precio) + ' · ' + (esp ? nombreEtiqueta(esp.etiqueta) : CLASES[clase]);
+                celdas += `<button type="button" class="pc-dia pc-${clase}${esp ? ' pc-especial' : ''}${sel ? ' is-sel' : ''}${pasado ? ' is-past' : ''}${festivo ? ' is-festivo' : ''}${noche === hoy ? ' is-hoy' : ''}"` +
+                    ` data-noche="${noche}"${esp ? ` style="--pc-color:${colorEtiqueta(esp.etiqueta)}"` : ''}${pasado ? ' disabled' : ''} title="${esc(titulo)}" aria-label="${esc(titulo)}" aria-pressed="${sel}">` +
+                    `<span class="pc-num">${d}</span><span class="pc-precio">${precio ? precioCorto(precio) : '—'}</span>${tag ? `<span class="pc-tag">${esc(tag)}</span>` : ''}</button>`;
+            }
+            const nombre = capitalize(fechaD(primero).toLocaleDateString('es-CO', { month: 'long', year: 'numeric' }).replace(' de ', ' '));
+            return `<div class="${i ? 'hidden sm:block' : ''}"><h4 class="font-display text-xl text-ink mb-3">${esc(nombre)}</h4>` +
+                `<div class="pc-grid">${['L', 'M', 'M', 'J', 'V', 'S', 'D'].map(x => `<span class="pc-dow" aria-hidden="true">${x}</span>`).join('')}${celdas}</div></div>`;
+        }
+
+        /* Marca las noches elegidas sin volver a dibujar el calendario (mientras se arrastra) */
+        function pintarSeleccion() {
+            document.querySelectorAll('#pc-meses .pc-dia').forEach(b => {
+                const sel = !!pcSel && b.dataset.noche >= pcSel.desde && b.dataset.noche <= pcSel.hasta;
+                b.classList.toggle('is-sel', sel);
+                b.setAttribute('aria-pressed', sel);
+            });
+        }
+
+        /* Lleva el calendario al mes de esa noche si no está a la vista */
+        function mostrarMesDe(noche) {
+            const ym = noche.slice(0, 7);
+            if (ym < pcMes) pcMes = ym;
+            else if (ym > mesSiguiente(pcMes, 1)) pcMes = mesSiguiente(ym, -1);
+        }
+
+        function elegirNoches(sel) {
+            const hoy = hoyISO();
+            if (sel.desde < hoy) sel.desde = hoy;
+            if (sel.hasta < sel.desde) sel.hasta = sel.desde;
+            if (nochesEntre(sel.desde, sel.hasta) + 1 > MAX_NOCHES_PRECIO) {
+                sel.hasta = sumarDias(sel.desde, MAX_NOCHES_PRECIO - 1);
+                toast('Se pueden cambiar hasta ' + MAX_NOCHES_PRECIO + ' noches a la vez.');
+            }
+            pcSel = sel;
+            pintarSeleccion();
+            renderEditorPrecios();
+        }
+
+        function nuevaSeleccion(noche) {
+            pcAncla = noche;
+            pcEscrito = {};
+            elegirNoches({ desde: noche, hasta: noche });
+        }
+
+        function quitarSeleccion() {
+            pcSel = null;
+            pcAncla = null;
+            pcEscrito = {};
+            pintarSeleccion();
+            renderEditorPrecios();
+        }
+
+        function nochesElegidas() {
+            const lista = [];
+            if (pcSel) for (let n = pcSel.desde; n <= pcSel.hasta; n = sumarDias(n, 1)) lista.push(n);
+            return lista;
+        }
+
+        /* --- Editor de las noches elegidas --- */
+        function renderEditorPrecios() {
+            const haySel = !!pcSel;
+            document.getElementById('pc-vacio').classList.toggle('hidden', haySel);
+            document.getElementById('pc-con-seleccion').classList.toggle('hidden', !haySel);
+            document.getElementById('pc-barra').classList.toggle('hidden', !haySel);
+            if (!haySel) return;
+
+            const noches = nochesElegidas();
+            const clases = {};
+            noches.forEach(n => { const c = claseNoche(n); (clases[c] = clases[c] || []).push(n); });
+            const presentes = ['semana', 'finde', 'puente'].filter(c => clases[c]);
+            const texto = noches.length === 1
+                ? 'Noche del ' + fechaLarga(pcSel.desde).toLowerCase() + conAno(pcSel.desde)
+                : 'Del ' + fechaLarga(pcSel.desde).toLowerCase() + conAno(pcSel.desde) + ' al ' + fechaLarga(pcSel.hasta).toLowerCase() + conAno(pcSel.hasta) + ' · ' + plural(noches.length, 'noche', 'noches');
+            document.getElementById('pc-rango-texto').textContent = texto;
+            document.getElementById('pc-barra-texto').textContent = texto;
+            const desde = document.getElementById('pc-desde');
+            const hasta = document.getElementById('pc-hasta');
+            desde.value = pcSel.desde;
+            hasta.value = pcSel.hasta;
+            desde.min = hasta.min = hoyISO();
+            document.getElementById('pc-clases').textContent = presentes.length > 1
+                ? presentes.map(c => plural(clases[c].length, 'noche', 'noches') + ' ' + CLASES_TEXTO[c]).join(' · ')
+                : noches.length > 1 ? 'Todas son noches ' + CLASES_TEXTO[presentes[0]] + '.' : '';
+
+            /* Nombre: lo escrito o, si todas las noches especiales elegidas tienen el mismo, ese */
+            const etiqueta = document.getElementById('pc-etiqueta');
+            if (pcEscrito.etiqueta !== undefined) etiqueta.value = pcEscrito.etiqueta;
+            else {
+                const nombres = new Set();
+                Object.keys(UNIDADES).forEach(k => noches.forEach(n => { const e = especialDe(k, n); if (e) nombres.add(e.etiqueta); }));
+                etiqueta.value = nombres.size === 1 ? [...nombres][0] : '';
+            }
+            marcarChipsEtiqueta();
+
+            /* Una fila por habitación, con un precio por cada clase de noche elegida. Si todas las
+               noches de esa clase cuestan lo mismo, se muestra ese precio; si no, queda vacío. */
+            const unaClase = presentes.length === 1;
+            document.getElementById('pc-filas').innerHTML = Object.keys(UNIDADES).filter(k => TARIFAS[k]).map(k => {
+                const off = !!(pcEscrito.off && pcEscrito.off.has(k));
+                const actuales = noches.map(n => precioNoche(k, n));
+                const min = Math.min(...actuales), max = Math.max(...actuales);
+                const conEspecial = noches.filter(n => especialDe(k, n)).length;
+                const campos = presentes.map(c => {
+                    const precios = clases[c].map(n => precioNoche(k, n));
+                    const igual = precios.every(v => v === precios[0]);
+                    const clave = k + '|' + c;
+                    const valor = pcEscrito[clave] !== undefined ? pcEscrito[clave] : igual ? precios[0].toLocaleString('es-CO') : '';
+                    return `<label class="block min-w-0"><span class="pc-mini">${unaClase ? 'Precio' : CLASES[c]}</span>` +
+                        `<input class="pc-input" data-pc-precio="${clave}" inputmode="numeric" autocomplete="off" maxlength="15" value="${esc(valor)}"` +
+                        ` placeholder="${igual ? '' : 'Varía'}" aria-label="${esc((NOMBRES[k] || k) + ' · ' + (unaClase ? 'precio' : CLASES[c]))}"></label>`;
+                }).join('');
+                return `<div class="pc-fila${off ? ' is-off' : ''}" data-pc-fila="${k}">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="checkbox" class="w-4 h-4 accent-[#0A212E]" data-pc-incluir="${k}"${off ? '' : ' checked'}>
+                        <span class="text-[0.85rem] text-ink font-medium">${esc(NOMBRES[k] || k)}</span>
+                    </label>
+                    <div class="pc-precios grid gap-2 mt-3" style="grid-template-columns:repeat(${presentes.length},minmax(0,1fr))">${campos}</div>
+                    <p class="text-[0.68rem] text-graphite/50 mt-2">Ahora: ${min === max ? COP(min) : 'de ' + COP(min) + ' a ' + COP(max)}${conEspecial ? ' · ' + plural(conEspecial, 'noche', 'noches') + ' con precio especial' : ''}</p>
+                </div>`;
             }).join('');
+
+            pintarRespetar();
+            document.getElementById('pc-error').classList.add('hidden');
+            const hayEspecial = Object.keys(UNIDADES).some(k => noches.some(n => especialDe(k, n)));
+            document.getElementById('pc-quitar').classList.toggle('hidden', !hayEspecial);
+            document.getElementById('pc-quitar').nextElementSibling.classList.toggle('hidden', !hayEspecial);
+        }
+
+        /* Noches elegidas que ya tienen otro precio especial (p. ej. Navidad dentro de la temporada
+           alta): por defecto no se tocan, para no borrarlas sin querer al pintar una temporada larga */
+        function pintarRespetar() {
+            if (!pcSel) return;
+            const nombre = limpiarEtiqueta(document.getElementById('pc-etiqueta').value);
+            const otros = new Set();
+            const noches = nochesElegidas();
+            Object.keys(UNIDADES).forEach(k => noches.forEach(n => { const e = especialDe(k, n); if (e && e.etiqueta !== nombre) otros.add(nombreEtiqueta(e.etiqueta)); }));
+            document.getElementById('pc-respetar-caja').classList.toggle('hidden', !otros.size);
+            document.getElementById('pc-respetar').checked = pcEscrito.respetar !== false;
+            document.getElementById('pc-respetar-texto').innerHTML = 'No cambiar las noches que ya tienen otro precio especial: <strong class="font-medium text-ink">' +
+                esc([...otros].join(', ')) + '</strong>. Desmárcalo para reemplazarlas también.';
+        }
+
+        function marcarChipsEtiqueta() {
+            const valor = normalizar(document.getElementById('pc-etiqueta').value).trim();
+            document.querySelectorAll('#pc-etiquetas [data-etiqueta]').forEach(c => c.classList.toggle('is-active', normalizar(c.dataset.etiqueta) === valor));
+        }
+
+        const tiposMarcados = () => [...document.querySelectorAll('#pc-filas [data-pc-incluir]')].filter(c => c.checked).map(c => c.dataset.pcIncluir);
+
+        /* ¿Un cero de más o de menos? */
+        const precioRaro = (precio, base) => !!base && (precio >= base * 3 || precio * 3 <= base || precio < 10000);
+
+        async function guardarPreciosCalendario() {
+            if (!pcSel) return;
+            const error = document.getElementById('pc-error');
+            const fallo = texto => { error.textContent = texto; error.classList.remove('hidden'); };
+            error.classList.add('hidden');
+            const hoy = hoyISO();
+            const noches = nochesElegidas().filter(n => n >= hoy);
+            const etiqueta = limpiarEtiqueta(document.getElementById('pc-etiqueta').value);
+            const tipos = tiposMarcados();
+            if (!tipos.length) return fallo('Marca al menos una habitación.');
+
+            const valores = {};
+            let malo = null;
+            document.querySelectorAll('#pc-filas [data-pc-precio]').forEach(input => {
+                const [k, c] = input.dataset.pcPrecio.split('|');
+                input.classList.remove('is-error');
+                if (!tipos.includes(k) || !input.value.trim()) return;
+                const v = validarPrecio(input.value);
+                if (v.error) {
+                    input.classList.add('is-error');
+                    if (!malo) malo = (CORTOS[k] || k) + ' · ' + CLASES[c].toLowerCase() + ': ' + v.error;
+                    return;
+                }
+                (valores[k] = valores[k] || {})[c] = v.precio;
+            });
+            if (malo) return fallo(malo);
+            if (!Object.keys(valores).length) return fallo('Escribe el precio de al menos una habitación.');
+
+            const respetar = !document.getElementById('pc-respetar-caja').classList.contains('hidden') && document.getElementById('pc-respetar').checked;
+            const filas = [];
+            const raros = new Set();
+            let respetadas = 0;
+            noches.forEach(n => {
+                const c = claseNoche(n);
+                tipos.forEach(k => {
+                    const precio = valores[k] && valores[k][c];
+                    if (!precio) return;
+                    const actual = especialDe(k, n);
+                    const base = precioBase(k, n);
+                    if (actual && respetar && actual.etiqueta !== etiqueta) { respetadas++; return; }   // otra fecha especial: no se toca
+                    if (!actual && !etiqueta && precio === base) return;                      // ya cuesta eso con el precio normal
+                    if (actual && actual.precio === precio && actual.etiqueta === etiqueta) return;   // sin cambios
+                    filas.push({ tipo: k, noche: n, precio, etiqueta: etiqueta || null });
+                    if (precioRaro(precio, base)) raros.add(CORTOS[k] || k);
+                });
+            });
+            if (!filas.length) return toast(respetadas ? 'No hay cambios: esas noches ya tienen otro precio especial (desmarca «No cambiar…» para reemplazarlo).' : 'Esas noches ya tienen esos precios.');
+            if (raros.size && !confirm('Revisa los valores de ' + [...raros].join(', ') + ': quedan muy distintos del precio normal. ¿Guardar de todas formas?')) return;
+
+            const boton = document.getElementById('pc-guardar');
+            boton.disabled = true;
+            try {
+                if (CONECTADO) {
+                    for (let i = 0; i < filas.length; i += 500) {
+                        await api('POST', 'precios_noche?on_conflict=tipo,noche', filas.slice(i, i + 500), { Prefer: 'resolution=merge-duplicates,return=minimal' });
+                    }
+                }
+                filas.forEach(f => { (preciosNoche[f.tipo] = preciosNoche[f.tipo] || {})[f.noche] = { precio: f.precio, etiqueta: f.etiqueta || '' }; });
+                const cuantas = new Set(filas.map(f => f.noche)).size;
+                toast(!CONECTADO ? 'Modo de ejemplo: los precios se ven aquí, pero no se guardan.'
+                    : servidorHotel === false ? 'Guardado. Falta publicar el servidor nuevo para que la página los use.'
+                    : 'Guardado: ' + plural(cuantas, 'noche', 'noches') + (etiqueta ? ' de ' + etiqueta : '') + ' con precio nuevo.');
+                pcEscrito = {};
+                renderCalendarioPrecios();
+                renderEditorPrecios();
+                renderEspeciales();
+            } catch (e) {
+                fallo(esFaltaDeTabla(e) ? textoFaltaBase : e.message);
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        /* Borra los precios especiales de las noches elegidas, en las habitaciones marcadas */
+        async function quitarPreciosElegidos() {
+            if (!pcSel) return;
+            const hoy = hoyISO();
+            const desde = pcSel.desde < hoy ? hoy : pcSel.desde;
+            const noches = nochesElegidas().filter(n => n >= desde);
+            const tipos = tiposMarcados().filter(k => noches.some(n => especialDe(k, n)));
+            if (!tipos.length) return toast('Esas noches ya tienen el precio normal en las habitaciones marcadas.');
+            const cuantas = noches.filter(n => tipos.some(k => especialDe(k, n))).length;
+            if (!confirm('¿Quitar el precio especial de ' + plural(cuantas, 'noche', 'noches') + ' en ' + tipos.map(k => CORTOS[k] || k).join(', ') + '? Vuelven al precio normal.')) return;
+            const boton = document.getElementById('pc-quitar');
+            boton.disabled = true;
+            try {
+                if (CONECTADO) await api('DELETE', 'precios_noche?tipo=in.(' + tipos.join(',') + ')&noche=gte.' + desde + '&noche=lte.' + pcSel.hasta, null, { Prefer: 'return=minimal' });
+                tipos.forEach(k => noches.forEach(n => { if (preciosNoche[k]) delete preciosNoche[k][n]; }));
+                toast(CONECTADO ? 'Listo: ' + plural(cuantas, 'noche', 'noches') + ' volvieron al precio normal.' : 'Modo de ejemplo: el cambio no se guarda.');
+                pcEscrito = {};
+                renderCalendarioPrecios();
+                renderEditorPrecios();
+                renderEspeciales();
+            } catch (e) {
+                toast(e.message);
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        /* --- Precio normal: entre semana, fin de semana y puente --- */
+        function renderPrecioBase() {
+            document.getElementById('pc-base-body').innerHTML = Object.keys(UNIDADES).filter(k => TARIFAS[k]).map(k => {
+                const t = TARIFAS[k];
+                const fila = tarifasPanel[k];
+                /* Fin de semana vacío si no tiene uno propio (se cobra como entre semana) */
+                const finde = fila ? (fila.precio_finde > 0 ? fila.precio_finde : '') : (t.finde !== t.semana ? t.finde : '');
+                const foto = fotosDe(k)[0];
+                const campo = (clase, valor, ayuda) => `<input class="pc-input" data-base="${clase}" inputmode="numeric" autocomplete="off" maxlength="15"` +
+                    ` value="${valor ? valor.toLocaleString('es-CO') : ''}" placeholder="${esc(ayuda)}" aria-label="${esc((NOMBRES[k] || k) + ' · ' + CLASES[clase])}">`;
+                return `<tr data-pc-base="${k}">
+                    <td><div class="flex items-center gap-3">
+                        ${foto ? `<img src="${esc(foto.mini)}" alt="" class="w-10 h-10 object-cover bg-bone shrink-0">` : ''}
+                        <div><span class="block text-ink">${esc(NOMBRES[k] || k)}</span>
+                        <span class="block text-[0.68rem] text-graphite/45">${plural(UNIDADES[k], 'habitación', 'habitaciones')}${fila && fila.actualizada ? ' · cambiado ' + haceCuanto(fila.actualizada) : ''}</span></div>
+                    </div></td>
+                    <td>${campo('semana', t.semana, 'Obligatorio')}</td>
+                    <td>${campo('finde', finde, 'Igual a entre semana')}</td>
+                    <td>${campo('puente', t.puente, 'Igual a fin de semana')}</td>
+                </tr>`;
+            }).join('');
+            document.getElementById('pc-base-error').classList.add('hidden');
+            document.getElementById('pc-puentes').innerHTML = textoPuentes();
+        }
+
+        /* "Próximos puentes: 31 oct–2 nov · 14–16 nov…" (noches de puente seguidas) */
+        function textoPuentes() {
+            if (!FESTIVOS.size) return '';
+            const hoy = hoyISO();
+            const puentes = [];
+            for (let i = 0; i < 400; i++) {
+                const n = sumarDias(hoy, i);
+                if (claseNoche(n) !== 'puente') continue;
+                const ultimo = puentes[puentes.length - 1];
+                if (ultimo && sumarDias(ultimo.hasta, 1) === n) ultimo.hasta = n;
+                else puentes.push({ desde: n, hasta: n });
+            }
+            return puentes.length ? '<strong class="font-medium text-graphite/75">Próximas noches de puente:</strong> ' +
+                puentes.slice(0, 6).map(p => fechaCorta(p.desde) + (p.hasta !== p.desde ? '–' + fechaCorta(p.hasta) : '')).join(' · ') : '';
+        }
+
+        async function guardarPrecioBase() {
+            const error = document.getElementById('pc-base-error');
+            const fallo = texto => { error.textContent = texto; error.classList.remove('hidden'); };
+            error.classList.add('hidden');
+            const cambios = [];
+            const raros = new Set();
+            for (const tr of document.querySelectorAll('#pc-base-body [data-pc-base]')) {
+                const k = tr.dataset.pcBase;
+                const leer = clase => {
+                    const input = tr.querySelector('[data-base="' + clase + '"]');
+                    input.classList.remove('is-error');
+                    if (!input.value.trim()) return { precio: null };
+                    const v = validarPrecio(input.value);
+                    if (v.error) input.classList.add('is-error');
+                    return v;
+                };
+                const semana = leer('semana'), finde = leer('finde'), puente = leer('puente');
+                if (!semana.precio && !semana.error) {
+                    tr.querySelector('[data-base="semana"]').classList.add('is-error');
+                    return fallo((NOMBRES[k] || k) + ': escribe el precio entre semana.');
+                }
+                const malo = [['entre semana', semana], ['fin de semana', finde], ['puente', puente]].find(x => x[1].error);
+                if (malo) return fallo((NOMBRES[k] || k) + ' · ' + malo[0] + ': ' + malo[1].error);
+                const fila = { tipo: k, precio: semana.precio, precio_finde: finde.precio, precio_puente: puente.precio };
+                const antes = tarifasPanel[k];
+                const igual = antes
+                    ? antes.precio === fila.precio && (antes.precio_finde || null) === fila.precio_finde && (antes.precio_puente || null) === fila.precio_puente
+                    : TARIFAS[k].semana === fila.precio && (fila.precio_finde || fila.precio) === TARIFAS[k].finde && !fila.precio_puente;
+                if (igual) continue;
+                [fila.precio, fila.precio_finde, fila.precio_puente].forEach(p => { if (p && precioRaro(p, TARIFAS[k].semana)) raros.add(CORTOS[k] || k); });
+                cambios.push(fila);
+            }
+            if (!cambios.length) return toast('El precio normal no tiene cambios.');
+            if (raros.size && !confirm('Revisa los valores de ' + [...raros].join(', ') + ': quedan muy distintos del precio actual. ¿Guardar de todas formas?')) return;
+            const boton = document.getElementById('pc-base-guardar');
+            boton.disabled = true;
+            try {
+                if (CONECTADO) {
+                    const filas = await api('POST', 'tarifas?on_conflict=tipo', cambios, { Prefer: 'resolution=merge-duplicates,return=representation' });
+                    if (!filas || !filas.length) throw new Error('No se pudo guardar el precio. Vuelve a cargar el panel.');
+                    filas.forEach(f => { tarifasPanel[f.tipo] = f; });
+                } else {
+                    cambios.forEach(f => { tarifasPanel[f.tipo] = { ...f, actualizada: new Date().toISOString() }; });
+                }
+                cambios.forEach(f => { TARIFAS[f.tipo] = tarifaDeFila(f); });
+                toast(!CONECTADO ? 'Modo de ejemplo: el precio no se guarda.'
+                    : servidorHotel === false ? 'Guardado. Falta publicar el servidor nuevo para que la página lo use.'
+                    : 'Guardado. Las reservas nuevas ya usan el precio normal nuevo de ' + cambios.map(f => CORTOS[f.tipo] || f.tipo).join(', ') + '.');
+                renderPrecios();
+            } catch (e) {
+                fallo(esFaltaDeTabla(e) ? textoFaltaBase : e.message);
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        /* --- Fechas con precio especial: noches seguidas con el mismo nombre --- */
+        function gruposEspeciales() {
+            const hoy = hoyISO();
+            const porNoche = {};             // noche → nombre → tipo → precio
+            Object.keys(preciosNoche).forEach(k => Object.keys(preciosNoche[k]).forEach(n => {
+                if (n < hoy) return;
+                const e = preciosNoche[k][n];
+                const nombres = porNoche[n] = porNoche[n] || {};
+                (nombres[e.etiqueta] = nombres[e.etiqueta] || {})[k] = e.precio;
+            }));
+            const grupos = [];
+            const abiertos = {};
+            Object.keys(porNoche).sort().forEach(n => Object.keys(porNoche[n]).forEach(nombre => {
+                let g = abiertos[nombre];
+                if (!g || sumarDias(g.hasta, 1) !== n) {
+                    g = abiertos[nombre] = { etiqueta: nombre, desde: n, hasta: n, precios: {} };
+                    grupos.push(g);
+                }
+                g.hasta = n;
+                Object.keys(porNoche[n][nombre]).forEach(k => {
+                    const p = porNoche[n][nombre][k];
+                    const r = g.precios[k] = g.precios[k] || { min: p, max: p };
+                    r.min = Math.min(r.min, p);
+                    r.max = Math.max(r.max, p);
+                });
+            }));
+            return grupos.sort((a, b) => a.desde.localeCompare(b.desde) || a.etiqueta.localeCompare(b.etiqueta));
+        }
+
+        function renderEspeciales() {
+            pcGrupos = gruposEspeciales();
+            document.getElementById('pc-especiales').innerHTML = pcGrupos.length ? pcGrupos.map((g, i) => {
+                const color = colorEtiqueta(g.etiqueta);
+                const precios = Object.keys(UNIDADES).filter(k => g.precios[k]).map(k => esc(CORTOS[k] || k) + ' <strong class="font-medium text-graphite/75">' +
+                    (g.precios[k].min === g.precios[k].max ? COP(g.precios[k].min) : COP(g.precios[k].min) + '–' + COP(g.precios[k].max)) + '</strong>').join(' · ');
+                return `<li class="p-5 sm:px-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[0.9rem] text-ink font-medium flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${color}"></span>${esc(nombreEtiqueta(g.etiqueta))}</p>
+                        <p class="text-[0.75rem] text-graphite/60 mt-1">${esc(textoNoches(g.desde, g.hasta))}</p>
+                        <p class="text-[0.72rem] text-graphite/55 mt-1.5 leading-relaxed">${precios}</p>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                        <button type="button" class="btn btn-outline btn-sm" data-pc-editar="${i}"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar</button>
+                        <button type="button" class="btn btn-peligro btn-sm" data-pc-borrar="${i}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Quitar</button>
+                    </div>
+                </li>`;
+            }).join('') : '<li class="p-5 sm:px-6 text-[0.8rem] text-graphite/55">Aún no hay fechas con precio especial. Elige noches en el calendario para crear una temporada alta, Navidad, fin de año…</li>';
+            lucide.createIcons();
+        }
+
+        function editarGrupo(g) {
+            pcSel = { desde: g.desde, hasta: g.hasta };
+            pcAncla = g.desde;
+            pcEscrito = { etiqueta: g.etiqueta, off: new Set(Object.keys(UNIDADES).filter(k => !g.precios[k])) };
+            mostrarMesDe(g.desde);
+            renderCalendarioPrecios();
+            renderEditorPrecios();
+            const destino = window.matchMedia('(min-width: 1280px)').matches ? document.getElementById('pc-meses') : document.getElementById('pc-editor');
+            destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function borrarGrupo(g) {
+            if (!confirm('¿Quitar «' + nombreEtiqueta(g.etiqueta) + '» (' + textoNoches(g.desde, g.hasta).toLowerCase() + ')? Esas noches vuelven al precio normal.')) return;
+            try {
+                if (CONECTADO) {
+                    await api('DELETE', 'precios_noche?noche=gte.' + g.desde + '&noche=lte.' + g.hasta +
+                        (g.etiqueta ? '&etiqueta=eq.' + encodeURIComponent(g.etiqueta) : '&etiqueta=is.null'), null, { Prefer: 'return=minimal' });
+                }
+                Object.keys(preciosNoche).forEach(k => Object.keys(preciosNoche[k]).forEach(n => {
+                    if (n >= g.desde && n <= g.hasta && preciosNoche[k][n].etiqueta === g.etiqueta) delete preciosNoche[k][n];
+                }));
+                toast(CONECTADO ? '«' + nombreEtiqueta(g.etiqueta) + '» quitado: esas noches vuelven al precio normal.' : 'Modo de ejemplo: el cambio no se guarda.');
+                pcEscrito = {};
+                renderCalendarioPrecios();
+                renderEditorPrecios();
+                renderEspeciales();
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        /* Precios de ejemplo (sin conexión): Navidad y fin de año más caros */
+        function preciosNocheDeEjemplo() {
+            const ano = hoyISO().slice(0, 4);
+            const lista = {};
+            const pintar = (desde, hasta, etiqueta, factor) => {
+                for (let n = desde; n <= hasta; n = sumarDias(n, 1)) {
+                    Object.keys(TARIFAS).forEach(k => {
+                        (lista[k] = lista[k] || {})[n] = { precio: Math.round(precioBase(k, n) * factor / 10000) * 10000, etiqueta };
+                    });
+                }
+            };
+            pintar(ano + '-12-20', ano + '-12-23', 'Temporada alta', 1.2);
+            pintar(ano + '-12-24', ano + '-12-25', 'Navidad', 1.4);
+            pintar(ano + '-12-30', (+ano + 1) + '-01-01', 'Fin de año', 1.5);
+            return lista;
         }
 
         /* "270.000", "$ 270000" o "270000,00" → { precio: 270000 }; si no sirve, { error } */
@@ -2594,62 +3313,128 @@
             return { precio };
         }
 
-        function previsualizarPrecio(form) {
-            const k = form.dataset.precio;
-            const v = validarPrecio(form.querySelector('input').value);
-            const nota = form.querySelector('[data-precio-nota]');
-            const nuevo = v.precio && TARIFAS[k] && v.precio !== TARIFAS[k].semana;
-            nota.textContent = nuevo ? 'Nuevo precio: ' + COP(v.precio) + ' por noche (antes ' + COP(TARIFAS[k].semana) + '). Toca «Guardar precio».' : notaPrecio(k);
-            nota.classList.toggle('text-ink', !!nuevo);
-            form.querySelector('[data-precio-error]').classList.add('hidden');
-        }
-
-        async function guardarPrecio(form) {
-            const k = form.dataset.precio;
-            const input = form.querySelector('input');
-            const error = form.querySelector('[data-precio-error]');
-            const fallo = texto => { error.textContent = texto; error.classList.remove('hidden'); };
-            error.classList.add('hidden');
-            const v = validarPrecio(input.value);
-            if (v.error) return fallo(v.error);
-            const antes = TARIFAS[k] ? TARIFAS[k].semana : 0;
-            if (v.precio === antes && tarifasPanel[k]) {
-                input.value = v.precio.toLocaleString('es-CO');
-                return toast('Ese ya es el precio de ' + (NOMBRES[k] || k) + '.');
-            }
-            /* Un cero de más o de menos se nota: se pide confirmar los cambios muy grandes */
-            if (antes && (v.precio >= antes * 3 || v.precio * 3 <= antes || v.precio < 10000) &&
-                !confirm('¿Seguro que el precio de ' + (NOMBRES[k] || k) + ' pasa de ' + COP(antes) + ' a ' + COP(v.precio) + ' por noche?')) return;
-            const boton = form.querySelector('button[type="submit"]');
-            boton.disabled = true;
-            try {
-                if (CONECTADO) {
-                    const filas = await api('POST', 'tarifas?on_conflict=tipo', { tipo: k, precio: v.precio }, { Prefer: 'resolution=merge-duplicates,return=representation' });
-                    if (!filas || !filas.length) throw new Error('No se pudo guardar el precio. Vuelve a cargar el panel.');
-                    tarifasPanel[k] = filas[0];
-                } else {
-                    tarifasPanel[k] = { tipo: k, precio: v.precio, actualizada: new Date().toISOString() };
-                }
-                TARIFAS[k] = { finde: v.precio, semana: v.precio };
-                input.value = v.precio.toLocaleString('es-CO');
-                previsualizarPrecio(form);
-                toast(!CONECTADO ? 'Modo de ejemplo: el precio no se guarda.'
-                    : servidorHotel === false ? 'Guardado. Falta publicar el servidor nuevo para que la página lo use.'
-                    : 'Guardado. Las reservas nuevas de ' + (CORTOS[k] || k) + ' ya usan ' + COP(v.precio) + ' por noche.');
-            } catch (e) {
-                fallo(esFaltaDeTabla(e) ? textoFaltaBase : e.message);
-            } finally {
-                boton.disabled = false;
-            }
-        }
-
-        document.getElementById('precios-body').addEventListener('input', e => {
-            const form = e.target.closest('form[data-precio]');
-            if (form) previsualizarPrecio(form);
+        /* --- Eventos de Precios --- */
+        document.getElementById('pc-tipos').addEventListener('click', e => {
+            const b = e.target.closest('[data-pc-ver]');
+            if (!b) return;
+            pcTipo = b.dataset.pcVer;
+            pintarTiposPrecios();
+            renderCalendarioPrecios();
         });
-        document.getElementById('precios-body').addEventListener('submit', e => {
-            e.preventDefault();
-            guardarPrecio(e.target);
+        document.getElementById('pc-anterior').addEventListener('click', () => { pcMes = mesSiguiente(pcMes, -1); renderCalendarioPrecios(); });
+        document.getElementById('pc-siguiente').addEventListener('click', () => { pcMes = mesSiguiente(pcMes, 1); renderCalendarioPrecios(); });
+        document.getElementById('pc-hoy').addEventListener('click', () => { pcMes = hoyISO().slice(0, 7); renderCalendarioPrecios(); });
+
+        /* Elegir días: tocar uno; tocar otro para elegir los del medio; arrastrar; Mayús + clic */
+        const pcMeses = document.getElementById('pc-meses');
+        pcMeses.addEventListener('mousedown', e => {
+            const b = e.target.closest('.pc-dia');
+            if (!b || b.disabled || e.button !== 0 || e.shiftKey) return;
+            pcArrastre = { inicio: b.dataset.noche, movido: false };
+            e.preventDefault();          // que no se seleccione el texto al arrastrar
+        });
+        pcMeses.addEventListener('mouseover', e => {
+            if (!pcArrastre) return;
+            const b = e.target.closest('.pc-dia');
+            if (!b || b.disabled) return;
+            if (b.dataset.noche !== pcArrastre.inicio) pcArrastre.movido = true;
+            if (!pcArrastre.movido) return;
+            pcSel = rango(pcArrastre.inicio, b.dataset.noche);
+            pintarSeleccion();
+        });
+        document.addEventListener('mouseup', () => {
+            if (!pcArrastre) return;
+            const { inicio, movido } = pcArrastre;
+            pcArrastre = null;
+            if (!movido) return;
+            pcIgnorarClic = true;        // el clic que sigue al arrastre no cuenta
+            setTimeout(() => { pcIgnorarClic = false; }, 0);
+            pcAncla = inicio;
+            pcEscrito = {};
+            elegirNoches({ ...pcSel });
+        });
+        pcMeses.addEventListener('click', e => {
+            const b = e.target.closest('.pc-dia');
+            if (!b || b.disabled) return;
+            if (pcIgnorarClic) { pcIgnorarClic = false; return; }
+            const noche = b.dataset.noche;
+            if (e.shiftKey && pcAncla) return elegirNoches(rango(pcAncla, noche));
+            if (pcSel && pcSel.desde === pcSel.hasta && noche !== pcSel.desde) return elegirNoches(rango(pcSel.desde, noche));
+            if (pcSel && pcSel.desde === noche && pcSel.hasta === noche) return;
+            nuevaSeleccion(noche);
+        });
+
+        const pcEditor = document.getElementById('pc-editor');
+        pcEditor.addEventListener('input', e => {
+            const t = e.target;
+            if (t.dataset.pcPrecio) { pcEscrito[t.dataset.pcPrecio] = t.value; t.classList.remove('is-error'); }
+            if (t.id === 'pc-etiqueta') { pcEscrito.etiqueta = t.value; marcarChipsEtiqueta(); pintarRespetar(); }
+        });
+        pcEditor.addEventListener('change', e => {
+            const t = e.target;
+            if (t.id === 'pc-respetar') pcEscrito.respetar = t.checked;
+            if (t.dataset.pcIncluir) {
+                pcEscrito.off = pcEscrito.off || new Set();
+                if (t.checked) pcEscrito.off.delete(t.dataset.pcIncluir); else pcEscrito.off.add(t.dataset.pcIncluir);
+                t.closest('.pc-fila').classList.toggle('is-off', !t.checked);
+            }
+            if (t.id === 'pc-desde' || t.id === 'pc-hasta') {
+                const a = document.getElementById('pc-desde').value;
+                const b = document.getElementById('pc-hasta').value;
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(a) || !/^\d{4}-\d{2}-\d{2}$/.test(b)) return;
+                const sel = t.id === 'pc-desde' && a > b ? { desde: a, hasta: a } : rango(a, b);
+                mostrarMesDe(t.id === 'pc-desde' ? sel.desde : sel.hasta);
+                elegirNoches(sel);
+                renderCalendarioPrecios();
+            }
+        });
+        /* Al salir de un precio se escribe con puntos de mil */
+        pcEditor.addEventListener('focusout', e => {
+            const t = e.target;
+            if (!t.dataset || !t.dataset.pcPrecio || !t.value.trim()) return;
+            const v = validarPrecio(t.value);
+            if (v.precio) { t.value = v.precio.toLocaleString('es-CO'); pcEscrito[t.dataset.pcPrecio] = t.value; }
+        });
+        pcEditor.addEventListener('click', e => {
+            const chip = e.target.closest('[data-etiqueta]');
+            if (chip) {
+                const input = document.getElementById('pc-etiqueta');
+                input.value = chip.dataset.etiqueta;
+                pcEscrito.etiqueta = input.value;
+                marcarChipsEtiqueta();
+                pintarRespetar();
+                return;
+            }
+            const ampliar = e.target.closest('[data-ampliar]');
+            if (!ampliar || !pcSel) return;
+            const a = ampliar.dataset.ampliar;
+            const fin = finDeMes(pcSel.hasta);
+            const hasta = a === 'dia' ? pcSel.desde
+                : a === 'mes' ? (pcSel.hasta === fin ? finDeMes(sumarDias(fin, 1)) : fin)
+                : sumarDias(pcSel.hasta, +a);
+            mostrarMesDe(hasta);
+            elegirNoches({ desde: pcSel.desde, hasta });
+            renderCalendarioPrecios();
+        });
+        pcEditor.addEventListener('submit', e => { e.preventDefault(); guardarPreciosCalendario(); });
+        document.getElementById('pc-cancelar').addEventListener('click', quitarSeleccion);
+        document.getElementById('pc-quitar').addEventListener('click', quitarPreciosElegidos);
+
+        const pcBase = document.getElementById('pc-base');
+        pcBase.addEventListener('submit', e => { e.preventDefault(); guardarPrecioBase(); });
+        pcBase.addEventListener('focusout', e => {
+            const t = e.target;
+            if (!t.dataset || !t.dataset.base || !t.value.trim()) return;
+            const v = validarPrecio(t.value);
+            if (v.precio) t.value = v.precio.toLocaleString('es-CO');
+        });
+        pcBase.addEventListener('input', e => { if (e.target.dataset && e.target.dataset.base) e.target.classList.remove('is-error'); });
+
+        document.getElementById('pc-especiales').addEventListener('click', e => {
+            const editar = e.target.closest('[data-pc-editar]');
+            if (editar) return editarGrupo(pcGrupos[+editar.dataset.pcEditar]);
+            const borrar = e.target.closest('[data-pc-borrar]');
+            if (borrar) borrarGrupo(pcGrupos[+borrar.dataset.pcBorrar]);
         });
 
         /* --- Fechas bloqueadas --- */
@@ -5335,7 +6120,11 @@
             reservas = reservasDeEjemplo();
             bloqueos = bloqueosDeEjemplo();
             fotos = fotosDeEjemplo();
-            leerTarifasDelSitio().then(() => { if (document.getElementById('app').classList.contains('is-shown')) renderTodo(); });
+            leerTarifasDelSitio().then(() => {
+                preciosNoche = preciosNocheDeEjemplo();
+                if (document.getElementById('app').classList.contains('is-shown')) renderTodo();
+                if (vistaActual === 'precios') renderPrecios();
+            });
         } else if (!revisarEnlaceDeRecuperacion()) {
             sesion = leerSesion();
             if (sesion) {

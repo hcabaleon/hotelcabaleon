@@ -3810,8 +3810,8 @@
                     <div class="flex items-start gap-4">
                         <i data-lucide="calendar-days" class="w-4 h-4 text-brass mt-1 shrink-0"></i>
                         <div>
-                            <h4 class="micro text-ink mb-2">Una tarifa, sin sorpresas</h4>
-                            <p class="body-sm text-graphite/70">Cada habitación tiene un solo valor por noche, desde <span data-tarifa="desde">$250.000</span>. Impuestos y desayuno siempre incluidos.</p>
+                            <h4 class="micro text-ink mb-2">Tarifa clara, sin sorpresas</h4>
+                            <p class="body-sm text-graphite/70">Desde <span data-tarifa="desde">$250.000</span> la noche, según la habitación y la fecha. Al elegir tus fechas ves el valor exacto de tu estadía. Impuestos y desayuno siempre incluidos.</p>
                         </div>
                     </div>
                     <div class="flex items-start gap-4">
@@ -5134,8 +5134,8 @@
                         </button>
                         <div class="faq-panel">
                             <p class="body-sm text-graphite/70 pb-7 max-w-2xl">
-                                Depende de la habitación: desde <span data-tarifa="desde">$250.000</span> hasta
-                                <span data-tarifa="hasta">$290.000</span> por noche, el mismo valor cualquier día de la semana.
+                                Depende de la habitación y de la fecha: desde <span data-tarifa="desde">$250.000</span> por noche.
+                                Los fines de semana, los puentes y temporadas como Navidad y fin de año pueden tener otra tarifa.
                                 Todas incluyen impuestos y desayuno. En <a href="#habitaciones" class="text-ink border-b border-brass hover:text-brass transition-colors">Habitaciones</a>
                                 ves el valor de cada una y, al elegir fechas en el formulario, te mostramos el valor de tu estadía.
                             </p>
@@ -5611,7 +5611,7 @@
                             <span id="rm-semana" class="font-display text-3xl sm:text-4xl text-ink"></span>
                         </div>
                     </div>
-                    <p class="text-[0.75rem] text-graphite/70 mb-7">COP por noche · Impuestos y desayuno incluidos · Anticipo del 50 % para confirmar</p>
+                    <p class="text-[0.75rem] text-graphite/70 mb-7">COP por noche · Impuestos y desayuno incluidos · Anticipo del 50 % para confirmar<span id="rm-fechas-nota"></span></p>
 
                     <div class="grid grid-cols-1 xs:grid-cols-2 gap-3 mb-6">
                         <button type="button" id="rm-consultar" class="btn btn-outline text-ink"><svg class="w-4 h-4" aria-hidden="true"><use href="#i-whatsapp"/></svg> Preguntar</button>
@@ -5978,17 +5978,19 @@
 
         /* ---------------------------------------------------------
            Tarifas por noche (COP · impuestos y desayuno incluidos)
-           El precio de cada habitación se cambia en el panel del hotel
-           (admin.html › Precios): al cargar, la página lo pide al
-           servidor de reservas (GET /catalogo) y lo pone aquí, y el
-           cobro usa ese mismo valor. Estos números quedan de respaldo
-           por si el servidor no responde. Tarjetas, ficha de cada
-           habitación, valor estimado de la reserva y asistente leen de aquí.
+           Los precios se cambian en el panel del hotel (admin.html ›
+           Precios): al cargar, la página los pide al servidor de reservas
+           (GET /catalogo) y los pone aquí y en ESPECIALES, y el cobro usa
+           esos mismos valores. Estos números quedan de respaldo por si el
+           servidor no responde. Tarjetas, ficha de cada habitación, valor
+           estimado de la reserva y asistente leen de aquí.
              finde  → noches de viernes, sábado y víspera de festivo
              semana → noches de domingo a jueves
-           Hoy cada habitación cobra lo mismo todos los días, así que finde
-           y semana llevan el mismo valor; si algún día se separan, la página
-           muestra las dos tarifas sola.
+             puente → (solo desde el panel) noches de un fin de semana largo
+                      con festivo; sin él, se cobra como finde
+           Las noches con precio especial del calendario del panel
+           (temporada alta, Navidad, fin de año…) llegan en ESPECIALES y
+           mandan sobre todo lo demás. Ver precioNoche().
            El servidor de pagos Bold lee TARIFAS, UNIDADES, TARIFA_MASCOTA,
            ANTICIPO, FESTIVOS y CODIGOS_PROMO de esta página publicada: se pueden
            cambiar los valores, pero conserva el formato de cada línea.
@@ -5999,25 +6001,31 @@
             cuadruple: { finde: 260000, semana: 260000 },
             triple:    { finde: 250000, semana: 250000 }
         };
-        const tarifaUnica = k => TARIFAS[k].finde === TARIFAS[k].semana;
+        const tarifaUnica = k => TARIFAS[k].finde === TARIFAS[k].semana && (!TARIFAS[k].puente || TARIFAS[k].puente === TARIFAS[k].semana);
+        /* Noches con precio especial: { suite: { 'AAAA-MM-DD': { precio, etiqueta } } } (del panel) */
+        let ESPECIALES = {};
         /* Habitaciones de cada tipo que se pueden reservar en una misma compra.
-           CONFIRMAR CON EL HOTEL (15 habitaciones y 1 cabaña en total).
+           Confirmado por el hotel el 28 de octubre de 2026: 15 habitaciones y 1 cabaña.
            El servidor de pagos también lee esta línea. */
-        const UNIDADES = { suite: 2, cabana: 1, cuadruple: 6, triple: 7 };
+        const UNIDADES = { suite: 3, cabana: 1, cuadruple: 2, triple: 10 };
 
         const TARIFA_MASCOTA = 70000;   // por mascota y por noche (Acuerdo Pet Friendly)
         const ANTICIPO = 0.5;           // porcentaje que se paga para confirmar la reserva
 
-        /* Festivos de Colombia (2026–2027). La noche anterior a un festivo
-           se cobra con tarifa de fin de semana. Actualizar cada año.
-           Incluye la Virgen de Chiquinquirá (Ley 2578 de 2026): lunes 13 de julio de 2026 y lunes 12 de julio de 2027. */
+        /* Festivos de Colombia (2026–2028). La noche anterior a un festivo
+           se cobra con tarifa de fin de semana, y las de un fin de semana largo
+           con festivo, con la de puente. Actualizar cada año.
+           Incluye la Virgen de Chiquinquirá (Ley 2578 de 2026): lunes 13 de julio de 2026, lunes 12 de julio de 2027 y lunes 10 de julio de 2028. */
         const FESTIVOS = new Set([
             '2026-01-01', '2026-01-12', '2026-03-23', '2026-04-02', '2026-04-03', '2026-05-01',
             '2026-05-18', '2026-06-08', '2026-06-15', '2026-06-29', '2026-07-13', '2026-07-20', '2026-08-07',
             '2026-08-17', '2026-10-12', '2026-11-02', '2026-11-16', '2026-12-08', '2026-12-25',
             '2027-01-01', '2027-01-11', '2027-03-22', '2027-03-25', '2027-03-26', '2027-05-01',
             '2027-05-10', '2027-05-31', '2027-06-07', '2027-07-05', '2027-07-12', '2027-07-20', '2027-08-07',
-            '2027-08-16', '2027-10-18', '2027-11-01', '2027-11-15', '2027-12-08', '2027-12-25'
+            '2027-08-16', '2027-10-18', '2027-11-01', '2027-11-15', '2027-12-08', '2027-12-25',
+            '2028-01-01', '2028-01-10', '2028-03-20', '2028-04-13', '2028-04-14', '2028-05-01',
+            '2028-05-29', '2028-06-19', '2028-06-26', '2028-07-03', '2028-07-10', '2028-07-20', '2028-08-07',
+            '2028-08-21', '2028-10-16', '2028-11-06', '2028-11-13', '2028-12-08', '2028-12-25'
         ]);
 
         /* Códigos promocionales: descuento en % sobre el alojamiento.
@@ -6207,6 +6215,54 @@
             return dia === 5 || dia === 6 || FESTIVOS.has(addDays(fecha, 1));
         }
 
+        /* Precio de cada noche: mismo cálculo que el servidor de pagos y el panel.
+           "noche" es la fecha en que se llega a dormir. Manda el precio especial del
+           calendario del panel; si no hay, el de puente (el día siguiente es parte de
+           3 o más días seguidos de descanso con al menos un festivo: viernes, sábado y
+           domingo antes de un lunes festivo), el de fin de semana o el de entre semana. */
+        const esDescanso = fecha => { const d = new Date(fecha + 'T12:00:00').getDay(); return d === 0 || d === 6 || FESTIVOS.has(fecha); };
+
+        function claseNoche(noche) {
+            const manana = addDays(noche, 1);
+            if (esDescanso(manana)) {
+                let primero = manana, ultimo = manana, conFestivo = FESTIVOS.has(manana);
+                for (let i = 0; i < 10 && esDescanso(addDays(primero, -1)); i++) { primero = addDays(primero, -1); conFestivo = conFestivo || FESTIVOS.has(primero); }
+                for (let i = 0; i < 10 && esDescanso(addDays(ultimo, 1)); i++) { ultimo = addDays(ultimo, 1); conFestivo = conFestivo || FESTIVOS.has(ultimo); }
+                if (conFestivo && Math.round((new Date(ultimo + 'T12:00:00') - new Date(primero + 'T12:00:00')) / 86400000) >= 2) return 'puente';
+            }
+            return esNocheFinde(noche) ? 'finde' : 'semana';
+        }
+
+        const NOMBRE_CLASE = { semana: 'Entre semana', finde: 'Fin de semana o festivo', puente: 'Puente festivo' };
+
+        /* { precio, desc }: desc es el nombre que ve el huésped (Navidad, Puente festivo…) */
+        function precioNoche(k, noche) {
+            const e = ESPECIALES[k] && ESPECIALES[k][noche];
+            if (e) return { precio: e.precio, desc: e.etiqueta || 'Fecha especial' };
+            const t = TARIFAS[k];
+            const clase = claseNoche(noche);
+            if (clase === 'puente' && t.puente) return { precio: t.puente, desc: NOMBRE_CLASE.puente };
+            return clase === 'semana' ? { precio: t.semana, desc: NOMBRE_CLASE.semana } : { precio: t.finde, desc: NOMBRE_CLASE.finde };
+        }
+
+        /* Noches de la estadía de una habitación agrupadas por precio y nombre, en orden:
+           [{ desc, precio, noches }]. Si todas cuestan lo mismo, un solo tramo. */
+        function tramosHabitacion(k) {
+            const tramos = [];
+            for (let i = 0, n = nightsBetween(); i < n; i++) {
+                const p = precioNoche(k, addDays(booking.checkin, i));
+                const t = tramos.find(x => x.precio === p.precio && x.desc === p.desc);
+                if (t) t.noches++; else tramos.push({ desc: p.desc, precio: p.precio, noches: 1 });
+            }
+            return tramos;
+        }
+        const costoHabitacion = k => tramosHabitacion(k).reduce((s, t) => s + t.precio * t.noches, 0);
+        const precioUnico = tramos => tramos.length > 0 && tramos.every(t => t.precio === tramos[0].precio);
+        /* Entre semana o fin de semana con el precio normal (no puente ni fecha especial) */
+        const esTramoNormal = t => t.desc === NOMBRE_CLASE.semana || t.desc === NOMBRE_CLASE.finde;
+        /* "fin de semana", "Navidad + entre semana"…: para el resumen corto de cada habitación */
+        const resumenTramos = tramos => [...new Set(tramos.map(t => esTramoNormal(t) ? (t.desc === NOMBRE_CLASE.semana ? 'entre semana' : 'fin de semana') : t.desc))].join(' + ');
+
         function promoVigente() {
             const p = CODIGOS_PROMO[booking.promo];
             return p && p.activo ? p : null;
@@ -6274,17 +6330,17 @@
             let alojamiento = 0, capacidad = 0, cuartos = 0;
             elegidas.forEach(k => {
                 const n = booking.habitaciones[k];
-                const t = TARIFAS[k];
                 const nombre = habitaciones[k].nombre + (n > 1 ? ' × ' + n : '');
                 capacidad += n * habitaciones[k].capacidad;
                 cuartos += n;
-                if (tarifaUnica(k)) {
-                    lineas.push({ desc: nombre, det: COP(t.semana) + ' por noche', cant: n * noches, valor: n * noches * t.semana });
+                /* Una línea por cada precio de la estadía (entre semana, fin de semana, puente, Navidad…) */
+                const tramos = tramosHabitacion(k);
+                if (precioUnico(tramos) && tramos.every(t => esTramoNormal(t))) {
+                    lineas.push({ desc: nombre, det: COP(tramos[0].precio) + ' por noche', cant: n * noches, valor: n * noches * tramos[0].precio });
                 } else {
-                    if (finde) lineas.push({ desc: nombre, det: 'Fin de semana o festivo · ' + COP(t.finde) + ' por noche', cant: n * finde, valor: n * finde * t.finde });
-                    if (semana) lineas.push({ desc: nombre, det: 'Entre semana · ' + COP(t.semana) + ' por noche', cant: n * semana, valor: n * semana * t.semana });
+                    tramos.forEach(t => lineas.push({ desc: nombre, det: t.desc + ' · ' + COP(t.precio) + ' por noche', cant: n * t.noches, valor: n * t.noches * t.precio }));
                 }
-                alojamiento += n * (finde * t.finde + semana * t.semana);
+                alojamiento += n * costoHabitacion(k);
             });
 
             const promo = promoVigente();
@@ -6365,20 +6421,19 @@
         }
 
         function pintarReservaHabitaciones() {
-            const { noches, finde, semana } = contarNoches();
-            const tipoNoches = finde && semana ? 'tarifa mixta' : (finde ? 'fin de semana' : 'entre semana');
+            const { noches } = contarNoches();
             document.querySelectorAll('.rv-hab').forEach(fila => {
                 const k = fila.dataset.hab;
                 const h = habitaciones[k];
                 const n = booking.habitaciones[k] || 0;
                 const max = maxHabitaciones(k);
-                const t = TARIFAS[k];
-                const porHabitacion = finde * t.finde + semana * t.semana;
+                const tramos = tramosHabitacion(k);
+                const porHabitacion = costoHabitacion(k);
                 fila.classList.toggle('is-sel', n > 0);
                 fila.classList.toggle('is-agotada', !max && !n);
                 fila.querySelector('[data-hab-precio]').textContent = COP(n > 1 ? n * porHabitacion : porHabitacion);
                 fila.querySelector('[data-hab-detalle]').innerHTML = (n > 1 ? n + ' hab. · ' : '') + plural(noches, 'noche', 'noches') +
-                    '<span class="txt-largo">' + (tarifaUnica(k) ? ' · ' + COP(t.semana) + '/noche' : ' · ' + tipoNoches) + '</span>' +
+                    '<span class="txt-largo">' + (precioUnico(tramos) && tramos.every(esTramoNormal) ? ' · ' + COP(tramos[0].precio) + '/noche' : ' · ' + escaparHtml(resumenTramos(tramos))) + '</span>' +
                     '<span class="txt-corto"> · hasta ' + h.capacidad + ' pers.</span>';
                 const nota = fila.querySelector('[data-hab-nota]');
                 nota.textContent = !max && !n ? 'Sin cupo en estas fechas'
@@ -6399,8 +6454,9 @@
         /* --- Combinación sugerida: la más económica con cupo para todos los huéspedes --- */
         function sugerirHabitaciones() {
             const huespedes = parseInt(booking.guests, 10);
-            const { finde, semana } = contarNoches();
             const tipos = Object.keys(habitaciones);
+            const costos = {};
+            tipos.forEach(k => { costos[k] = costoHabitacion(k); });
             let mejor = null;
             const probar = (i, combo, capacidad, costo, cuartos) => {
                 if (i === tipos.length) {
@@ -6410,7 +6466,7 @@
                     return;
                 }
                 const k = tipos[i];
-                const porHabitacion = finde * TARIFAS[k].finde + semana * TARIFAS[k].semana;
+                const porHabitacion = costos[k];
                 for (let n = 0; n <= maxHabitaciones(k); n++) {
                     combo[k] = n;
                     probar(i + 1, combo, capacidad + n * habitaciones[k].capacidad, costo + n * porHabitacion, cuartos + n);
@@ -7074,7 +7130,6 @@
             const pets = parseInt(booking.pets, 10);
             document.getElementById('rs-meta').textContent = plural(nightsBetween(), 'noche', 'noches') + ' · ' +
                 plural(parseInt(booking.guests, 10), 'huésped', 'huéspedes') + (pets ? ' · ' + plural(pets, 'mascota', 'mascotas') : '');
-            const { finde, semana } = contarNoches();
             const fila = (media, nombre, sub, valor) => '<li>' + media +
                 '<span class="rs-item"><span class="rs-item-n">' + nombre + '</span><span class="rs-item-s">' + sub + '</span></span>' +
                 '<span class="rs-item-v">' + valor + '</span></li>';
@@ -7085,7 +7140,7 @@
                     const h = habitaciones[k];
                     const c = booking.habitaciones[k];
                     return fila('<img src="' + miniatura(h.fotos[0]) + '" alt="">', h.nombre + (c > 1 ? ' × ' + c : ''),
-                        plural(est.noches, 'noche', 'noches'), COP(c * (finde * TARIFAS[k].finde + semana * TARIFAS[k].semana)));
+                        plural(est.noches, 'noche', 'noches'), COP(c * costoHabitacion(k)));
                 }).join('') +
                 (est.mascotas ? fila(ico(trazo('paw')), 'Pet Friendly' + (pets > 1 ? ' × ' + pets : ''), COP(TARIFA_MASCOTA) + ' por noche', COP(est.mascotas)) : '') +
                 (est.descuento ? fila(ico(trazo('ticket')), 'Código ' + escaparHtml(booking.promo), est.promo.descuento + ' % en alojamiento', '−' + COP(est.descuento)) : '') +
@@ -7402,7 +7457,7 @@
         }
 
         function renderCarrito(est) {
-            const { noches, finde, semana } = contarNoches();
+            const { noches } = contarNoches();
             const pets = parseInt(booking.pets, 10);
             const huespedes = parseInt(booking.guests, 10);
 
@@ -7417,10 +7472,16 @@
                     '<button type="button" onclick="irAPaso(\'paso-fechas\')" class="text-[0.75rem] text-ink underline hover:text-brass-deep shrink-0">Cambiar</button>' +
                 '</div>';
 
-            const detalleNoches = [
-                finde ? plural(finde, 'noche', 'noches') + ' de fin de semana' : '',
-                semana ? plural(semana, 'noche', 'noches') + ' entre semana' : ''
-            ].filter(Boolean).join(' + ');
+            /* "2 noches entre semana + 1 de Navidad": noches de cada precio */
+            const detalleNoches = tramos => {
+                const grupos = [];
+                tramos.forEach(t => {
+                    const nombre = esTramoNormal(t) ? (t.desc === NOMBRE_CLASE.semana ? 'entre semana' : 'de fin de semana') : 'de ' + t.desc;
+                    const g = grupos.find(x => x.nombre === nombre);
+                    if (g) g.noches += t.noches; else grupos.push({ nombre, noches: t.noches });
+                });
+                return grupos.map((g, i) => (i ? g.noches : plural(g.noches, 'noche', 'noches')) + ' ' + escaparHtml(g.nombre)).join(' + ');
+            };
             const otraLinea = (ic, titulo, det, valor) =>
                 '<li class="py-3.5 flex items-center gap-3">' +
                     '<span class="w-16 flex justify-center shrink-0">' + icono(ic, 'w-4 h-4 text-brass-deep') + '</span>' +
@@ -7432,10 +7493,11 @@
                 habitacionesElegidas().map(k => {
                     const h = habitaciones[k];
                     const n = booking.habitaciones[k];
-                    const porHabitacion = finde * TARIFAS[k].finde + semana * TARIFAS[k].semana;
-                    const detalle = tarifaUnica(k)
-                        ? plural(noches, 'noche', 'noches') + ' · ' + COP(TARIFAS[k].semana) + ' la noche' + (n > 1 ? ', cada una' : '')
-                        : detalleNoches + (n > 1 ? ' · ' + COP(porHabitacion) + ' c/u' : '');
+                    const tramos = tramosHabitacion(k);
+                    const porHabitacion = costoHabitacion(k);
+                    const detalle = precioUnico(tramos) && tramos.every(esTramoNormal)
+                        ? plural(noches, 'noche', 'noches') + ' · ' + COP(tramos[0].precio) + ' la noche' + (n > 1 ? ', cada una' : '')
+                        : detalleNoches(tramos) + (n > 1 ? ' · ' + COP(porHabitacion) + ' c/u' : '');
                     return '<li class="py-4 flex items-start gap-3">' +
                         '<img src="' + miniatura(h.fotos[0]) + '" alt="" class="w-16 h-16 object-cover shrink-0">' +
                         '<div class="flex-1 min-w-0">' +
@@ -8650,27 +8712,48 @@
         const MINIATURAS = {};
         const miniatura = src => MINIATURAS[src] || (src.indexOf('foto-') === 0 ? src.replace(/\.jpg$/, '-sm.jpg') : src);
 
-        /* Precios escritos en el texto de la página: "desde", "hasta" y Pet Friendly */
+        /* Precios escritos en el texto de la página: "desde", "hasta" y Pet Friendly (precio normal) */
         function pintarTarifasTexto() {
             document.querySelectorAll('[data-tarifa="mascota"]').forEach(el => { el.textContent = COP(TARIFA_MASCOTA); });
-            const valoresNoche = Object.values(TARIFAS).flatMap(t => [t.finde, t.semana]);
+            const valoresNoche = Object.values(TARIFAS).flatMap(t => [t.finde, t.semana, t.puente].filter(Boolean))
+                .concat(Object.values(ESPECIALES).flatMap(noches => Object.values(noches).map(e => e.precio)));   // temporada baja puede ser menos
             document.querySelectorAll('[data-tarifa="desde"]').forEach(el => { el.textContent = COP(Math.min(...valoresNoche)); });
             document.querySelectorAll('[data-tarifa="hasta"]').forEach(el => { el.textContent = COP(Math.max(...valoresNoche)); });
         }
 
-        /* Precio por noche y fotos de cada habitación como los deja el hotel en el panel
-           (servidor de reservas › GET /catalogo). Sin respuesta, quedan los de esta página. */
+        /* Precios y fotos de cada habitación como los deja el hotel en el panel (servidor de
+           reservas › GET /catalogo): precio normal (entre semana, fin de semana y puente), noches
+           con precio especial y fotos. Sin respuesta, quedan los de esta página. */
         const urlFotoValida = u => typeof u === 'string' && /^(https:\/\/[^\s"'<>()\\]+|[\w-]+\.(jpe?g|png|webp))$/i.test(u);
+        const precioValido = n => Number.isInteger(n) && n > 0;
+        const fechaValida = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
         function cargarCatalogo() {
             if (!BOLD_ACTIVO) return;
             fetch(urlServidorBold('/catalogo'))
                 .then(r => (r.ok ? r.json() : null))
                 .then(c => {
-                    if (!c || (!c.tarifas && !c.fotos)) return;
-                    if (c.tarifas) Object.keys(TARIFAS).forEach(k => {
-                        const precio = Number(c.tarifas[k]);
-                        if (Number.isInteger(precio) && precio > 0) { TARIFAS[k].finde = precio; TARIFAS[k].semana = precio; }
+                    if (!c || (!c.tarifas && !c.precios && !c.fotos)) return;
+                    if (c.precios) Object.keys(TARIFAS).forEach(k => {
+                        const p = c.precios[k] || {};
+                        if (!precioValido(p.semana)) return;
+                        TARIFAS[k].semana = p.semana;
+                        TARIFAS[k].finde = precioValido(p.finde) ? p.finde : p.semana;
+                        TARIFAS[k].puente = precioValido(p.puente) ? p.puente : null;
                     });
+                    /* Servidor anterior al 28 de octubre: un solo precio por noche */
+                    else if (c.tarifas) Object.keys(TARIFAS).forEach(k => {
+                        const precio = Number(c.tarifas[k]);
+                        if (precioValido(precio)) { TARIFAS[k].finde = precio; TARIFAS[k].semana = precio; }
+                    });
+                    if (Array.isArray(c.especiales)) {
+                        ESPECIALES = {};
+                        c.especiales.forEach(e => {
+                            if (!e || !TARIFAS[e.tipo] || !precioValido(e.precio) || !fechaValida(e.desde) || !fechaValida(e.hasta) || e.hasta < e.desde) return;
+                            const etiqueta = String(e.etiqueta || '').replace(/[<>&"'`\\]/g, '').trim().slice(0, 40);
+                            const noches = ESPECIALES[e.tipo] = ESPECIALES[e.tipo] || {};
+                            for (let n = e.desde, i = 0; n <= e.hasta && i < 800; n = addDays(n, 1), i++) noches[n] = { precio: e.precio, etiqueta };
+                        });
+                    }
                     if (c.fotos) Object.keys(habitaciones).forEach(k => {
                         const lista = (c.fotos[k] || []).filter(f => f && urlFotoValida(f.grande));
                         habitaciones[k].fotos = lista.map(f => f.grande);
@@ -8753,7 +8836,7 @@
                     '<ul class="grid grid-cols-1 xs:grid-cols-2 gap-y-2.5 gap-x-4 mb-7 hairline-t pt-6">' + h.destacados.map(itemIcono).join('') + '</ul>' +
                     '<div class="hairline-t pt-6 mt-auto">' +
                         '<div class="flex items-end justify-between gap-4 mb-1.5">' +
-                            '<span class="micro text-graphite/70">' + (tarifaUnica(key) ? 'Tarifa por noche' : 'Fin de semana y festivos') + '</span>' +
+                            '<span class="micro text-graphite/70">' + (t.finde === t.semana ? 'Tarifa por noche' : 'Fin de semana y festivos') + '</span>' +
                             '<span class="micro text-moss">' + h.etiqueta + '</span>' +
                         '</div>' +
                         '<div class="flex items-baseline gap-2 mb-1">' +
@@ -8761,8 +8844,10 @@
                             '<span class="body-sm text-graphite/70">COP / noche</span>' +
                         '</div>' +
                         '<p class="text-[0.75rem] text-graphite/70 mb-6">' +
-                            (tarifaUnica(key) ? '' : 'Domingo a jueves <strong class="font-medium text-graphite/75">' + COP(t.semana) + '</strong> · ') +
-                            'Impuestos y desayuno incluidos</p>' +
+                            (t.finde === t.semana ? '' : 'Domingo a jueves <strong class="font-medium text-graphite/75">' + COP(t.semana) + '</strong> · ') +
+                            (t.puente && t.puente !== t.finde ? 'Puentes <strong class="font-medium text-graphite/75">' + COP(t.puente) + '</strong> · ' : '') +
+                            'Impuestos y desayuno incluidos' +
+                            (Object.keys(ESPECIALES[key] || {}).length ? '. Temporadas y fechas especiales con otra tarifa' : '') + '</p>' +
                         '<div class="grid grid-cols-2 gap-3">' +
                             '<button type="button" onclick="openRoom(\'' + key + '\')" class="btn btn-outline text-ink">Ver habitación</button>' +
                             '<button type="button" onclick="reservarHabitacion(\'' + key + '\')" class="btn btn-ink">Reservar</button>' +
@@ -8978,8 +9063,11 @@
             document.getElementById('rm-comodidades').innerHTML = h.extras.concat(COMODIDADES_BASE).map(itemIcono).join('');
             document.getElementById('rm-finde').textContent = COP(t.finde);
             document.getElementById('rm-semana').textContent = COP(t.semana);
-            document.getElementById('rm-finde-label').textContent = tarifaUnica(key) ? 'Tarifa por noche' : 'Fin de semana y festivos';
-            document.getElementById('rm-semana-caja').classList.toggle('hidden', tarifaUnica(key));
+            document.getElementById('rm-finde-label').textContent = t.finde === t.semana ? 'Tarifa por noche' : 'Fin de semana y festivos';
+            document.getElementById('rm-semana-caja').classList.toggle('hidden', t.finde === t.semana);
+            document.getElementById('rm-fechas-nota').textContent =
+                (t.puente && t.puente !== t.finde ? ' · Puentes: ' + COP(t.puente) : '') +
+                (Object.keys(ESPECIALES[key] || {}).length ? ' · Temporadas y fechas especiales con otra tarifa: la ves al elegir tus fechas' : '');
 
             pintarFotoHabitacion();
             document.getElementById('room-modal').classList.remove('is-hidden');
@@ -9793,10 +9881,14 @@
 
         /* Texto de tarifas para el asistente (sale de TARIFAS). Las respuestas con precio
            son "get respuesta()": se arman al preguntar, con el precio vigente del panel */
-        const tarifaTxt = key => tarifaUnica(key)
-            ? '<strong>' + COP(TARIFAS[key].semana) + '</strong> la noche'
-            : '<strong>' + COP(TARIFAS[key].semana) + '</strong> de domingo a jueves y <strong>' + COP(TARIFAS[key].finde) + '</strong> fin de semana y festivos';
-        const DOS_TARIFAS = Object.keys(TARIFAS).some(k => !tarifaUnica(k));
+        const tarifaTxt = key => {
+            const t = TARIFAS[key];
+            const puente = t.puente && t.puente !== t.finde ? ' y <strong>' + COP(t.puente) + '</strong> en puentes' : '';
+            return t.finde === t.semana
+                ? '<strong>' + COP(t.semana) + '</strong> la noche' + (puente ? ' (' + puente.slice(3) + ')' : '')
+                : '<strong>' + COP(t.semana) + '</strong> de domingo a jueves' + (puente ? ', ' : ' y ') + '<strong>' + COP(t.finde) + '</strong> fin de semana y festivos' + puente;
+        };
+        const dosTarifas = () => Object.keys(TARIFAS).some(k => TARIFAS[k].finde !== TARIFAS[k].semana);
 
         const intenciones = [
             /* ---------- Conversación ---------- */
@@ -9843,7 +9935,8 @@
                 get respuesta() {
                     return 'Tarifas <strong>por noche</strong>, con impuestos y desayuno incluidos:<ul>' +
                            Object.keys(habitaciones).map(k => '<li>' + habitaciones[k].nombre + ' — ' + tarifaTxt(k) + '</li>').join('') +
-                           '</ul>' + (DOS_TARIFAS ? 'Las noches de viernes, sábado y víspera de festivo tienen tarifa de fin de semana. ' : '') +
+                           '</ul>' + (dosTarifas() ? 'Las noches de viernes, sábado y víspera de festivo tienen tarifa de fin de semana. ' : '') +
+                           (Object.keys(ESPECIALES).some(k => Object.keys(ESPECIALES[k]).length) ? 'En temporadas y fechas especiales (como Navidad o fin de año) el valor puede cambiar. ' : '') +
                            'En el formulario de reserva te calculamos el valor de tu estadía al instante.';
                 },
                 acciones: [{ t: 'Ver habitaciones', h: '#habitaciones' }, { t: 'Calcular mi estadía', h: '#reservar' }],
@@ -9871,10 +9964,16 @@
             {
                 id: 'temporada',
                 clave: ['temporada alta', 'temporada', 'festivo', 'festivos', 'puente', 'puentes', 'semana santa', 'fin de ano', 'navidad', 'vacaciones', 'diciembre', 'fin de semana', 'entre semana'],
-                respuesta: (DOS_TARIFAS
-                    ? 'Manejamos dos tarifas: <strong>fin de semana</strong> (noches de viernes, sábado y víspera de festivo) y <strong>entre semana</strong> (domingo a jueves). '
-                    : 'Cada habitación tiene <strong>una sola tarifa por noche</strong>, igual entre semana, fines de semana y festivos. ') +
-                    'En temporadas especiales como Semana Santa o fin de año te confirmamos el valor según tus fechas. En puentes conviene reservar con tiempo: en 2027 hay 19 festivos y 11 lunes de puente.',
+                get respuesta() {
+                    const puentes = Object.keys(TARIFAS).some(k => TARIFAS[k].puente && TARIFAS[k].puente !== TARIFAS[k].finde);
+                    return (dosTarifas()
+                        ? 'La tarifa depende de la noche: <strong>entre semana</strong> (domingo a jueves) y <strong>fin de semana</strong> (viernes, sábado y víspera de festivo)' +
+                          (puentes ? ', y los <strong>puentes festivos</strong> tienen su propia tarifa. ' : '. ')
+                        : puentes ? 'Los <strong>puentes festivos</strong> tienen su propia tarifa; las demás noches cuestan lo mismo entre semana y fin de semana. '
+                        : 'Hoy cada habitación tiene <strong>la misma tarifa</strong> entre semana y fines de semana. ') +
+                        'En temporadas como Semana Santa, Navidad o fin de año el valor puede cambiar: al elegir tus fechas en el formulario de reserva ves el valor exacto, noche por noche. ' +
+                        'En puentes conviene reservar con tiempo: en 2027 hay 19 festivos y 11 lunes de puente.';
+                },
                 acciones: [{ t: 'Calendario de festivos 2027', url: 'blog-festivos-y-puentes-2027-colombia.html' }, { t: 'Consultar fechas', wa: true }]
             },
             {
