@@ -205,3 +205,50 @@
     window.addEventListener('pagehide', cerrarTramo);
     setInterval(enviar, 8000);
 })();
+
+/* =========================================================
+   Precios del blog y de la guía del hotel: los mismos de la página principal.
+   Al abrir la página se leen del panel (servidor de reservas › GET /catalogo), con la
+   misma regla de index.html (pintarTarifasTexto):
+     data-tarifa="desde" / "hasta"  el menor y el mayor precio por noche de todo el hotel,
+                                    contando las noches con precio especial
+     data-tarifa-hab="<tipo>"       el menor precio por noche de esa habitación
+   El precio de mascota (data-tarifa="mascota") no está en el catálogo: lo deja escrito
+   herramientas/publicar.mjs desde TARIFA_MASCOTA de index.html.
+   Sin respuesta del servidor quedan los precios escritos al publicar.
+   ========================================================= */
+(() => {
+    /* La misma dirección de SERVIDOR (arriba) y de BOLD.servidor en index.html */
+    const SERVIDOR_PRECIOS = 'https://pagos-cabaleon.hcabaleon.workers.dev';
+    if (location.protocol === 'file:' || !document.querySelector('[data-tarifa="desde"], [data-tarifa="hasta"], [data-tarifa-hab]')) return;
+    const valido = n => Number.isInteger(n) && n > 0;
+    const fecha = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+    const COP = n => '$' + n.toLocaleString('es-CO');
+    fetch(SERVIDOR_PRECIOS + '/catalogo')
+        .then(r => (r.ok ? r.json() : null))
+        .then(c => {
+            if (!c) return;
+            const valores = {};
+            if (c.precios) Object.keys(c.precios).forEach(k => {
+                const p = c.precios[k] || {};
+                if (!valido(p.semana)) return;
+                valores[k] = [p.semana, valido(p.finde) ? p.finde : p.semana].concat(valido(p.puente) ? [p.puente] : []);
+            });
+            else if (c.tarifas) Object.keys(c.tarifas).forEach(k => {
+                const precio = Number(c.tarifas[k]);
+                if (valido(precio)) valores[k] = [precio];
+            });
+            if (!Object.keys(valores).length) return;
+            if (Array.isArray(c.especiales)) c.especiales.forEach(e => {
+                if (e && valores[e.tipo] && valido(e.precio) && fecha(e.desde) && fecha(e.hasta) && e.hasta >= e.desde) valores[e.tipo].push(e.precio);
+            });
+            const todos = Object.values(valores).flat();
+            document.querySelectorAll('[data-tarifa="desde"]').forEach(el => { el.textContent = COP(Math.min(...todos)); });
+            document.querySelectorAll('[data-tarifa="hasta"]').forEach(el => { el.textContent = COP(Math.max(...todos)); });
+            document.querySelectorAll('[data-tarifa-hab]').forEach(el => {
+                const v = valores[el.dataset.tarifaHab];
+                if (v) el.textContent = COP(Math.min(...v));
+            });
+        })
+        .catch(() => { /* sin conexión: quedan los precios escritos al publicar */ });
+})();
