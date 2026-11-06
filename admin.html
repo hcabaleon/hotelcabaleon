@@ -580,7 +580,9 @@
                 <a class="nav-item" data-view="estadisticas"><i data-lucide="chart-no-axes-combined" class="w-4 h-4"></i> Estadísticas</a>
                 <span class="block px-5 pb-2 pt-5 micro text-white/30">Hotel</span>
                 <a class="nav-item" data-view="precios"><i data-lucide="tag" class="w-4 h-4"></i> Precios</a>
+                <a class="nav-item" data-view="carta"><i data-lucide="utensils-crossed" class="w-4 h-4"></i> Restaurante y bar</a>
                 <a class="nav-item" data-view="bloqueos"><i data-lucide="calendar-x" class="w-4 h-4"></i> Bloquear fechas</a>
+                <a class="nav-item" data-view="booking"><i data-lucide="calendar-sync" class="w-4 h-4"></i> Booking</a>
                 <a class="nav-item" data-view="fotos"><i data-lucide="images" class="w-4 h-4"></i> Fotos</a>
                 <a class="nav-item" data-view="mensajes" data-modo="ejemplo"><i data-lucide="message-square" class="w-4 h-4"></i> Mensajes <span class="ml-auto pill pill-amber">3</span></a>
                 <a class="nav-item" data-view="ajustes"><i data-lucide="settings" class="w-4 h-4"></i> Ajustes</a>
@@ -1340,13 +1342,51 @@
                     </div>
                 </section>
 
+                <!-- ---------- RESTAURANTE Y BAR (precios de la carta) ---------- -->
+                <section class="view" data-view="carta">
+                    <p id="ca-aviso" class="hidden mb-5 p-4 bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] text-[0.8rem] text-[#8a6a34]" role="status"></p>
+                    <div class="card p-4 sm:p-5 mb-5 flex gap-3 text-[0.8rem] text-graphite/70 leading-relaxed">
+                        <i data-lucide="info" class="w-4 h-4 text-brass shrink-0 mt-0.5"></i>
+                        <div class="space-y-2">
+                            <p>Cambia el número y toca <strong class="font-medium text-ink">Guardar precios</strong>. La página y el cobro de los pedidos usan el precio nuevo de una vez. Los pedidos y reservas que ya existen conservan el suyo.</p>
+                            <p>Los afiches y la imagen de la carta de Cabalante traen el precio impreso. Si cambias un plato, la página muestra la foto del plato en vez de su afiche. Si cambias una bebida, deja de mostrar la imagen de la carta. Así nunca se ven dos precios distintos.</p>
+                        </div>
+                    </div>
+                    <form id="ca-form" novalidate>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+                            <div class="card min-w-0">
+                                <div class="p-5 sm:p-6 border-b border-line">
+                                    <h3 class="font-display text-2xl text-ink">Restaurante Mangolé</h3>
+                                    <p class="text-[0.75rem] text-graphite/55 mt-1">Carta de favoritos. Precio por plato, en pesos.</p>
+                                </div>
+                                <ul id="ca-platos" class="divide-y divide-line"></ul>
+                            </div>
+                            <div class="card min-w-0">
+                                <div class="p-5 sm:p-6 border-b border-line">
+                                    <h3 class="font-display text-2xl text-ink">Cabalante Bar</h3>
+                                    <p class="text-[0.75rem] text-graphite/55 mt-1">Carta de bebidas. Licores por botella, en pesos.</p>
+                                </div>
+                                <div id="ca-bebidas"></div>
+                            </div>
+                        </div>
+                        <p id="ca-error" class="hidden mt-5 text-[0.8rem] text-[#8a3d3d]" role="alert"></p>
+                        <div class="sticky bottom-0 mt-6 border border-line bg-white px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+                            <span id="ca-estado" class="text-[0.78rem] text-graphite/60" role="status"></span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" id="ca-deshacer" class="btn btn-outline btn-sm">Deshacer</button>
+                                <button type="submit" id="ca-guardar" class="btn btn-ink btn-sm"><i data-lucide="check" class="w-3.5 h-3.5"></i> Guardar precios</button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
                 <!-- ---------- BLOQUEAR FECHAS ---------- -->
                 <section class="view" data-view="bloqueos">
                     <p data-aviso-hotel class="hidden mb-5 p-4 bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] text-[0.8rem] text-[#8a6a34]" role="status"></p>
                     <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
                         <form id="form-bloqueo" class="card p-5 sm:p-7 xl:col-span-3" novalidate>
                             <h3 class="font-display text-2xl text-ink mb-1">Cerrar fechas en la página</h3>
-                            <p class="text-[0.78rem] text-graphite/55 mb-6">Úsalo cuando vendas por Booking, por teléfono o cuando una habitación no se pueda usar. La página deja de ofrecerla esas noches.</p>
+                            <p class="text-[0.78rem] text-graphite/55 mb-6">Úsalo cuando vendas por teléfono, por Booking en una habitación que no está conectada (menú Booking) o cuando una habitación no se pueda usar. La página deja de ofrecerla esas noches y, si está conectada, Booking también.</p>
 
                             <span class="field-label">1 · ¿Qué habitaciones?</span>
                             <div class="space-y-2" id="bq-habs"></div>
@@ -1378,6 +1418,45 @@
                                 <p class="text-[0.7rem] text-graphite/45 mt-0.5">De hoy en adelante. Al quitar un bloqueo, esas noches vuelven a ofrecerse en la página.</p>
                             </div>
                             <ul id="bloqueos-body" class="divide-y divide-line"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ---------- BOOKING (calendarios iCal) ---------- -->
+                <section class="view" data-view="booking">
+                    <p id="bk-aviso" class="hidden mb-5 p-4 bg-[rgba(201,160,99,.12)] border border-[rgba(201,160,99,.4)] text-[0.8rem] text-[#8a6a34]" role="status"></p>
+                    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6 items-start">
+                        <div class="xl:col-span-3 space-y-6">
+                            <div class="card p-5 sm:p-7">
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                                    <div class="min-w-0">
+                                        <h3 class="font-display text-2xl text-ink mb-1">Calendarios con Booking</h3>
+                                        <p class="text-[0.78rem] text-graphite/55 max-w-xl">Lo que se vende en Booking se cierra solo en la página, y lo que se vende en la página (o bloqueas en el panel) se cierra solo en Booking. Cada habitación de Booking se conecta con dos enlaces.</p>
+                                    </div>
+                                    <button type="button" id="bk-sincronizar" class="btn btn-ink btn-sm shrink-0" onclick="sincronizarBookingAhora()"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Sincronizar ahora</button>
+                                </div>
+                                <p id="bk-estado" class="mt-4 text-[0.74rem] text-graphite/55"></p>
+                            </div>
+                            <div id="bk-tipos" class="space-y-6"></div>
+                        </div>
+
+                        <div class="card p-5 sm:p-7 xl:col-span-2">
+                            <h3 class="font-display text-xl text-ink mb-1">Cómo conectar una habitación</h3>
+                            <p class="text-[0.72rem] text-graphite/45 mb-5">Una vez por habitación y desde un computador: en el celular Booking no muestra esta opción. Conviene probar primero con la Cabaña.</p>
+                            <ol class="space-y-4 text-[0.8rem] text-graphite/75 leading-relaxed list-decimal pl-5">
+                                <li><strong class="font-medium text-ink">En Booking, cada habitación va sola.</strong> Booking solo deja sincronizar si hay máximo 20 tipos de habitación, cada uno con 1 unidad y una sola tarifa activa, y sin channel manager. Si hoy tienes "Triple" con 10 unidades, en el extranet (o con soporte de Booking) deben quedar "Triple 1", "Triple 2"… La Cabaña ya cumple.</li>
+                                <li><strong class="font-medium text-ink">Aquí:</strong> toca "Agregar habitación de Booking" en su tipo.</li>
+                                <li><strong class="font-medium text-ink">En el extranet de Booking:</strong> Tarifas y disponibilidad → Sincronizar calendarios → esa habitación.
+                                    <span class="block mt-1">· <em>Importar calendario:</em> pega el enlace 1 (de la página) y ponle de nombre "Página Cabaleón".</span>
+                                    <span class="block">· <em>Exportar calendario:</em> si pregunta qué exportar, elige solo las fechas reservadas, y copia el enlace que te da Booking.</span></li>
+                                <li><strong class="font-medium text-ink">Aquí:</strong> pega ese enlace en el campo 2 y toca Guardar. El panel lo lee enseguida.</li>
+                            </ol>
+                            <div class="mt-6 p-4 bg-bone border border-line text-[0.74rem] text-graphite/65 leading-relaxed space-y-2">
+                                <p>Después queda funcionando sola, día y noche, sin dejar nada abierto. La página lee Booking cada 15 minutos. Booking lee la página cada cierto tiempo, no al instante (pueden ser horas): en ese rato una misma habitación se podría vender en los dos lados, sobre todo para el mismo día.</p>
+                                <p>Para cerrar una habitación (mantenimiento, por ejemplo), bloquéala aquí en Bloquear fechas: se cierra en la página y en Booking. Lo que cierres solo en el extranet no llega a la página.</p>
+                                <p>Booking solo envía fechas, sin el nombre del huésped: sus reservas se ven en Disponibilidad como "Booking · Triple 1".</p>
+                                <p>Las reservas de la página llenan primero las habitaciones que no están en Booking. En las conectadas ya no hace falta bloquear a mano lo vendido por Booking: se contaría dos veces.</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1418,7 +1497,7 @@
                             <p class="text-[0.78rem] text-graphite/50 mb-6">Así aparecen en la página pública y en las confirmaciones. Se cambian en index.html.</p>
                             <div class="space-y-4">
                                 <div><label class="field-label">Nombre</label><input class="field-input" value="Hotel Cabaleón" readonly></div>
-                                <div><label class="field-label">Correo</label><input class="field-input" value="informacion@hotelcabaleon.com" readonly></div>
+                                <div><label class="field-label">Correo</label><input class="field-input" value="hcabaleon@gmail.com" readonly></div>
                                 <div><label class="field-label">Teléfono y WhatsApp</label><input class="field-input" value="311 888 4430" readonly></div>
                                 <div><label class="field-label">Dirección</label><input class="field-input" value="Ramal de Escalante, Vereda Escalante, Tena, Cundinamarca" readonly></div>
                                 <div class="grid grid-cols-2 gap-3">
@@ -1549,7 +1628,12 @@
             return new Date(ts).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }).replace('.', '');
         }
 
-        /* Tarifas, unidades y festivos publicados en index.html (misma fuente que la página y el cobro) */
+        /* Mismo identificador de bebida que idBebida() en index.html y en el servidor */
+        const idBebida = (nombre, medida) => 'b-' + (nombre + '-' + medida).toLowerCase()
+            .normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        let cartaSitio = { platos: [], bebidas: [] };   // platos y bebidas publicados en index.html
+
+        /* Tarifas, unidades, festivos y carta publicados en index.html (misma fuente que la página y el cobro) */
         async function leerTarifasDelSitio() {
             try {
                 const html = await (await fetch('index.html', { cache: 'no-store' })).text();
@@ -1566,6 +1650,14 @@
                 if (Object.keys(t).length) TARIFAS = t;
                 if (Object.keys(u).length) UNIDADES = u;
                 FESTIVOS = new Set(bloque('const FESTIVOS = new Set([', ']);').match(/\d{4}-\d{2}-\d{2}/g) || []);
+                /* Platos y bebidas (mismas reglas del servidor de reservas) */
+                cartaSitio = {
+                    platos: [...bloque('const CARTA_FAVORITOS = [', '];').matchAll(/nombre\s*:\s*'([^']*)'\s*,\s*precio\s*:\s*(\d+)[^}]*?foto\s*:\s*'([^']+)'/g)]
+                        .map(m => ({ id: m[3], nombre: m[1], precio: +m[2] })),
+                    bebidas: [...bloque('const CARTA_BEBIDAS = [', '];').matchAll(/categoria\s*:\s*'([^']+)'[^\[]*items\s*:\s*\[([\s\S]*?)\]\s*\}/g)]
+                        .map(c => ({ categoria: c[1], items: [...c[2].matchAll(/\[\s*'([^']*)'\s*,\s*'([^']*)'\s*,\s*(\d+)\s*\]/g)]
+                            .map(m => ({ id: idBebida(m[1], m[2]), nombre: m[1], medida: m[2], precio: +m[3] })) }))
+                };
             } catch (e) { /* sin acceso a index.html: quedan los valores de respaldo */ }
         }
 
@@ -1579,6 +1671,9 @@
         let tarifasPanel = {};          // tipo → fila de la tabla tarifas (precios y cuándo se cambiaron)
         let faltaBaseHotel = false;     // la base aún no tiene las tablas tarifas, bloqueos y fotos
         let faltaBasePrecios = false;   // …o aún no tiene la tabla precios_noche y las columnas de fin de semana y puente
+        /* Habitaciones conectadas con Booking (menú Booking) */
+        let calendariosBooking = [];
+        let faltaBaseBooking = false;   // la base aún no tiene la tabla calendarios_booking
 
         function reservasDeEjemplo() {
             const hoy = hoyISO();
@@ -1695,7 +1790,8 @@
             if (!CONECTADO) return;
             const [filas] = await Promise.all([
                 api('GET', 'reservas?select=*&salida=gte.' + sumarDias(hoyISO(), -400) + '&order=llegada.asc&limit=2000'),
-                cargarBloqueos()
+                cargarBloqueos(),
+                cargarCalendariosBooking()
             ]);
             reservas = filas || [];
         }
@@ -1974,7 +2070,7 @@
             }
             borrarSesion();
             clearInterval(temporizador);
-            if (CONECTADO) { reservas = []; bloqueos = []; fotos = []; }
+            if (CONECTADO) { reservas = []; bloqueos = []; fotos = []; calendariosBooking = []; }
             cerrarModal();
             mostrarLogin();
         }
@@ -2105,7 +2201,9 @@
             disponibilidad: 'Disponibilidad',
             estadisticas: 'Estadísticas',
             precios: 'Precios',
+            carta: 'Restaurante y bar',
             bloqueos: 'Bloquear fechas',
+            booking: 'Conexión con Booking',
             fotos: 'Fotos de las habitaciones',
             mensajes: 'Mensajes',
             ajustes: 'Ajustes'
@@ -2121,6 +2219,8 @@
             window.scrollTo(0, 0);
             if (view === 'estadisticas') cargarEstadisticas();
             if (view === 'precios' || view === 'bloqueos' || view === 'fotos') abrirVistaHotel(view);
+            if (view === 'booking') abrirVistaBooking();
+            if (view === 'carta') abrirVistaCarta();
         }
 
         document.querySelectorAll('.nav-item[data-view]').forEach(n => {
@@ -2624,7 +2724,8 @@
                     <ul class="divide-y divide-line border-y border-line">${bloqueadas.map(b => `
                         <li class="py-2.5 flex justify-between gap-3 text-[0.8rem]">
                             <span class="text-ink">${esc(textoBloqueo(b))}${b.motivo ? `<span class="block text-[0.7rem] text-graphite/50">${esc(b.motivo)}</span>` : ''}</span>
-                            <button type="button" class="text-[0.72rem] text-brass-deep border-b border-brass/50 hover:text-ink self-start" onclick="quitarBloqueo('${esc(b.id)}')">Quitar</button>
+                            ${b.calendario ? '<span class="pill pill-gray self-start">Reserva de Booking</span>'
+                                : `<button type="button" class="text-[0.72rem] text-brass-deep border-b border-brass/50 hover:text-ink self-start" onclick="quitarBloqueo('${esc(b.id)}')">Quitar</button>`}
                         </li>`).join('')}</ul>` : ''}`;
         }
 
@@ -2656,7 +2757,10 @@
 
         function bloqueosDeEjemplo() {
             const hoy = hoyISO();
-            return [{ id: 'ejemplo-b1', creado: new Date().toISOString(), tipo: 'cuadruple', unidades: 2, desde: sumarDias(hoy, 8), hasta: sumarDias(hoy, 9), motivo: 'Reservada por Booking' }];
+            return [
+                { id: 'ejemplo-b1', creado: new Date().toISOString(), tipo: 'cuadruple', unidades: 2, desde: sumarDias(hoy, 8), hasta: sumarDias(hoy, 9), motivo: 'Reservada por Booking' },
+                { id: 'ejemplo-b2', creado: new Date().toISOString(), tipo: 'cabana', unidades: 1, desde: sumarDias(hoy, 15), hasta: sumarDias(hoy, 16), motivo: 'Booking · Cabaña', calendario: 'ejemplo-cal-1' }
+            ];
         }
 
         function fotosDeEjemplo() {
@@ -2774,6 +2878,8 @@
                 servidorHotel = versionServidor >= VERSION_SERVIDOR_HOTEL;
             } catch (e) { servidorHotel = undefined; /* no se pudo revisar: no se avisa */ }
             pintarAvisosHotel();
+            pintarAvisoBooking();
+            pintarAvisoCarta();
         }
 
         /* --- Precios ---
@@ -3534,10 +3640,16 @@
                   d.tipos.map(t => '<span class="block text-ink">' + esc(textoBloqueo(t)) + '</span>').join('') +
                   '<span class="block mt-1.5">' + esc(textoNoches(d.desde, d.hasta)) + '</span>';
             const choques = falta ? [] : choquesBloqueo(d);
+            /* Lo vendido por Booking en una habitación conectada ya llega solo: bloquearlo también lo cuenta dos veces */
+            const conectadas = /booking/i.test(d.motivo) ? d.tipos.filter(t => calendariosDe(t.tipo).length).map(t => CORTOS[t.tipo] || t.tipo) : [];
             const aviso = document.getElementById('bq-aviso');
-            aviso.textContent = choques.length ? 'Ojo: esas noches ya tienen reservas o bloqueos en ' + choques.join(', ') +
-                '. Con este bloqueo quedarían más habitaciones ocupadas de las que hay. Revisa esas reservas en Reservas o en Disponibilidad.' : '';
-            aviso.classList.toggle('hidden', !choques.length);
+            aviso.textContent = [
+                choques.length ? 'Ojo: esas noches ya tienen reservas o bloqueos en ' + choques.join(', ') +
+                    '. Con este bloqueo quedarían más habitaciones ocupadas de las que hay. Revisa esas reservas en Reservas o en Disponibilidad.' : '',
+                conectadas.length ? 'Ojo: ' + conectadas.join(', ') + (conectadas.length > 1 ? ' ya tienen' : ' ya tiene') +
+                    ' conexión con Booking, y lo vendido por Booking ahí se cierra solo. Si también lo bloqueas aquí, se cuenta dos veces.' : ''
+            ].filter(Boolean).join(' ');
+            aviso.classList.toggle('hidden', !choques.length && !conectadas.length);
             document.getElementById('bq-error').classList.add('hidden');
         }
 
@@ -3580,9 +3692,16 @@
         function renderBloqueos() {
             const hoy = hoyISO();
             const orden = Object.keys(UNIDADES);
-            const activos = bloqueos.filter(b => b.hasta >= hoy)
+            /* Los que vienen de Booking no se quitan aquí: se van solos cuando Booking libera esas noches */
+            const deBooking = bloqueos.filter(b => b.hasta >= hoy && b.calendario).length;
+            const activos = bloqueos.filter(b => b.hasta >= hoy && !b.calendario)
                 .sort((a, b) => a.desde.localeCompare(b.desde) || a.hasta.localeCompare(b.hasta) || orden.indexOf(a.tipo) - orden.indexOf(b.tipo));
-            document.getElementById('bloqueos-body').innerHTML = activos.length ? activos.map(b => `
+            const notaBooking = deBooking ? `<li class="p-4 sm:p-5 text-[0.76rem] text-graphite/60 flex items-start gap-3">
+                    <i data-lucide="calendar-sync" class="w-4 h-4 text-brass-deep shrink-0 mt-0.5"></i>
+                    <span>Además, ${plural(deBooking, 'reserva de Booking cierra', 'reservas de Booking cierran')} noches en la página. Se ven en Disponibilidad y se quitan solas cuando Booking las libera.
+                        <button type="button" class="text-brass-deep border-b border-brass/50 hover:text-ink" onclick="nav('booking')">Ver Booking</button></span>
+                </li>` : '';
+            document.getElementById('bloqueos-body').innerHTML = (activos.length ? activos.map(b => `
                 <li class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3">
                     <div class="flex items-start gap-3 min-w-0 flex-1">
                         <span class="w-9 h-9 bg-bone flex items-center justify-center shrink-0"><i data-lucide="calendar-x" class="w-4 h-4 text-brass-deep"></i></span>
@@ -3594,12 +3713,13 @@
                     </div>
                     <button type="button" class="btn btn-outline btn-sm shrink-0" onclick="quitarBloqueo('${esc(b.id)}')"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Quitar</button>
                 </li>`).join('')
-                : '<li class="p-5 text-[0.8rem] text-graphite/45">No hay fechas bloqueadas de hoy en adelante.</li>';
+                : '<li class="p-5 text-[0.8rem] text-graphite/45">No hay fechas bloqueadas de hoy en adelante.</li>') + notaBooking;
         }
 
         async function quitarBloqueo(id) {
             const b = bloqueos.find(x => String(x.id) === String(id));
             if (!b) return;
+            if (b.calendario) return toast('Es una reserva de Booking: se quita sola cuando Booking libera esas noches.');
             if (!confirm('¿Seguro que quieres quitar este bloqueo?\n\n' + textoBloqueo(b) + '\n' + textoNoches(b.desde, b.hasta) +
                 '\n\nEsas noches vuelven a ofrecerse en la página.')) return;
             try {
@@ -3634,8 +3754,414 @@
         formBloqueo.addEventListener('submit', guardarBloqueo);
         document.getElementById('bq-motivos').addEventListener('click', e => {
             const chip = e.target.closest('[data-motivo]');
-            if (chip) document.getElementById('bq-motivo').value = chip.dataset.motivo;
+            if (!chip) return;
+            document.getElementById('bq-motivo').value = chip.dataset.motivo;
+            actualizarFormBloqueo();
         });
+
+        /* --- Restaurante y bar: precios de la carta ---
+           Los platos y bebidas salen de index.html (CARTA_FAVORITOS y CARTA_BEBIDAS). Lo que se cambia
+           aquí queda en la tabla precios_carta, que el servidor de reservas aplica a la página
+           (GET /catalogo) y al cobro de los pedidos. */
+        const VERSION_SERVIDOR_CARTA = '2026-11-05';   // servidor-pagos-bold.js que ya usa estos precios
+        let preciosCarta = {};          // id → fila de la tabla precios_carta
+        let faltaBaseCarta = false;     // la base aún no tiene la tabla precios_carta
+        const precioDeCarta = x => (preciosCarta[x.id] ? preciosCarta[x.id].precio : x.precio);
+        const precioRaroCarta = (precio, antes) => precio < 500 || precio >= antes * 3 || precio * 3 <= antes;
+
+        async function cargarPreciosCarta() {
+            try {
+                const filas = await api('GET', 'precios_carta?select=*');
+                preciosCarta = {};
+                (filas || []).forEach(f => { preciosCarta[f.id] = f; });
+                faltaBaseCarta = false;
+            } catch (e) {
+                if (!esFaltaDeTabla(e)) throw e;
+                faltaBaseCarta = true;
+            }
+        }
+
+        async function abrirVistaCarta() {
+            renderCarta();
+            revisarServidorHotel();
+            if (!CONECTADO) return;
+            try {
+                await cargarPreciosCarta();
+            } catch (e) {
+                toast(e.message);
+            }
+            if (vistaActual === 'carta') renderCarta();
+        }
+
+        function filaDeCarta(x) {
+            const fila = preciosCarta[x.id];
+            const nombre = x.nombre + (x.medida ? ' · ' + x.medida : '');
+            return `<li class="px-4 sm:px-6 py-3 flex items-center justify-between gap-4" data-ca="${esc(x.id)}" data-ca-antes="${precioDeCarta(x)}" data-ca-nombre="${esc(nombre)}">
+                <span class="min-w-0">
+                    <span class="block text-[0.85rem] text-ink">${esc(x.nombre)}${x.medida ? ` <span class="text-graphite/45">${esc(x.medida)}</span>` : ''}</span>
+                    ${fila && fila.actualizada ? `<span class="block text-[0.68rem] text-graphite/45">Cambiado ${esc(haceCuanto(fila.actualizada))}</span>` : ''}
+                </span>
+                <input class="pc-input !w-[7.5rem] shrink-0 text-right" data-ca-precio inputmode="numeric" autocomplete="off" maxlength="15" value="${precioDeCarta(x).toLocaleString('es-CO')}" aria-label="${esc('Precio de ' + nombre)}">
+            </li>`;
+        }
+
+        function renderCarta() {
+            /* Lo que se está escribiendo y aún no se guarda no se pierde al volver a pintar */
+            const escritos = {};
+            document.querySelectorAll('#ca-form [data-ca]').forEach(li => {
+                const input = li.querySelector('[data-ca-precio]');
+                if (input.value !== input.defaultValue) escritos[li.dataset.ca] = input.value;
+            });
+            document.getElementById('ca-platos').innerHTML = cartaSitio.platos.map(filaDeCarta).join('');
+            document.getElementById('ca-bebidas').innerHTML = cartaSitio.bebidas.map(c =>
+                `<h4 class="px-4 sm:px-6 pt-5 pb-2 micro text-graphite/45">${esc(c.categoria)}</h4><ul class="divide-y divide-line border-b border-line">${c.items.map(filaDeCarta).join('')}</ul>`).join('');
+            document.querySelectorAll('#ca-form [data-ca]').forEach(li => {
+                if (escritos[li.dataset.ca] !== undefined) li.querySelector('[data-ca-precio]').value = escritos[li.dataset.ca];
+            });
+            pintarAvisoCarta();
+            pintarEstadoCarta();
+        }
+
+        function pintarAvisoCarta() {
+            const el = document.getElementById('ca-aviso');
+            const texto = !CONECTADO ? 'Modo de ejemplo: los cambios se ven en esta pantalla, pero no se guardan.'
+                : faltaBaseCarta ? textoFaltaBase
+                : !cartaSitio.platos.length ? 'No se pudo leer la carta de la página (index.html). Vuelve a cargar el panel.'
+                : versionServidor && versionServidor < VERSION_SERVIDOR_CARTA ? 'Falta publicar el servidor nuevo en Cloudflare (servidor-pagos-bold.js). Hasta entonces los precios se guardan, pero la página y el cobro no los usan.'
+                : '';
+            el.textContent = texto;
+            el.classList.toggle('hidden', !texto);
+        }
+
+        /* Lo que cambió respecto a lo guardado: { filas: [{ id, precio }], raros: [nombres], error } */
+        function cambiosDeCarta() {
+            const filas = [], raros = [];
+            let error = '';
+            document.querySelectorAll('#ca-form [data-ca]').forEach(li => {
+                const input = li.querySelector('[data-ca-precio]');
+                const v = input.value.trim() ? validarPrecio(input.value) : { error: 'Escribe el precio.' };
+                input.classList.toggle('is-error', !!v.error);
+                if (v.error) { error = error || li.dataset.caNombre + ': ' + v.error; return; }
+                const antes = Number(li.dataset.caAntes);
+                if (v.precio === antes) return;
+                filas.push({ id: li.dataset.ca, precio: v.precio });
+                if (precioRaroCarta(v.precio, antes)) raros.push(li.dataset.caNombre);
+            });
+            return { filas, raros, error };
+        }
+
+        function pintarEstadoCarta() {
+            const { filas } = cambiosDeCarta();
+            document.getElementById('ca-estado').textContent = filas.length ? plural(filas.length, 'precio', 'precios') + ' sin guardar' : 'Sin cambios por guardar';
+            document.getElementById('ca-deshacer').disabled = !filas.length;
+        }
+
+        document.getElementById('ca-form').addEventListener('input', () => {
+            document.getElementById('ca-error').classList.add('hidden');
+            pintarEstadoCarta();
+        });
+        /* Al salir del campo queda con sus puntos de mil */
+        document.getElementById('ca-form').addEventListener('focusout', e => {
+            if (e.target.dataset && 'caPrecio' in e.target.dataset) {
+                const v = validarPrecio(e.target.value);
+                if (!v.error) e.target.value = v.precio.toLocaleString('es-CO');
+            }
+        });
+        document.getElementById('ca-deshacer').addEventListener('click', () => {
+            document.querySelectorAll('#ca-form [data-ca-precio]').forEach(input => { input.value = input.defaultValue; input.classList.remove('is-error'); });
+            document.getElementById('ca-error').classList.add('hidden');
+            pintarEstadoCarta();
+        });
+        document.getElementById('ca-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const aviso = document.getElementById('ca-error');
+            aviso.classList.add('hidden');
+            const fallo = texto => { aviso.textContent = texto; aviso.classList.remove('hidden'); };
+            const { filas, raros, error } = cambiosDeCarta();
+            if (error) return fallo(error);
+            if (!filas.length) return toast('No hay precios nuevos para guardar.');
+            if (raros.length && !confirm('Revisa estos valores: ' + raros.join(', ') + '. Quedan muy distintos del precio actual. ¿Guardar de todas formas?')) return;
+            const boton = document.getElementById('ca-guardar');
+            boton.disabled = true;
+            try {
+                if (CONECTADO) {
+                    const guardadas = await api('POST', 'precios_carta?on_conflict=id', filas, { Prefer: 'resolution=merge-duplicates,return=representation' });
+                    if (!guardadas || !guardadas.length) throw new Error('No se pudieron guardar los precios. Vuelve a cargar el panel.');
+                    guardadas.forEach(f => { preciosCarta[f.id] = f; });
+                } else {
+                    filas.forEach(f => { preciosCarta[f.id] = { ...f, actualizada: new Date().toISOString() }; });
+                }
+                document.querySelectorAll('#ca-form [data-ca-precio]').forEach(input => { input.defaultValue = input.value; });
+                renderCarta();
+                toast(!CONECTADO ? 'Modo de ejemplo: los precios no se guardan.'
+                    : versionServidor && versionServidor < VERSION_SERVIDOR_CARTA ? 'Guardado. Falta publicar el servidor nuevo para que la página lo use.'
+                    : 'Guardado. La página ya muestra ' + (filas.length === 1 ? 'el precio nuevo' : 'los ' + filas.length + ' precios nuevos') + '.');
+            } catch (err) {
+                fallo(esFaltaDeTabla(err) ? textoFaltaBase : err.message);
+            } finally {
+                boton.disabled = false;
+            }
+        });
+
+        /* --- Booking (calendarios iCal) ---
+           Cada habitación de Booking (en Booking, 1 unidad por tipo) es una fila de la tabla
+           calendarios_booking con dos enlaces: el de la página (servidor/ical/<token>.ics), que
+           se importa en Booking, y el que exporta Booking (url_booking), que el servidor lee cada
+           15 minutos y deja como bloqueos de 1 habitación (columna calendario). */
+        const VERSION_SERVIDOR_BOOKING = '2026-11-02';   // servidor-pagos-bold.js que ya habla con Booking
+        const calendariosDe = k => calendariosBooking.filter(c => c.tipo === k);
+        const enlaceDeLaPagina = c => CONEXION.servidor.trim().replace(/\/+$/, '') + '/ical/' + c.token + '.ics';
+
+        function calendariosDeEjemplo() {
+            const hace = min => new Date(Date.now() - min * 60000).toISOString();
+            return [
+                { id: 'ejemplo-cal-1', creado: hace(9000), tipo: 'cabana', nombre: 'Cabaña', url_booking: 'https://ical.booking.com/v1/export?t=ejemplo',
+                  token: '0123456789abcdef0123456789abcdef', leido: hace(6), intento: hace(6), error: null, noches: 2, consultado: hace(95) },
+                { id: 'ejemplo-cal-2', creado: hace(8000), tipo: 'suite', nombre: 'Suite 1', url_booking: null,
+                  token: 'fedcba9876543210fedcba9876543210', leido: null, intento: null, error: null, noches: null, consultado: null }
+            ];
+        }
+
+        async function cargarCalendariosBooking() {
+            if (!CONECTADO) return;
+            try {
+                calendariosBooking = await api('GET', 'calendarios_booking?select=*&order=creado.asc,id.asc') || [];
+                faltaBaseBooking = false;
+            } catch (e) {
+                if (esFaltaDeTabla(e)) faltaBaseBooking = true;
+                /* otro error: quedan los de antes */
+            }
+        }
+
+        async function abrirVistaBooking() {
+            renderBooking();
+            revisarServidorHotel();
+            if (!CONECTADO) return;
+            try {
+                await Promise.all([cargarCalendariosBooking(), cargarBloqueos()]);
+            } catch (e) {
+                toast(e.message);
+            }
+            if (vistaActual === 'booking') renderBooking();
+        }
+
+        /* Estado de la lectura de Booking de una habitación */
+        function estadoCalendario(c) {
+            if (!c.url_booking) return { pill: 'pill-amber', txt: 'Falta el enlace de Booking', detalle: 'La página aún no recibe las reservas de Booking de esta habitación.' };
+            if (c.error) return { pill: 'pill-red', txt: 'No se pudo leer Booking', detalle: c.error + (c.leido ? ' Última lectura buena: ' + haceCuanto(c.leido) + '.' : '') };
+            if (!c.leido) return { pill: 'pill-gray', txt: 'Sin leer aún', detalle: 'Toca "Sincronizar ahora".' };
+            return { pill: 'pill-green', txt: 'Conectada', detalle: 'En Booking: ' + plural(c.noches || 0, 'noche ocupada', 'noches ocupadas') + ' de hoy en adelante · leído ' + haceCuanto(c.leido) + '.' };
+        }
+
+        function filaCalendarioBooking(c) {
+            const e = estadoCalendario(c);
+            const id = esc(c.id);
+            const enlace = CONEXION.servidor.trim() ? enlaceDeLaPagina(c) : '';
+            return `<li class="p-5" data-bk="${id}">
+                <div class="flex items-start justify-between gap-3 mb-4">
+                    <div class="min-w-0">
+                        <span class="pill ${e.pill}">${e.txt}</span>
+                        <span class="block text-[0.72rem] text-graphite/55 mt-1.5">${esc(e.detalle)}</span>
+                    </div>
+                    <button type="button" class="text-[0.72rem] text-brass-deep border-b border-brass/50 hover:text-ink shrink-0" onclick="quitarCalendarioBooking('${id}')">Quitar</button>
+                </div>
+                <label class="field-label !tracking-[0.12em]" for="bk-nombre-${id}">Nombre de la habitación en Booking</label>
+                <input id="bk-nombre-${id}" data-bk-nombre class="field-input" maxlength="60" autocomplete="off" value="${esc(c.nombre)}">
+                <span class="field-label !tracking-[0.12em] mt-4">1 · Enlace de la página <span class="normal-case tracking-normal font-normal text-graphite/40">(en Booking: Importar calendario)</span></span>
+                ${enlace ? `<div class="flex gap-2 items-stretch">
+                    <code class="flex-1 min-w-0 px-3 py-2.5 bg-bone border border-line text-[0.72rem] text-ink break-all">${esc(enlace)}</code>
+                    <button type="button" class="btn btn-outline btn-sm shrink-0" data-enlace="${esc(enlace)}" data-nombre="la página para ${esc(c.nombre)}" onclick="copiarTexto(this.dataset.enlace, this.dataset.nombre)"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar</button>
+                </div>
+                <span class="block text-[0.7rem] text-graphite/45 mt-1.5">${c.consultado ? 'Pedido por última vez ' + haceCuanto(c.consultado) + '.' : 'Nadie lo ha pedido aún. Cuando Booking lo importe, aquí verás cuándo lo leyó.'}</span>`
+                    : '<span class="block text-[0.76rem] text-[#8a3d3d]">Falta la dirección del servidor en admin.html (CONEXION.servidor).</span>'}
+                <label class="field-label !tracking-[0.12em] mt-4" for="bk-url-${id}">2 · Enlace de Booking <span class="normal-case tracking-normal font-normal text-graphite/40">(en Booking: Exportar calendario)</span></label>
+                <input id="bk-url-${id}" data-bk-url type="url" inputmode="url" class="field-input" maxlength="600" autocomplete="off" spellcheck="false" placeholder="https://ical.booking.com/v1/export?t=…" value="${esc(c.url_booking || '')}">
+                <p data-bk-error class="hidden text-[0.76rem] text-[#8a3d3d] mt-3" role="alert"></p>
+                <div class="mt-4 flex justify-end">
+                    <button type="button" class="btn btn-ink btn-sm" data-bk-guardar onclick="guardarCalendarioBooking('${id}')"><i data-lucide="check" class="w-3.5 h-3.5"></i> Guardar</button>
+                </div>
+            </li>`;
+        }
+
+        function renderBooking() {
+            const cont = document.getElementById('bk-tipos');
+            /* Lo que se está escribiendo y aún no se guarda no se pierde al volver a pintar */
+            const borradores = {};
+            cont.querySelectorAll('[data-bk]').forEach(li => {
+                borradores[li.dataset.bk] = { nombre: li.querySelector('[data-bk-nombre]').value, url: li.querySelector('[data-bk-url]').value };
+            });
+            cont.innerHTML = Object.keys(UNIDADES).map(k => {
+                const lista = calendariosDe(k);
+                const total = UNIDADES[k];
+                const resumen = (total > 1 ? 'Hay ' + total : 'Unidad única') + ' · ' +
+                    (!lista.length ? (total > 1 ? 'ninguna conectada' : 'sin conectar') : total > 1 ? lista.length + ' de ' + total + ' conectadas con Booking' : 'conectada con Booking');
+                return `<div class="card">
+                    <div class="p-5 border-b border-line flex flex-wrap items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <h3 class="font-display text-xl text-ink">${esc(NOMBRES[k] || k)}</h3>
+                            <p class="text-[0.7rem] text-graphite/45 mt-0.5">${resumen}</p>
+                        </div>
+                        ${lista.length < total ? `<button type="button" class="btn btn-outline btn-sm" onclick="agregarCalendarioBooking('${k}')"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Agregar habitación de Booking</button>` : ''}
+                    </div>
+                    ${lista.length ? `<ul class="divide-y divide-line">${lista.map(filaCalendarioBooking).join('')}</ul>`
+                        : `<p class="p-5 text-[0.78rem] text-graphite/45">${total > 1 ? 'Se venden' : 'Se vende'} solo en la página. Si ${total > 1 ? 'alguna está' : 'está'} en Booking, conéctala para que no se venda dos veces.</p>`}
+                </div>`;
+            }).join('');
+            Object.keys(borradores).forEach(id => {
+                const li = cont.querySelector('[data-bk="' + CSS.escape(id) + '"]');
+                if (!li) return;
+                li.querySelector('[data-bk-nombre]').value = borradores[id].nombre;
+                li.querySelector('[data-bk-url]').value = borradores[id].url;
+            });
+
+            const conEnlace = calendariosBooking.filter(c => c.url_booking);
+            const ultima = Math.max(0, ...conEnlace.map(c => Date.parse(c.leido) || 0));
+            document.getElementById('bk-estado').textContent = !calendariosBooking.length ? 'Ninguna habitación conectada todavía.'
+                : plural(calendariosBooking.length, 'habitación conectada', 'habitaciones conectadas') +
+                  (conEnlace.length < calendariosBooking.length ? ' (' + (calendariosBooking.length - conEnlace.length) + ' sin el enlace de Booking)' : '') +
+                  ' · ' + (ultima ? 'última lectura de Booking ' + haceCuanto(new Date(ultima).toISOString()) : 'Booking aún no se ha leído') + '. La página lee Booking cada 15 minutos.';
+            pintarAvisoBooking();
+            lucide.createIcons();
+        }
+
+        function pintarAvisoBooking() {
+            const el = document.getElementById('bk-aviso');
+            const conEnlace = calendariosBooking.filter(c => c.url_booking);
+            const ultimoIntento = Math.max(0, ...conEnlace.map(c => Date.parse(c.intento) || 0));
+            const conError = conEnlace.filter(c => c.error);
+            /* Booking lee el enlace de la página cada pocas horas: un día sin pedirlo es que dejó de importarlo */
+            const sinPedir = conEnlace.filter(c => Date.now() - Date.parse(c.consultado || c.creado) > 24 * 60 * 60000);
+            const nombres = lista => lista.map(c => c.nombre).join(', ');
+            const texto = !CONECTADO ? 'Modo de ejemplo: los cambios se ven en esta pantalla, pero no se guardan.'
+                : faltaBaseBooking ? textoFaltaBase
+                : !CONEXION.servidor.trim() ? 'Falta la dirección del servidor de reservas en admin.html (CONEXION.servidor): sin ella no hay enlace para Booking.'
+                : versionServidor && versionServidor < VERSION_SERVIDOR_BOOKING ? 'Falta publicar el servidor nuevo en Cloudflare (servidor-pagos-bold.js). Hasta entonces Booking no puede leer el enlace de la página y la página no lee Booking.'
+                : ultimoIntento && Date.now() - ultimoIntento > 60 * 60000 ? 'Booking no se lee solo desde ' + haceCuanto(new Date(ultimoIntento).toISOString()) +
+                    ': revisa en Cloudflare que el Worker tenga la lectura automática (pagos-cabaleon → Settings → Trigger Events → Cron Triggers → "Every 15 minutes"). Mientras tanto, toca "Sincronizar ahora".'
+                : conError.length ? 'No se pudo leer Booking en ' + nombres(conError) + '. Mientras tanto, la página no recibe sus reservas nuevas: revisa el enlace 2 de esa habitación.'
+                : sinPedir.length ? 'Booking lleva más de un día sin pedir el enlace de la página en ' + nombres(sinPedir) + '. Mientras tanto, lo vendido por la página no se cierra en Booking: revisa en el extranet (Sincronizar calendarios) que el enlace 1 siga importado.'
+                : '';
+            el.textContent = texto;
+            el.classList.toggle('hidden', !texto);
+        }
+
+        /* Lo que está mal en el enlace de Booking (vacío: se puede guardar) */
+        function errorEnlaceBooking(url) {
+            if (!url) return '';
+            if (!/^https:\/\/\S+$/i.test(url)) return 'El enlace debe empezar por https:// y no llevar espacios. Cópialo otra vez de Booking.';
+            const servidor = CONEXION.servidor.trim().replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+            if (/\/ical\/[a-f0-9]{32}\.ics/i.test(url) || (servidor && url.includes(servidor))) {
+                return 'Ese es el enlace de la página (el 1): va en Booking, en Importar calendario. Aquí va el que da Booking en Exportar calendario.';
+            }
+            return '';
+        }
+
+        async function agregarCalendarioBooking(k) {
+            const lista = calendariosDe(k);
+            if (lista.length >= UNIDADES[k]) return;
+            const nombres = new Set(lista.map(c => c.nombre));
+            let n = lista.length + 1;
+            while (nombres.has((CORTOS[k] || k) + ' ' + n)) n++;
+            const fila = { tipo: k, nombre: UNIDADES[k] > 1 ? (CORTOS[k] || k) + ' ' + n : (CORTOS[k] || k) };
+            try {
+                if (CONECTADO) {
+                    const [nueva] = await api('POST', 'calendarios_booking', fila, { Prefer: 'return=representation' }) || [];
+                    if (!nueva) throw new Error('No se pudo agregar. Vuelve a cargar el panel.');
+                    calendariosBooking.push(nueva);
+                } else {
+                    const token = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+                    calendariosBooking.push({ ...fila, id: 'ejemplo-cal-' + Date.now(), creado: new Date().toISOString(), token, url_booking: null, leido: null, intento: null, error: null, noches: null, consultado: null });
+                }
+                renderBooking();
+                toast(CONECTADO ? 'Agregada. Cámbiale el nombre si en Booking se llama distinto y sigue los pasos de la derecha.' : 'Modo de ejemplo: no se guarda.');
+            } catch (e) {
+                toast(esFaltaDeTabla(e) ? textoFaltaBase : e.message);
+            }
+        }
+
+        async function guardarCalendarioBooking(id) {
+            const c = calendariosBooking.find(x => String(x.id) === String(id));
+            const li = document.querySelector('#bk-tipos [data-bk="' + CSS.escape(id) + '"]');
+            if (!c || !li) return;
+            const error = li.querySelector('[data-bk-error]');
+            const fallo = texto => { error.textContent = texto; error.classList.remove('hidden'); };
+            error.classList.add('hidden');
+            const nombre = li.querySelector('[data-bk-nombre]').value.trim().replace(/\s+/g, ' ').slice(0, 60);
+            const url = li.querySelector('[data-bk-url]').value.trim();
+            if (!nombre) return fallo('Ponle un nombre, como se llama esa habitación en Booking.');
+            const problema = errorEnlaceBooking(url);
+            if (problema) return fallo(problema);
+            const cambios = { nombre, url_booking: url || null };
+            /* Con otro enlace, lo leído antes ya no vale */
+            if ((url || null) !== (c.url_booking || null)) Object.assign(cambios, { leido: null, intento: null, error: null, noches: null });
+            const boton = li.querySelector('[data-bk-guardar]');
+            boton.disabled = true;
+            try {
+                if (CONECTADO) {
+                    const filas = await api('PATCH', 'calendarios_booking?id=eq.' + encodeURIComponent(id), cambios, { Prefer: 'return=representation' });
+                    if (!filas || !filas.length) throw new Error('No se pudo guardar. Vuelve a cargar el panel.');
+                    Object.assign(c, filas[0]);
+                } else {
+                    Object.assign(c, cambios);
+                }
+            } catch (e) {
+                boton.disabled = false;
+                return fallo(esFaltaDeTabla(e) ? textoFaltaBase : e.message);
+            }
+            boton.disabled = false;
+            renderBooking();
+            if (!CONECTADO) return toast('Modo de ejemplo: no se guarda.');
+            if (url) await sincronizarBookingAhora();
+            else toast('Guardado.');
+        }
+
+        async function quitarCalendarioBooking(id) {
+            const c = calendariosBooking.find(x => String(x.id) === String(id));
+            if (!c) return;
+            if (!confirm('¿Quitar la conexión de ' + c.nombre + ' (' + (NOMBRES[c.tipo] || c.tipo) + ')?\n\nLa página deja de recibir sus reservas de Booking y se borran las noches que trajo de Booking. ' +
+                'Quita también, en el extranet de Booking, el calendario importado de la página.')) return;
+            try {
+                if (CONECTADO) {
+                    const filas = await api('DELETE', 'calendarios_booking?id=eq.' + encodeURIComponent(id), null, { Prefer: 'return=representation' });
+                    if (!filas || !filas.length) throw new Error('No se pudo quitar. Vuelve a cargar el panel.');
+                }
+                calendariosBooking = calendariosBooking.filter(x => String(x.id) !== String(id));
+                bloqueos = bloqueos.filter(b => String(b.calendario || '') !== String(id));
+                renderTodo();
+                renderBooking();
+                toast(CONECTADO ? 'Conexión quitada.' : 'Modo de ejemplo: el cambio no se guarda.');
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        /* Pide al servidor leer ya los calendarios de Booking y trae lo nuevo de la base */
+        async function sincronizarBookingAhora() {
+            if (!CONECTADO) return toast('Modo de ejemplo: aquí no se lee Booking.');
+            const base = CONEXION.servidor.trim().replace(/\/+$/, '');
+            if (!base) return toast('Falta la dirección del servidor de reservas en admin.html (CONEXION.servidor).');
+            const boton = document.getElementById('bk-sincronizar');
+            boton.disabled = true;
+            let j = null, aviso = '';
+            try {
+                const r = await fetch(base + '/booking/sincronizar', { method: 'POST' });
+                j = await r.json().catch(() => null);
+                if (!r.ok) throw new Error((j && j.error) || 'El servidor de reservas respondió con un error (' + r.status + ').');
+                aviso = j.espera ? 'Booking se acaba de leer. Vuelve a tocar "Sincronizar ahora" en unos segundos.'
+                    : !j.calendarios.length ? 'Aún no hay habitaciones con el enlace de Booking.'
+                    : j.leidos === j.calendarios.length ? 'Booking leído: ' + plural(j.leidos, 'habitación al día', 'habitaciones al día') + '.'
+                    : 'Booking leído: ' + j.leidos + ' de ' + j.calendarios.length + ' habitaciones. Revisa las que tienen error.';
+            } catch (e) {
+                aviso = e instanceof TypeError ? 'No se pudo contactar el servidor de reservas. Revisa tu internet.' : e.message;
+            }
+            try {
+                await Promise.all([cargarCalendariosBooking(), cargarBloqueos()]);
+            } catch (e) { /* queda lo de antes */ }
+            boton.disabled = false;
+            renderTodo();
+            renderBooking();
+            toast(aviso);
+        }
 
         /* --- Fotos de cada habitación ---
            Al subirla, la foto se achica en el navegador (grande de LADO_FOTO px y una liviana de
@@ -4009,7 +4535,10 @@
             'que-hacer-en-tena': ['Qué hacer en Tena', 'blog-que-hacer-en-tena-cundinamarca.html'],
             'laguna-pedro-palo': ['Laguna de Pedro Palo', 'blog-laguna-de-pedro-palo-tena.html'],
             'pueblos-clima-calido': ['Pueblos de clima cálido', 'blog-pueblos-de-clima-calido-cerca-de-bogota.html'],
-            'puentes-festivos-2027': ['Festivos y puentes 2027', 'blog-festivos-y-puentes-2027-colombia.html']
+            'puentes-festivos-2027': ['Festivos y puentes 2027', 'blog-festivos-y-puentes-2027-colombia.html'],
+            'cerca-de-la-mesa': ['Hotel cerca de La Mesa', 'blog-hotel-cerca-de-la-mesa-cundinamarca.html'],
+            'cerca-de-mesitas': ['Hotel cerca de Mesitas del Colegio', 'blog-hotel-cerca-de-mesitas-del-colegio.html'],
+            'cerca-de-anapoima': ['Hotel cerca de Anapoima', 'blog-hotel-cerca-de-anapoima.html']
         };
         const nombreArticulo = id => (ARTICULOS[id] ? ARTICULOS[id][0] : legible(id));
         /* Enlaces que tocan dentro de un artículo */
@@ -6119,6 +6648,7 @@
         if (!CONECTADO) {
             reservas = reservasDeEjemplo();
             bloqueos = bloqueosDeEjemplo();
+            calendariosBooking = calendariosDeEjemplo();
             fotos = fotosDeEjemplo();
             leerTarifasDelSitio().then(() => {
                 preciosNoche = preciosNocheDeEjemplo();
